@@ -1,0 +1,27 @@
+User Register 
+User Must choose a pricing / else he cannot see dashboard 
+User must create a business and choose the type of business (prestation de service ? Business physique ? ) 
+User can now see in his dashboard to add a service to monitore or a stock to handle 
+
+
+Create a team 
+add team to business 
+add member to team #
+add type to user (admin , client , team_member)
+Maybe diisplay differrent dashboard to client a team member based on the permission too
+when adding member to a team the memeber must sign in into the app before being abble to manage anything 
+team member can only maange and see  the business they are affected to
+permission will even reinforce things
+team member can only maange and see  the magasin of the business they are affected to
+
+
+Who say stock say magasin
+
+Permission 
+
+crezate a password for the invited team_member and make him be abble to modify the passworrd ,
+display ionterface of the team member based on the permission they have 
+
+
+
+handle team member view in app layout forr the menu 
