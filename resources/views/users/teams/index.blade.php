@@ -40,18 +40,18 @@
                                                         return $business->deleted_at !== null;
                                                     });
                                                 @endphp
-                                                
+
                                                 @if ($allDeleted)
                                                     <span class="badge badge-warning">No business linked</span>
                                                 @else
                                                     <ul>
                                                         @foreach ($team->business as $business)
                                                             <li>
-                                                                
+
                                                                 @if (!$business->deleted_at)
                                                                     <!-- Check if the business is soft-deleted -->
-                                                                   {{--  <span class="badge badge-danger">(Deleted)</span> --}}
-                                                                   {{ $business->name }} 
+                                                                    {{--  <span class="badge badge-danger">(Deleted)</span> --}}
+                                                                    {{ $business->name }}
                                                                 @endif
                                                             </li>
                                                         @endforeach
@@ -61,7 +61,7 @@
                                                 N/A
                                             @endif
                                         </td>
-                                        
+
 
 
                                         <td>
@@ -121,16 +121,20 @@
                             // Update the multi-select for associated businesses
                             let businessSelect = document.getElementById('business_id_edit');
                             // Clear previous selections:
-                            Array.from(businessSelect.options).forEach(option => option
-                                .selected = false);
+                            //Array.from(businessSelect.options).forEach(option => option.selected = false);
 
                             // Loop through associated businesses and mark the corresponding options as selected
-                            if (data.businesses && Array.isArray(data.businesses)) {
+                            if (data.businesses) {
                                 data.businesses.forEach(function(business) {
-                                    let option = businessSelect.querySelector(
-                                        'option[value="' + business.id + '"]');
-                                    if (option) {
-                                        option.selected = true;
+                                    //let option = businessSelect.querySelector('option[value="' + business.id + '"]');
+                                    //if (option) {
+                                    //    option.selected = true;
+                                    //}
+                                    let inputEyesOn = document.getElementById(
+                                        "business_id_edit" + business.id);
+
+                                    if(inputEyesOn){
+                                        inputEyesOn.checked = true;
                                     }
                                 });
                             }

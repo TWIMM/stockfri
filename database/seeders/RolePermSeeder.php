@@ -10,100 +10,97 @@ class RolePermSeeder extends Seeder
 {
     public function run()
     {
-        // Define permissions
+        // Définir les permissions
         $permissions = [
-            // Team Management
-            'manage team', 'create team', 'edit team', 'delete team', 'view team',
+            // Gestion de l'équipe
+            'gérer équipe', 'créer équipe', 'modifier équipe', 'supprimer équipe', 'voir équipe',
 
-            // Magasins (Stores)
-            'manage magasins', 'create magasins', 'edit magasins', 'delete magasins', 'view magasins',
+            // Magasins
+            'gérer magasins', 'créer magasins', 'modifier magasins', 'supprimer magasins', 'voir magasins',
 
-           
-            // Stock Management
-            'manage stock', 'create stock', 'edit stock', 'delete stock', 'view stock',
+            // Gestion du stock
+            'gérer stock', 'créer stock', 'modifier stock', 'supprimer stock', 'voir stock',
 
-            // Service Management
-            'manage services', 'create services', 'edit services', 'delete services', 'view services',
+            // Gestion des services
+            'gérer services', 'créer services', 'modifier services', 'supprimer services', 'voir services',
 
-            // Report Management
-            'manage reports', 'create reports', 'edit reports', 'delete reports', 'view reports',
+            // Gestion des rapports
+            'gérer rapports', 'créer rapports', 'modifier rapports', 'supprimer rapports', 'voir rapports',
 
-            // Invoice Management
-            'manage invoices', 'create invoices', 'edit invoices', 'delete invoices', 'view invoices',
-            'send invoice',
+            // Gestion des factures
+            'gérer factures', 'créer factures', 'modifier factures', 'supprimer factures', 'voir factures',
+            'envoyer facture',
 
-            // App Settings
-            'manage setting_of_app', 'edit setting_of_app', 'view setting_of_app',
+            // Paramètres de l'application
+            'gérer paramètres_application', 'modifier paramètres_application', 'voir paramètres_application',
 
-            // Other Permissions
-            'sell product', 'sell service',
-            'manage permissions', 'accountability',
-            'manage inventory', 'view sales reports', 'rappel',
-            'handle stock', 'handle service', 'handle client', 
+            // Autres permissions
+            'vendre produit', 'vendre service',
+            'gérer permissions', 'comptabilité',
+            'gérer inventaire', 'voir rapports de ventes', 'rappel',
+            'gérer stock', 'gérer service', 'gérer client', 
         ];
 
-        // Seed permissions
+        // Insérer les permissions
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Fetch all permissions
+        // Récupérer toutes les permissions
         $allPermissions = Permission::all()->keyBy('name');
 
-        // Define roles and their respective permissions
+        // Définir les rôles et leurs permissions respectives
         $roles = [
-            
-            'team_handler' => [
-                'manage team', 'create team', 'delete team', 'manage permissions',
+            'gestionnaire_équipe' => [
+                'gérer équipe', 'créer équipe', 'supprimer équipe', 'gérer permissions',
             ],
-            'sales_handler' => [
-                'sell product', 'sell service', 'create invoices', 'send invoice',
+            'gestionnaire_ventes' => [
+                'vendre produit', 'vendre service', 'créer factures', 'envoyer facture',
             ],
             'comptable' => [
-                'accountability', 'view sales reports', 'create invoices', 'send invoice',
+                'comptabilité', 'voir rapports de ventes', 'créer factures', 'envoyer facture',
             ],
             'rappel' => [
                 'rappel',
             ],
-            'stock_handler' => [
-                'manage stock', 'create stock', 'edit stock', 'delete stock', 'view stock',
+            'gestionnaire_stock' => [
+                'gérer stock', 'créer stock', 'modifier stock', 'supprimer stock', 'voir stock',
             ],
-            'service_handler' => [
-                'manage services', 'create services', 'edit services', 'delete services', 'view services',
+            'gestionnaire_services' => [
+                'gérer services', 'créer services', 'modifier services', 'supprimer services', 'voir services',
             ],
-            'client_handler' => [
-                'handle client',
+            'gestionnaire_clients' => [
+                'gérer client',
             ],
-            'inventory_handler' => [
-                'manage inventory',
+            'gestionnaire_inventaire' => [
+                'gérer inventaire',
             ],
-            'report_handler' => [
-                'manage reports', 'create reports', 'edit reports', 'view reports', 'delete reports',
+            'gestionnaire_rapports' => [
+                'gérer rapports', 'créer rapports', 'modifier rapports', 'voir rapports', 'supprimer rapports',
             ],
-            'magasin_handler' => [
-                'manage magasins', 'create magasins', 'edit magasins', 'delete magasins', 'view magasins',
+            'gestionnaire_magasins' => [
+                'gérer magasins', 'créer magasins', 'modifier magasins', 'supprimer magasins', 'voir magasins',
             ],
-           
-            'settings_handler' => [
-                'manage setting_of_app', 'edit setting_of_app', 'view setting_of_app',
+            'gestionnaire_paramètres' => [
+                'gérer paramètres_application', 'modifier paramètres_application', 'voir paramètres_application',
             ]
         ];
 
-        // Create roles and assign permissions
+        // Créer les rôles et leur assigner les permissions
         foreach ($roles as $roleName => $rolePermissions) {
             $role = Role::firstOrCreate(['name' => $roleName]);
 
             if (in_array('all', $rolePermissions)) {
-                // Assign all permissions to admin role
+                // Assigner toutes les permissions au rôle admin
                 $role->permissions()->sync($allPermissions->pluck('id')->toArray());
             } else {
-                // Assign specific permissions to the role
+                // Assigner des permissions spécifiques au rôle
                 $role->permissions()->sync(
                     collect($rolePermissions)->map(fn($perm) => $allPermissions[$perm]->id)->toArray()
                 );
             }
         }
 
-        $this->command->info('Roles and Permissions seeded successfully!');
+        $this->command->info('Rôles et Permissions insérés avec succès !');
     }
 }

@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notiflix@3.0.2/dist/notiflix-3.0.2.min.css" />
+    <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="text/javascript"></script>
 
 </head>
 
@@ -348,7 +349,6 @@
 
 
 
-        <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('assets/js/feather.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('assets/js/jquery.slimscroll.js') }}" type="text/javascript"></script>

@@ -16,17 +16,24 @@
                         <input type="hidden" class="form-control" id="team_id_edit" name="team_id_edit" required>
 
                     </div>
-                   
+
+
                     <div class="mb-3">
-                        <label for="business_id" class="form-label">Business associé</label>
-                        <select class="form-select" name="business_ids[]" id="business_id_edit" multiple>
+                        <label class="form-label">Business associé</label>
+                        <div id="business-options">
                             @forelse($businesses as $business)
-                                <option value="{{ $business->id }}">{{ $business->name }} - {{ $business->type == 'business_physique' ? 'Business Physique' : 'Prestation de service' }}</option>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="business_ids[]" id="business_id_edit{{ $business->id }}" value="{{ $business->id }}">
+                                    <label class="form-check-label" for="business_{{ $business->id }}">
+                                        {{ $business->name }} - {{ $business->type == 'business_physique' ? 'Business Physique' : 'Prestation de service' }}
+                                    </label>
+                                </div>
                             @empty
-                                <option value="">Aucun Business</option>
+                                <p>Aucun Business disponible</p>
                             @endforelse
-                        </select>
+                        </div>
                     </div>
+
                     
                     
                 </div>

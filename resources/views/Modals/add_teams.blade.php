@@ -14,25 +14,28 @@
                         <label for="name" class="form-label">Nom de l'equipe</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                         <input type="hidden" value="{{$user->id}}" class="form-control" id="user_id" name="user_id" required>
-
                     </div>
 
                     <div class="mb-3">
-                        <label for="business_id" class="form-label">Business associé</label>
-                        <select class="form-select" name="business_ids[]" id="business_id" multiple>
+                        <label class="form-label">Business associé</label>
+                        <div id="business-options">
                             @forelse($businesses as $business)
-                                <option value="{{ $business->id }}">{{ $business->name }} - {{ $business->type == 'business_physique' ? 'Business Physique' : 'Prestation de service' }}</option>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="business_ids[]" id="business_{{ $business->id }}" value="{{ $business->id }}">
+                                    <label class="form-check-label" for="business_{{ $business->id }}">
+                                        {{ $business->name }} - {{ $business->type == 'business_physique' ? 'Business Physique' : 'Prestation de service' }}
+                                    </label>
+                                </div>
                             @empty
-                                <option value="">Aucun Business</option>
+                                <p>Aucun Business disponible</p>
                             @endforelse
-                        </select>
+                        </div>
                     </div>
-                    
 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Cree equipe</button>
+                    <button type="submit" class="btn btn-primary">Créer équipe</button>
                 </div>
             </form>
         </div>
