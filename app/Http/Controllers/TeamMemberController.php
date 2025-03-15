@@ -12,6 +12,7 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 
 use Illuminate\Validation\ValidationException;
@@ -301,6 +302,29 @@ class TeamMemberController extends Controller
         return redirect()->route('team_member.listes')->with('success', 'Membre supprimé avec succès.');
     }
 
+    public function RemoveFrom(Request $request)
+    {
+
+
+        $teamMemberId = $request->query('team_member_id');
+        $teamId = $request->query('team_id');
+
+        // Validate that both IDs are provided
+        if (!$teamMemberId || !$teamId) {
+            return redirect()->back()->with('error', 'Invalid request: Missing parameters.');
+        }
+        
+        $pivotData = DB::table('team_member_team')
+            ->where('team_id', $teamId)
+            ->where('team_member_id', $teamMemberId)
+            ->delete();
+
+        //$pivotData->delete();
+        
+      
+        return redirect()->route('team_member.listes')->with('success', 'Membre supprimé avec succès.');
+    }
+
 
     public function assignMember(Request $request)
     {
@@ -351,23 +375,46 @@ class TeamMemberController extends Controller
         if (!$team || !$teamMember) {
             return redirect()->back()->with('error', 'Team or Team Member not found.');
         }
+
+        $pivotData = DB::table('team_member_team')
+            //->where('team_id', $team->id)
+            ->where('team_member_id', $request->team_member_id)
+            ->get();
+        
+      
+
+        if($request->mode_admin){
+            $pivotDataToDelete = DB::table('team_member_team')
+            ->where('team_member_id', $request->team_member_id)
+            ->delete();
+
+        }
     
-        // Check if the team member is already in the team
-        if ($team->members()->where('team_member_id', $teamMember->id)->exists()) {
-            return redirect()->back()->with('error', 'This Team Member is already in the selected team.');
+        
+        foreach ($pivotData as $key) {
+            // Must Not be admin 
+            if($key->mode_admin == 1){
+                return redirect()->back()->with('error', 'Team Member already admin.');
+            }
+            
         }
 
-        // Get the business_id of the current team
-        $businessId = optional($team->pivot)->business_id;
 
-        // Check if the user is already in another team that has the same business_id
-        $existingTeamWithSameBusiness = $team->members()
-            ->wherePivot('business_id', $businessId)
-            ->exists();
-
-        if ($existingTeamWithSameBusiness) {
-            return redirect()->back()->with('error', 'This Team Member is already in another team under the same business.');
+        $pivotData = DB::table('team_member_team')
+            ->where('team_member_id', $request->team_member_id)
+            ->get();
+        
+        foreach ($pivotData as $key) {
+          
+            // Must Not be in another team Linked to the same business (better edit and add up permissions)
+            if( $key->business_id == $request->business_id){
+                return redirect()->back()->with('error', 'Team Member already in a team for the same business.');
+            }
+            
         }
+        
+
+        //dd($pivotData); 
 
         // If mode_admin is selected, set business_id to null and hide business-specific permissions
         $businessId = $request->mode_admin ? null : $request->business_id;
@@ -385,8 +432,10 @@ class TeamMemberController extends Controller
 
         ]);
 
-        return redirect()->back()->with('success', 'Team Member successfully added to the team.');
-    }
+            return $request->mode_admin 
+            ? redirect()->back()->with('success', 'Team Member successfully granted admin.') 
+            : redirect()->back()->with('success', 'Team Member successfully added to the team.');
+        }
 
 
 

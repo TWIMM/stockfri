@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/owner_team_member_list', [TeamMemberController::class, 'showOwnerTeamMemberListPage'])->name('owner.team_member.listes');
     Route::get('/owner_business_list', [BusinessController::class, 'showOwnerBusinessListPage'])->name('owner.business.listes');
     Route::post('/business/store/team_member', [BusinessController::class, 'storeTeamMember'])->name('business.store.team_member');
+    Route::get('/remove.team.link', [TeamMemberController::class, 'RemoveFrom'])->name('team.remove');
 
 
 });
