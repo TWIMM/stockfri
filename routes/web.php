@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/team_member_team/unlink', [TeamMemberController::class, 'unlink'])->name('remove.team.link');
     Route::get('/team_member_team/edit_perm', [TeamMemberController::class, 'edit_perm'])->name('update.permissions');
     Route::get('/team_member/{id}/teams', [TeamMemberController::class, 'getTeams']);
-    Route::get("/team_member/{id}/getperms" , [TeamMemberController::class , "getPermissions"])->name('teammember.store.permissions');
+    Route::get("/team_member/{ids}/getperms" , [TeamMemberController::class , "getPermissions"])->name('teammember.store.permissions');
 
     //coequipier
     Route::get('/handle_coequipier', [CoequipierController::class, 'showCoequipier'])->name('ceoquipier.listes');

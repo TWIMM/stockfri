@@ -174,14 +174,26 @@ class TeamMemberController extends Controller
     }
 
 
-    public function getPermissions($id): JsonResponse
+    public function getPermissions(Request $request): JsonResponse
     {
-        $permissions = Permission::where('id', $id)->pluck('name'); 
+        // Retrieve 'ids' from the route parameter
+        $ids = explode(',', $request->route('ids')); // Split by commas if there are multiple ids
+        //dd($ids);
     
+        if (empty($ids)) {
+            return response()->json(['permissions' => []]); // Always return 'permissions' key
+        }
+    
+        // Fetch all permissions at once
+        $permissions = Permission::whereIn('id', $ids)->get(['id', 'name']);
+        $permissionsAll = Permission::all();
+
         return response()->json([
-            'permissions' => $permissions
+            'permissions' => $permissions, 
+            'permissionsAll'=> $permissionsAll, 
         ]);
     }
+    
     
     
 
