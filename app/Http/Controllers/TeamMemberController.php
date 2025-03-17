@@ -34,9 +34,13 @@ class TeamMemberController extends Controller
 
         $teamM = TeamMember::findOrFail($id);
         $isUserPasswordConfirmed = User::find($teamM->id);
-        return view('auth.create_team_member_password' , compact('teamM'));
+        if(!$isUserPasswordConfirmed || !$isUserPasswordConfirmed->id){
+            return view('auth.create_team_member_password' , compact('teamM'));
 
-        
+        }
+
+        return redirect()->route('login');
+
     }
 
     public function updatePasswordTeamMember(Request $request , $id){
