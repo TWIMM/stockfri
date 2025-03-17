@@ -117,18 +117,16 @@
                             document.getElementById('name_edit').value = data.team.name;
                             //document.getElementById('business_id_edit').value = data.business_id;
                             // Update the multi-select for associated businesses
-                            let businessSelect = document.getElementById('business_id_edit');
-                            // Clear previous selections:
-                            Array.from(businessSelect.options).forEach(option => option
-                                .selected = false);
-
+                            //let businessSelect = document.getElementById('business_id_edit');
+                           
                             // Loop through associated businesses and mark the corresponding options as selected
                             if (data.businesses && Array.isArray(data.businesses)) {
                                 data.businesses.forEach(function(business) {
-                                    let option = businessSelect.querySelector(
-                                        'option[value="' + business.id + '"]');
-                                    if (option) {
-                                        option.selected = true;
+                                    let inputEyesOn = document.getElementById(
+                                        "business_id_edit" + business.id);
+
+                                    if(inputEyesOn){
+                                        inputEyesOn.checked = true;
                                     }
                                 });
                             }
