@@ -394,6 +394,7 @@ class TeamMemberController extends Controller
                     'name' => 'admin',
                     'user_id' => $user_id,
         
+                    
                 ]);
             }
         } else {

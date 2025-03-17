@@ -9,7 +9,7 @@
     @include('Modal_team_members.linkmembertoteam')
 
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-12"> 
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeamMemberModal">
