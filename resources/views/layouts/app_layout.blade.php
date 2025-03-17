@@ -186,7 +186,7 @@
                                 <a href="profile.html">
                                     <img src="assets/img/profiles/avatar-14.jpg" class="img-fluid" alt="Profile">
                                     <div class="user-names">
-                                        <h5>{{$user->name}}</h5>
+                                        <h5>{{ $user->name }}</h5>
                                         <h6>Owner</h6>
                                     </div>
                                 </a>
@@ -205,7 +205,9 @@
                                                 class="menu-arrow"></span>
                                         </a>
                                         <ul>
-                                            <li><a href="{{ route('business.listes') }}"  class="{{ request()->routeIs('business.listes') ? 'active' : '' }}">Gerer mes business</a></li>
+                                            <li><a href="{{ route('business.listes') }}"
+                                                    class="{{ request()->routeIs('business.listes') ? 'active' : '' }}">Gerer
+                                                    mes business</a></li>
                                         </ul>
                                     </li>
 
@@ -223,28 +225,6 @@
                                                     class="{{ request()->routeIs('team_member.listes') ? 'active' : '' }}">Membres
                                                     d'equipes</a></li>
 
-                                        </ul>
-                                    </li>
-
-{{-- 
-                                    <li class="submenu">
-                                        <a href="javascript:void(0);"><i
-                                                class="ti ti-brand-airtable"></i><span>Commandes</span><span
-                                                class="menu-arrow"></span></a>
-                                        <ul>
-                                            <li><a href="video-call.html">Listes des ventes</a></li>
-                                            <li><a href="audio-call.html">Effectuer une vente </a></li>
-                                            <li><a href="call-history.html">Emettre une facture</a></li>
-                                        </ul>
-                                    </li>
-
-                                    <li class="submenu">
-                                        <a href="javascript:void(0);"><i
-                                                class="ti ti-brand-airtable"></i><span>Client(e)s</span><span
-                                                class="menu-arrow"></span></a>
-                                        <ul>
-                                            <li><a href="video-call.html">Listes des client(e)s</a></li>
-                                            <li><a href="audio-call.html">Ajouter un(e) client(e)s </a></li>
                                         </ul>
                                     </li>
 
@@ -285,12 +265,37 @@
                                             </ul>
                                         </li>
                                     @endif
+
+                                    {{-- 
+                                    <li class="submenu">
+                                        <a href="javascript:void(0);"><i
+                                                class="ti ti-brand-airtable"></i><span>Commandes</span><span
+                                                class="menu-arrow"></span></a>
+                                        <ul>
+                                            <li><a href="video-call.html">Listes des ventes</a></li>
+                                            <li><a href="audio-call.html">Effectuer une vente </a></li>
+                                            <li><a href="call-history.html">Emettre une facture</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="submenu">
+                                        <a href="javascript:void(0);"><i
+                                                class="ti ti-brand-airtable"></i><span>Client(e)s</span><span
+                                                class="menu-arrow"></span></a>
+                                        <ul>
+                                            <li><a href="video-call.html">Listes des client(e)s</a></li>
+                                            <li><a href="audio-call.html">Ajouter un(e) client(e)s </a></li>
+                                        </ul>
+                                    </li>
+
+
+                                   
  --}}
 
 
                                 </ul>
                             </li>
-{{-- 
+                            {{-- 
                             <li>
                                 <h6 class="submenu-hdr">Rapports</h6>
                                 <ul>
@@ -372,8 +377,8 @@
                 // Display error messages using Notiflix
 
                 @foreach ($errors->all() as $error)
-                    Notiflix.Notify.failure("{{ $error }}" , {
-                        timeout: 100000, 
+                    Notiflix.Notify.failure("{{ $error }}", {
+                        timeout: 100000,
                         zindex: 10000,
 
                     });
@@ -386,8 +391,8 @@
                 // Display error messages using Notiflix
                 @foreach ($errors->all() as $error)
                     Notiflix.Notify.failure("{{ $error }}", {
-                        timeout: 10000,  // Timeout in milliseconds
-                        zindex: 10000,   // Ensure the notification appears above other elements
+                        timeout: 10000, // Timeout in milliseconds
+                        zindex: 10000, // Ensure the notification appears above other elements
                     });
                 @endforeach
             </script>

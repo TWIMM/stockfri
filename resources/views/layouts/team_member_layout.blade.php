@@ -230,7 +230,6 @@
                                         </li>
                                     @endif
 
-                                    {{-- 
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
@@ -269,8 +268,7 @@
                                         </li>
                                     @endif
 
- --}}
-
+        
                                 </ul>
                             </li>
 
