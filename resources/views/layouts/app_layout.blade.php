@@ -231,14 +231,13 @@
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);" class="{{ request()->routeIs('stock.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
                                                 <span>Stock</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="video-call.html">Ajouter produit</a></li>
-                                                <li><a href="audio-call.html">Liste des produits</a></li>
-                                            </ul>
+                                                <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') }}">Gerer produits</a></li>
+s                                            </ul>
                                         </li>
 
                                         <li class="submenu">
@@ -255,13 +254,12 @@
 
                                     @if ($hasPrestation)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);" class="{{ request()->routeIs('services.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
                                                 <span>Services Offert</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="video-call.html">Ajouter service</a></li>
-                                                <li><a href="audio-call.html">Liste des services</a></li>
+                                                <li><a href="{{ route('services.listes') }}">Gerer services</a></li>
                                             </ul>
                                         </li>
                                     @endif

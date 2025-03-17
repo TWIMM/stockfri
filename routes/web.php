@@ -65,6 +65,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/business/store/team_member', [BusinessController::class, 'storeTeamMember'])->name('business.store.team_member');
     Route::get('/remove.team.link', [TeamMemberController::class, 'RemoveFrom'])->name('team.remove');
 
+    //stock_routes
+    Route::get('/owner_stock_list', [StockController::class, 'showOwnerStockListPage'])->name('owner.stock.listes');
+    Route::get('/stock_list', [StockController::class, 'index'])->name('stock.listes');
+
+
+    //services 
+
+    Route::get('/services_list', [ServicesController::class, 'index'])->name('services.listes');
+    Route::get('/owner_services_list', [ServicesController::class, 'showOwnerServicesListPage'])->name('owner.services.listes');
+
 
 });
 

@@ -233,24 +233,22 @@
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);" class="{{ request()->routeIs('owner.stock.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
                                                 <span>Stock</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="video-call.html">Ajouter produit</a></li>
-                                                <li><a href="audio-call.html">Liste des produits</a></li>
+                                                <li><a href="{{ route('owner.stock.listes') }}">Gerer produits</a></li>
                                             </ul>
                                         </li>
 
                                         <li class="submenu">
-                                            <a href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);" class="{{ request()->routeIs('owner.magasin.*') ? 'subdrop active' : '' }}" ><i class="ti ti-brand-airtable"></i>
                                                 <span>Magasin</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="audio-call.html">Liste des magasins</a></li>
-                                                <li><a href="audio-call.html">Ajouter stock au magasin</a></li>
+                                                <li><a href="audio-call.html">Gerer les magasins</a></li>
                                             </ul>
                                         </li>
                                     @endif
