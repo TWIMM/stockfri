@@ -6,7 +6,8 @@ use App\Models\Business;
 use App\Models\Role;
 use Illuminate\Support\Str;
 use App\Models\User;
-
+use App\Models\Team;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,6 +65,9 @@ class DashboardController extends Controller
         
         $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
 
+        
+        $clientOwner = User::findOrFail($realTeamMember->user_id);
+
         $businesses = $teamBusinessOwner->business()->paginate(10);
         $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
@@ -76,6 +80,27 @@ class DashboardController extends Controller
         $role = Role::find($realTeamMember->role_id);
         view()->share('role', $formattedRole);
         view()->share('roleObj', $role);
+
+
+        
+        $teamAdminMarked = Team::where('name', 'admin')->where('user_id', $clientOwner->id)->first();
+
+
+        $isUserAdminQuestionMarkMode  = DB::table('team_member_team')
+            ->where('team_id', $teamAdminMarked->id)
+            ->where('team_member_id', $realTeamMember->id)
+            ->where('mode_admin', 1)
+            ->first();
+
+        $isUserAdminQuestionMark = false; 
+
+        if($isUserAdminQuestionMarkMode && $isUserAdminQuestionMarkMode->id){
+            $isUserAdminQuestionMark = true ; 
+        }
+
+        //$permissions = 
+        view()->share('isUserAdminQuestionMark', $isUserAdminQuestionMark);
+
 
         return view('welcome_team_member', compact('businesses', 'hasPhysique', 'hasPrestation' , 'realTeamMember'));
     }

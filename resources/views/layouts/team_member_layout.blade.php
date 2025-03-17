@@ -185,7 +185,7 @@
                                 <a href="profile.html">
                                     <img src="assets/img/profiles/avatar-14.jpg" class="img-fluid" alt="Profile">
                                     <div class="user-names">
-                                        <h5>{{$realTeamMember->name}}</h5>
+                                        <h5>{{ $realTeamMember->name }}</h5>
                                         <h6>Coequipier</h6>
 
                                     </div>
@@ -197,38 +197,40 @@
                                 <h6 class="submenu-hdr">Main Menu</h6>
                                 <ul>
 
-                                    <li class="submenu">
-                                        <a href="javascript:void(0);"
-                                            class="{{ request()->routeIs('owner.business.*') ? 'subdrop active' : '' }}"
-                                            class="subdrop active">
-                                            <i class="ti ti-layout-2"></i><span>Business</span><span
-                                                class="menu-arrow"></span>
-                                        </a>
-                                        <ul>
-                                            <li><a class="{{ request()->routeIs('owner.business.listes') ? 'active' : '' }}" href="{{ route('owner.business.listes') }}">Gerer business</a></li>
-                                        </ul>
-                                    </li>
+                                    @if ($isUserAdminQuestionMark)
+                                        <li class="submenu">
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('owner.business.*') ? 'subdrop active' : '' }}"
+                                                class="subdrop active">
+                                                <i class="ti ti-layout-2"></i><span>Business</span><span
+                                                    class="menu-arrow"></span>
+                                            </a>
+                                            <ul>
+                                                <li><a class="{{ request()->routeIs('owner.business.listes') ? 'active' : '' }}"
+                                                        href="{{ route('owner.business.listes') }}">Gerer business</a>
+                                                </li>
+                                            </ul>
+                                        </li>
 
 
-                                    <li class="submenu">
-                                        <a href="javascript:void(0);"
-                                            class="{{ request()->routeIs('owner.teams.*') || request()->routeIs('owner.team_member.*') ? 'subdrop active' : '' }}"><i
-                                                class="ti ti-brand-airtable"></i><span>Equipes</span><span
-                                                class="menu-arrow"></span></a>
-                                        <ul>
-                                            <li><a href="{{ route('owner.teams.listes') }}"
-                                                    class="{{ request()->routeIs('owner.teams.listes') ? 'active' : '' }}">Gerer
-                                                    les equipes</a></li>
-                                            <li><a href="{{ route('owner.team_member.listes') }}"
-                                                    class="{{ request()->routeIs('owner.team_member.listes') ? 'active' : '' }}">Membres
-                                                    d'equipes</a></li>
+                                        <li class="submenu">
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('owner.teams.*') || request()->routeIs('owner.team_member.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i><span>Equipes</span><span
+                                                    class="menu-arrow"></span></a>
+                                            <ul>
+                                                <li><a href="{{ route('owner.teams.listes') }}"
+                                                        class="{{ request()->routeIs('owner.teams.listes') ? 'active' : '' }}">Gerer
+                                                        les equipes</a></li>
+                                                <li><a href="{{ route('owner.team_member.listes') }}"
+                                                        class="{{ request()->routeIs('owner.team_member.listes') ? 'active' : '' }}">Membres
+                                                        d'equipes</a></li>
 
-                                        </ul>
-                                    </li>
+                                            </ul>
+                                        </li>
+                                    @endif
 
-
-                                  
-{{-- 
+                                    {{-- 
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
@@ -272,7 +274,7 @@
                                 </ul>
                             </li>
 
-                           {{--  <li>
+                            {{--  <li>
                                 <h6 class="submenu-hdr">Rapports</h6>
                                 <ul>
                                     <li class="submenu">
@@ -349,13 +351,13 @@
         <script src="../../cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js"
             data-cf-settings="d49464235a86cf7c053a2086-|49" defer></script>
 
-            @if ($errors->any())
+        @if ($errors->any())
             <script>
                 // Display error messages using Notiflix
                 @foreach ($errors->all() as $error)
                     Notiflix.Notify.failure("{{ $error }}", {
-                        timeout: 10000,  // Timeout in milliseconds
-                        zindex: 10000,   // Ensure the notification appears above other elements
+                        timeout: 10000, // Timeout in milliseconds
+                        zindex: 10000, // Ensure the notification appears above other elements
                     });
                 @endforeach
             </script>

@@ -142,6 +142,28 @@ class TeamMemberController extends Controller
         view()->share('teamMembers', $teamMembers);
         view()->share('realTeamMember', $realTeamMember);
 
+       // view()->share('realTeamMemberPermissions', $realTeamMemberPermissions);
+
+        $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+        $teamAdminMarked = Team::where('name', 'admin')->where('user_id', $clientOwner->id)->first();
+
+
+        $isUserAdminQuestionMarkMode  = DB::table('team_member_team')
+            ->where('team_id', $teamAdminMarked->id)
+            ->where('team_member_id', $realTeamMember->id)
+            ->where('mode_admin', 1)
+            ->first();
+
+        $isUserAdminQuestionMark = false; 
+
+        if($isUserAdminQuestionMarkMode && $isUserAdminQuestionMarkMode->id){
+            $isUserAdminQuestionMark = true ; 
+        }
+
+        //$permissions = 
+        view()->share('isUserAdminQuestionMark', $isUserAdminQuestionMark);
+
 
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();

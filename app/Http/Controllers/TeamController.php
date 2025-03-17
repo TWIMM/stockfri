@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Role;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class TeamController extends Controller
 {
@@ -82,6 +83,30 @@ class TeamController extends Controller
         view()->share('role', $formattedRole);
         view()->share('roleObj', $role);
         view()->share('user', $user);
+
+
+        $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+
+        
+        $teamAdminMarked = Team::where('name', 'admin')->where('user_id', $clientOwner->id)->first();
+
+
+        $isUserAdminQuestionMarkMode  = DB::table('team_member_team')
+            ->where('team_id', $teamAdminMarked->id)
+            ->where('team_member_id', $realTeamMember->id)
+            ->where('mode_admin', 1)
+            ->first();
+
+        $isUserAdminQuestionMark = false; 
+
+        if($isUserAdminQuestionMarkMode && $isUserAdminQuestionMarkMode->id){
+            $isUserAdminQuestionMark = true ; 
+        }
+
+        //$permissions = 
+        view()->share('isUserAdminQuestionMark', $isUserAdminQuestionMark);
+
 
         return view('dashboard_team_member.teams.owner_index', compact('teams' , 'businesses' ,  'hasPhysique', 'hasPrestation'));
     }
