@@ -131,7 +131,7 @@
                     document.getElementById('modalTitle').textContent =
                         `Modifier les permissions pour ${teamName}`;
 
-                    fetch(`/team_member/${memberId}/teams`)
+                        fetch(`/team_member/${memberId}/teams`)
                         .then(response => response.json())
                         .then(data => {
                             const container = document.getElementById('permissionsContainer');
@@ -142,41 +142,53 @@
                                 // Show a loading message
                                 container.innerHTML = '<p>Loading permissions...</p>';
 
-                                const permissionsPromises = team.permissions.map(permissionId => {
-                                    // Fetch permission name for each ID
-                                    return fetch(`/team_member/${permissionId}/getperms`)
-                                        .then(response => response.json())
-                                        .then(permissionData => {
-                                            const permissionName = permissionData
-                                                .permissions; // Expecting a name instead of ID
+                                // Fetch all permissions in one request
+                                const permissionIds = team.permissions; // Array of permission IDs
+                                fetch(`/team_member/${permissionIds.join(',')}/getperms`)
+                                    .then(response => response.json())
+                                    .then(permissionData => {
+                                        if (!permissionData || !Array.isArray(permissionData
+                                                .permissions)) {
+                                            throw new Error("Invalid permissions data received");
+                                        }
+
+                                        // Generate the checkboxes dynamically
+                                        const checkboxes = permissionData.permissionsAll.map(({
+                                            id,
+                                            name
+                                        }) => {
+                                            // Check if the user has this permission
+                                            const isChecked = permissionData.permissions
+                                                .some(userPerm => userPerm.id === id);
+
+                                            const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+
 
                                             return `
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" name="permissions[]" 
-                                                    value="${permissionId}" id="perm_${teamId}_${permissionId}" checked>
-                                                <label class="form-check-label" for="perm_${teamId}_${permissionId}">
-                                                    ${permissionName} <!-- Display Permission Name Instead of ID -->
-                                                </label>
-                                            </div>`;
-                                        })
-                                        .catch(error => {
-                                            console.error("Error fetching permission name:",
-                                                error);
-                                            return ''; // Return empty string in case of error
-                                        });
-                                });
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" name="permissions[]" 
+                                                        value="${id}" id="perm_${id}" ${isChecked ? 'checked' : ''}>
+                                                    <label class="form-check-label" for="perm_${id}">
+                                                      ${capitalizedName} <!-- Display Permission Name -->
+                                                    </label>
+                                                </div>
+                                            `;
+                                        }).join('');
 
-                                // Wait for all permission fetches to complete
-                                Promise.all(permissionsPromises)
-                                    .then(checkboxes => {
                                         // Insert all checkboxes into the container
-                                        container.innerHTML = checkboxes.join('');
+                                        const container = document.getElementById(
+                                            'permissionsContainer'); // Adjust the container ID
+                                        container.innerHTML = checkboxes;
 
-                                        // Now that all permissions are loaded, show the modal
+                                        // Show the modal once data is loaded
                                         const modal = new bootstrap.Modal(document.getElementById(
                                             'editPermissionsModal'));
                                         modal.show();
+                                    })
+                                    .catch(error => {
+                                        console.error("Error fetching permissions:", error);
                                     });
+
                             }
                         })
                         .catch(error => console.error("Error fetching team permissions:", error));
