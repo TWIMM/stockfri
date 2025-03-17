@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Services\EmailService;
 
 
 use Illuminate\Validation\ValidationException;
@@ -21,10 +22,22 @@ use Illuminate\Validation\ValidationException;
 class TeamMemberController extends Controller
 {
 
+    protected $emailService;
+
+    public function __construct(EmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
 
     public function returnConfirmTeamMemberPwd($id){
 
         $teamM = TeamMember::findOrFail($id);
+        $isUserPasswordConfirmed = User::find($teamM->id);
+        if($isUserPasswordConfirmed && $isUserPasswordConfirmed->id){
+            return view('auth.login' , compact('teamM'));
+
+        }
 
         return view('auth.create_team_member_password' , compact('teamM'));
     }
@@ -258,6 +271,12 @@ class TeamMemberController extends Controller
         $teamMemberData = array_merge($validated, ['user_id' => $user_id]);
         $teamM = TeamMember::create($teamMemberData);
 
+        $success = $this->emailService->sendEmailWithTemplate($teamM->email, 'emails.teammate_confirm' , [
+            'name' => $teamM->name,      
+            'appLink' => env("APP_URL")."/".env('SIGN_IN_TEAM_MATE_LINK')."/".$teamM->id,   
+        ]);
+
+
         if ($teamM) {
             \Log::info('Team Member successfully added', ['team_member' => $teamM]);
             return back()->with('success', 'Membre ajouté avec succès.');
@@ -443,6 +462,8 @@ class TeamMemberController extends Controller
             'mode_admin' =>  $request->mode_admin ? true : false
 
         ]);
+
+        
 
             return $request->mode_admin 
             ? redirect()->back()->with('success', 'Team Member successfully granted admin.') 
