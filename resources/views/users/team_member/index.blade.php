@@ -161,12 +161,15 @@
                                             const isChecked = permissionData.permissions
                                                 .some(userPerm => userPerm.id === id);
 
+                                            const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+
+
                                             return `
                                                 <div class="form-check">
                                                     <input type="checkbox" class="form-check-input" name="permissions[]" 
                                                         value="${id}" id="perm_${id}" ${isChecked ? 'checked' : ''}>
                                                     <label class="form-check-label" for="perm_${id}">
-                                                        ${name} <!-- Display Permission Name -->
+                                                      ${capitalizedName} <!-- Display Permission Name -->
                                                     </label>
                                                 </div>
                                             `;
