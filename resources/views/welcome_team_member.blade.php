@@ -80,7 +80,7 @@
                     <a href="campaign.html" class="active">Commandes en cours<span>24</span></a>
                 </li>
                 <li>
-                    <a href="campaign-complete.html">Listes des factures</a>
+                    <a href="campaign-complete.html">Factures en attente</a>
                 </li>
                 <li>
                     <a href="campaign-archieve.html">Listes des clients</a>
