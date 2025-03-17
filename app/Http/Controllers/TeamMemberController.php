@@ -34,12 +34,9 @@ class TeamMemberController extends Controller
 
         $teamM = TeamMember::findOrFail($id);
         $isUserPasswordConfirmed = User::find($teamM->id);
-        if($isUserPasswordConfirmed && $isUserPasswordConfirmed->id){
-            return view('auth.login' , compact('teamM'));
-
-        }
-
         return view('auth.create_team_member_password' , compact('teamM'));
+
+        
     }
 
     public function updatePasswordTeamMember(Request $request , $id){
@@ -254,6 +251,7 @@ class TeamMemberController extends Controller
 
         // Determine user_id based on the team_member field
         $user_id = null;
+        $owner_user_id = null;
 
         if ($request->team_member === 'nothere') {
             $user_id = Auth::id(); // Assign the authenticated user ID

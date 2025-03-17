@@ -13,7 +13,7 @@ class RolePermSeeder extends Seeder
         // Définir les permissions
         $permissions = [
             // Gestion de l'équipe
-            'gérer équipe', 'créer équipe', 'modifier équipe', 'supprimer équipe', 'voir équipe',
+            //'gérer équipe', 'créer équipe', 'modifier équipe', 'supprimer équipe', 'voir équipe',
 
             // Magasins
             'gérer magasins', 'créer magasins', 'modifier magasins', 'supprimer magasins', 'voir magasins',
@@ -36,7 +36,7 @@ class RolePermSeeder extends Seeder
 
             // Autres permissions
             'vendre produit', 'vendre service',
-            'gérer permissions', 'comptabilité',
+            /* 'gérer permissions', */ 'comptabilité',
             'gérer inventaire', 'voir rapports de ventes', 'rappel',
             'gérer stock', 'gérer service', 'gérer client', 
         ];
@@ -51,9 +51,9 @@ class RolePermSeeder extends Seeder
 
         // Définir les rôles et leurs permissions respectives
         $roles = [
-            'gestionnaire_équipe' => [
+            /* 'gestionnaire_équipe' => [
                 'gérer équipe', 'créer équipe', 'supprimer équipe', 'gérer permissions',
-            ],
+            ], */
             'gestionnaire_ventes' => [
                 'vendre produit', 'vendre service', 'créer factures', 'envoyer facture',
             ],
