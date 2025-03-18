@@ -8,6 +8,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamMemberController;
+use App\Http\Controllers\ServicesController;
+use App\Http\Controllers\StockController;
 
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -74,6 +76,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/services_list', [ServicesController::class, 'index'])->name('services.listes');
     Route::get('/owner_services_list', [ServicesController::class, 'showOwnerServicesListPage'])->name('owner.services.listes');
+    Route::post('/services/store', [ServicesController::class, 'store'])->name('services.store');
+    Route::get('/services/{id}', [ServicesController::class, 'edit']);  // Used for fetching service data for editing
+    Route::post('/services/{id}/update', [ServicesController::class, 'update'])->name('services.update');
+    Route::post('/services/delete', [ServicesController::class, 'store'])->name('services.delete');
 
 
 });

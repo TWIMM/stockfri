@@ -236,7 +236,7 @@
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') }}">Gerer produits</a></li>
+                                                <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') ? 'active' : ''  }}">Gerer produits</a></li>
 s                                            </ul>
                                         </li>
 
@@ -259,7 +259,7 @@ s                                            </ul>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="{{ route('services.listes') }}">Gerer services</a></li>
+                                                <li><a class="{{ request()->routeIs('services.listes') ? 'active' : '' }}" href="{{ route('services.listes') }}">Gerer services</a></li>
                                             </ul>
                                         </li>
                                     @endif
