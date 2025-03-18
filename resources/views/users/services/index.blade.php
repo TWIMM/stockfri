@@ -39,9 +39,9 @@
                                             <!-- Edit Button -->
                                             <button type="button" data-id="{{ $service->id }}" class="btn btn-primary"
                                                 id="edit-service-btn" data-bs-toggle="modal" data-bs-target="#editServiceModal">
-                                                Edit
+                                                <i class="ti ti-pencil"></i>
                                             </button>
-                                            <a href="services/delete/{{ $service->id}}" class="btn btn-warning">Delete</a>
+                                            <a href="services/delete/{{ $service->id}}" class="btn btn-warning"> <i class="ti ti-trash"></i></a>
                                         </td>
                                     </tr>
                                 @empty

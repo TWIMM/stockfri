@@ -48,11 +48,11 @@
                                             <button type="button" data-id="{{ $business->id }}" class="btn btn-primary"
                                                 id='edit-business-btn' data-bs-toggle="modal"
                                                 data-bs-target="#editBusinessModal">
-                                                Edit
+                                                <i class="ti ti-pencil"></i>
                                             </button>
                                             {{-- <a href="{{ route('business.edit', $business->id) }}" class="btn btn-primary">Edit</a> --}}
                                             <a href="{{ route('business.delete', $business->id) }}"
-                                                class="btn btn-warning">Delete</a>
+                                                class="btn btn-warning"> <i class="ti ti-trash"></i></a>
                                         </td>
                                     </tr>
                                 @empty

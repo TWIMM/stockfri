@@ -68,10 +68,10 @@
                                             <!-- Edit Button -->
                                             <button type="button" data-id="{{ $team->id }}" class="btn btn-primary"
                                                 id="edit-team-btn" data-bs-toggle="modal" data-bs-target="#editTeamModal">
-                                                Edit
+                                                <i class="ti ti-pencil"></i>
                                             </button>
                                             <a href="{{ route('teams.delete', $team->id) }}"
-                                                class="btn btn-warning">Delete</a>
+                                                class="btn btn-warning"> <i class="ti ti-trash"></i></a>
                                         </td>
                                     </tr>
                                 @empty
