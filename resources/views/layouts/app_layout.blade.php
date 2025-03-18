@@ -236,8 +236,8 @@
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') ? 'active' : ''  }}">Gerer produits</a></li>
-s                                            </ul>
+                                                <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') ? 'active' : ''  }}">Gerer stock</a></li>
+                                            </ul>
                                         </li>
 
                                         <li class="submenu">

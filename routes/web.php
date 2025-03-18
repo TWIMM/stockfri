@@ -82,6 +82,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/services/delete/{id}', [ServicesController::class, 'destroy'])->name('services.delete');
 
 
+    //stock 
+
+    Route::get('/stock_list', [StockController::class, 'index'])->name('stock.listes');
+    Route::get('/owner_services_list', [StockController::class, 'showOwnerStockListPage'])->name('owner.stock.listes');
+    Route::post('/stock/store', [StockController::class, 'store'])->name('stock.store');
+    Route::get('/stock/{id}', [StockController::class, 'edit'])->name('stock.edit');  // Used for fetching service data for editing
+    Route::post('/stock/{id}/update', [StockController::class, 'update'])->name('stock.update');
+    Route::delete('/stock/delete/{id}', [StockController::class, 'destroy'])->name('stock.delete');
+    Route::get('/stock/faire_inventaire/{id}', [StockController::class, 'makeInventory'])->name('stock.faire_inventaire');
+    Route::get('/stock/confirmer_inventaire/{id}', [StockController::class, 'confirmInventory'])->name('stock.confirmer_inventaire');
+
+
+
 });
 
 Route::middleware(['auth']) -> group(function(){
