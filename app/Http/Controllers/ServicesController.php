@@ -45,7 +45,7 @@ class ServicesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|unique:services,title|string|max:255',
             'description' => 'required|string|max:1000',
             'business_id' => 'exists:business,id',
             'price' => 'required|numeric',
@@ -60,7 +60,7 @@ class ServicesController extends Controller
         $service->business_id = $request->business_id;
         $service->save();
 
-        return redirect()->route('dashboard_team_member.services.owner_index')->with('success', 'Service created successfully');
+        return back()->with('success', 'Service created successfully');
     }
 
 
@@ -89,7 +89,7 @@ class ServicesController extends Controller
 
         $service->save();
 
-        return redirect()->route('services.index')->with('success', 'Service updated successfully');
+        return back()->with('success', 'Service updated successfully');
     }
 
     public function destroy($id)
@@ -97,6 +97,6 @@ class ServicesController extends Controller
         $service = Services::findOrFail($id);
         $service->delete();
 
-        return redirect()->route('services.index')->with('success', 'Service deleted successfully');
+        return back()->with('success', 'Service deleted successfully');
     }
 }

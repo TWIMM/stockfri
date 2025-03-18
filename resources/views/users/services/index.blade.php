@@ -41,7 +41,7 @@
                                                 id="edit-service-btn" data-bs-toggle="modal" data-bs-target="#editServiceModal">
                                                 Edit
                                             </button>
-                                            <a href="{{ route('services.delete', $service->id) }}" class="btn btn-warning">Delete</a>
+                                            <a href="services/delete/{{ $service->id}}" class="btn btn-warning">Delete</a>
                                         </td>
                                     </tr>
                                 @empty
@@ -88,6 +88,7 @@
                             document.getElementById('title_edit').value = data.service.title;
                             document.getElementById('description_edit').value = data.service.description;
                             document.getElementById('price_edit').value = data.service.price;
+                            document.getElementById('business_id_edit').value = data.service.business_id;
 
                             // Set the form action for updating the service
                             let editServiceForm = document.getElementById('editServiceForm');

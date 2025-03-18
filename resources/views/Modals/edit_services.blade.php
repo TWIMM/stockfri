@@ -18,8 +18,24 @@
                         <textarea class="form-control" id="description_edit" name="description" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="price_edit" class="form-label">Price (€)</label>
+                        <label for="price_edit" class="form-label">Price (FCFA)</label>
                         <input type="number" class="form-control" id="price_edit" name="price" required>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Business associé</label>
+                        <div id="business-options">
+                            <select name="business_id" id="business_id_edit" class="form-control">
+                                    
+                            
+                                @forelse($businesses as $business)
+                                    <option value="{{$business->id}}" >{{$business->name}}</option>
+                                @empty
+                                    <p>Aucun Business disponible</p>
+                                @endforelse
+                           </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
