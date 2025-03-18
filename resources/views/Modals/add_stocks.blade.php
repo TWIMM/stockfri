@@ -20,6 +20,13 @@
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                     </div>
+
+                    <!-- Champ pour la quantité -->
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantité</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" required>
+                    </div>
+
                     <!-- Champ pour le prix -->
                     <div class="mb-3">
                         <label for="price" class="form-label">Prix</label>

@@ -44,7 +44,7 @@ class StockController extends Controller
           Stock::create([
               'name' => $request->name,
               'description' => $request->description,
-              'quantity' => 0,
+              'quantity' => $request->quantity,
               'quantite_inventorie' => 0,
 
               'price' => $request->price,

@@ -6,6 +6,7 @@
 
     @include('Modals.add_stocks')
     @include('Modals.edit_stocks')
+    @include('Modals.make_ineventory')
 
     <div class="row">
         <div class="col-sm-12">
@@ -15,9 +16,7 @@
                         Ajouter Stock
                     </button>
 
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
-                         Valider les inventaires
-                    </button>
+                   
                 </div>
 
                 <div class="card-body">
@@ -27,8 +26,7 @@
                                 <tr>
                                     <th>Nom</th>
                                     <th>Description</th>
-                                    <th>Quantité Réelle</th>
-                                    <th>Quantité En Inventaire</th>
+                                    <th>Quantité </th>
 
                                     <th>Prix</th>
                                     <th>Actions</th>
@@ -40,7 +38,6 @@
                                         <td>{{ $stock->name }}</td>
                                         <td>{{ $stock->description }}</td>
                                         <td>{{ $stock->quantity }}</td>
-                                        <td>{{ $stock->quantite_inventorie }}</td>
 
                                         <td>{{ $stock->price }} FCFA</td>
                                         <td>
@@ -52,9 +49,7 @@
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger"><i class="ti ti-trash"></i></button>
                                             </form>
-                                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editStockModal">
-                                               Inventaire
-                                           </button>                                         
+                                                                                  
                                         </td>
                                     </tr>
                                 @endforeach
