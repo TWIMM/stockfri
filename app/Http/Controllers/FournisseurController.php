@@ -18,7 +18,7 @@ class FournisseurController extends Controller
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
 
-        $fournisseurs = $user->fournisseurs->paginate(10); 
+        $fournisseurs = Fournisseur::where('user_id' ,$user->id)->paginate(10); 
         return view('users.fournisseurs.index', compact('fournisseurs','hasPhysique', 
             'hasPrestation', "businesses",  'user'));
     }

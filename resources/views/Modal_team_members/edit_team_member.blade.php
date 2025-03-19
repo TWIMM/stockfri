@@ -26,7 +26,7 @@
                     </div>
 
                     <h6>Équipes Associées</h6>
-                    <table class="table">
+                    <table class="table table-view">
                         <thead>
                             <tr>
                                 <th>Business</th>

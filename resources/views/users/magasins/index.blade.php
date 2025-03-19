@@ -19,7 +19,7 @@
 
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-view">
                             <thead>
                                 <tr>
                                     <th>Nom</th>
