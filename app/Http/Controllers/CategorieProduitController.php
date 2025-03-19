@@ -82,7 +82,7 @@ class CategorieProduitController extends Controller
 
     public function destroy($id)
     {
-        $category = Category::find($id);
+        $category = CategorieProduits::find($id);
 
         if (!$category) {
             return redirect()->back()->with('error', 'Catégorie introuvable.');

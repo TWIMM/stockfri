@@ -122,7 +122,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/categories/{category}', [CategorieProduitController::class, 'update'])->name('categories.update');
 
     // Route to delete a category
-    Route::delete('/categories/{category}', [CategorieProduitController::class, 'destroy'])->name('categories.destroy');
+    Route::delete('/categories/{id}', [CategorieProduitController::class, 'destroy'])->name('categories.destroy');
 
 });
 
