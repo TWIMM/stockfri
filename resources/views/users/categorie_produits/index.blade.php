@@ -31,10 +31,10 @@
                                         <td>{{ $category->name }}</td>
                                         <td>
                                             <!-- Modifier la catégorie -->
-                                            <button type="button" class="btn btn-primary edit-btn"
+                                            <button type="button" class="btn btn-secondary edit-btn"
                                                 data-id="{{ $category->id }}" data-name="{{ $category->name }}"
                                                 data-bs-toggle="modal" data-bs-target="#editCategoryModal">
-                                                Modifier
+                                                <i class="ti ti-pencil"></i>
                                             </button>
                                             
                                             <!-- Supprimer la catégorie -->
@@ -42,7 +42,7 @@
                                                 method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                <button type="submit" class="btn btn-danger"><i class="ti ti-trash"></i></button>
                                             </form>
                                         </td>
                                     </tr>
