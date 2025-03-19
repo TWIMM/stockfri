@@ -11,6 +11,8 @@ use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\MagasinsController;
+use App\Http\Controllers\FournisseurController;
+use App\Http\Controllers\CategorieProduitController;
 
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -93,10 +95,21 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/stock/delete/{id}', [StockController::class, 'destroy'])->name('stock.delete');
     Route::get('/stock/faire_inventaire/{id}', [StockController::class, 'makeInventory'])->name('stock.faire_inventaire');
     Route::get('/stock/confirmer_inventaire/{id}', [StockController::class, 'confirmInventory'])->name('stock.confirmer_inventaire');
+    Route::get('/fournisseurs_list', [FournisseurController::class, 'index'])->name('fournisseurs.listes');
+    Route::get('/cat_prod_list', [CategorieProduitController::class, 'index'])->name('cat_prod.listes');
 
 
     //mnagasins
     Route::get('/magasins_list', [MagasinsController::class, 'index'])->name('magasins.listes');
+
+
+    Route::get('fournisseurs/create', [FournisseurController::class, 'create'])->name('fournisseurs.create'); // Show create form
+    Route::post('fournisseurs', [FournisseurController::class, 'store'])->name('fournisseurs.store'); // Store new supplier
+    Route::get('fournisseurs/{id}', [FournisseurController::class, 'edit'])->name('fournisseurs.show'); // Show individual supplier
+    Route::put('fournisseurs/{fournisseur}', [FournisseurController::class, 'update'])->name('fournisseurs.update'); // Update supplier
+    Route::patch('fournisseurs/{fournisseur}', [FournisseurController::class, 'update']); // Alternative to PUT for update
+    Route::delete('fournisseurs/{fournisseur}', [FournisseurController::class, 'destroy'])->name('fournisseurs.destroy'); // Delete supplier
+
 
 });
 

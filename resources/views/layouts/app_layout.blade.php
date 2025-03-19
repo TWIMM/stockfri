@@ -236,6 +236,9 @@
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
+                                                <li><a href="{{ route('fournisseurs.listes') }}" class="{{ request()->routeIs('fournisseurs.listes') ? 'active' : ''  }}">Gerer Fournisseurs</a></li>
+                                                <li><a href="{{ route('cat_prod.listes') }}" class="{{ request()->routeIs('cat_prod.listes') ? 'active' : ''  }}">Categorie de produits</a></li>
+
                                                 <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') ? 'active' : ''  }}">Gerer stock</a></li>
                                             </ul>
                                         </li>
