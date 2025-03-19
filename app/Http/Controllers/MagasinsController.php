@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Magasins;
+use App\Models\Stock;
+use Illuminate\Support\Facades\DB;
 
 class MagasinsController extends Controller
 {
@@ -22,10 +24,54 @@ class MagasinsController extends Controller
         $categories = $user->categorieProduits; 
         $fournisseurs = $user->fournisseurs; 
         $businesses = $user->business; 
+        $stocks = Stock::where('user_id' ,$user->id)->get();
 
         $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
         return view('users.magasins.index', compact('magasins','hasPhysique', 
-            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
+            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs" , "stocks"));
+    }
+
+    public function showList($id){
+        $magasin = Magasins::find($id);
+
+        $user = Auth::user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+        $categories = $user->categorieProduits; 
+        $fournisseurs = $user->fournisseurs; 
+        $businesses = $user->business; 
+        $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
+
+
+        $magasin = Magasins::find($id);
+        $stocksOfMagasin =  DB::table('magasin_stock')
+        ->where('magasin_id', $id)
+        ->get();
+        $stocks = Stock::where('user_id' ,$user->id)->get();
+        //dd($stocksOfMagasin);
+        $stocksArray = [];
+        foreach ($stocksOfMagasin as $magasinStock) {
+            // Fetch the related Stock record based on the stock_id in magasin_stock
+            $stock = Stock::find($magasinStock->stock_id); // Assuming stock_id exists in magasin_stock
+    
+            // If stock exists, push it into the array (formatted to the desired structure)
+            if ($stock) {
+                $stocksArray[] = (object)[
+                    'id' => $magasinStock->id,
+                    'magasin_id' => $magasinStock->magasin_id, 
+                    'name' => $stock->name, 
+                    'quantity' => $magasinStock->quantity,
+                    'price' => $stock->price,
+                    //'description' => $stock->created_at,
+                    //'updated_at' => $stock->updated_at,
+                ];
+            }
+        }
+       // dd($stocksArray);
+        return view('users.magasins.details', compact('magasin', 'magasins','hasPhysique', 
+            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs" , "stocks" , "stocksArray"));
+
     }
 
 
@@ -65,6 +111,11 @@ class MagasinsController extends Controller
         $magasin = Magasins::find($request->magasin_id);
         // Find the stock
         $stock = Stock::find($request->stock_id);
+
+        if($stock->quantity<$request->quantity){
+            return redirect()->back()->with('error', 'Quantité souhaité inférieur a la quantité disponible!');
+        }
+
         
         // Check if the stock is already attached to the magasin
         $pivotData = $magasin->stocks()->where('stock_id', $stock->id)->first();
@@ -79,12 +130,16 @@ class MagasinsController extends Controller
                 'quantity' => $newQuantity
             ]);
     
-            return redirect()->back()->with('success', 'Quantité mise à jour avec succès!');
         } else {
             // If the product is not yet added, attach it with the given quantity
             $magasin->stocks()->attach($stock->id, ['quantity' => $request->quantity]);
     
-            return redirect()->back()->with('success', 'Produit ajouté au magasin!');
         }
+
+        $stock->quantity -= $request->quantity;
+        $stock->save();
+
+        return redirect()->back()->with('success', 'Quantité mise à jour avec succès!');
+
     }
 }

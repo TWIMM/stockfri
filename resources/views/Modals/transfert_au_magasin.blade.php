@@ -1,29 +1,20 @@
 <!-- Modal pour ajouter un stock -->
 <div class="modal fade" id="addToMagasinsModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="addStockForm" method="POST" action="{{ route('stock.store') }}">
+        <form id="addStockForm" method="POST" action="{{ route('magasins.magasins_add_produits') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addStockModalLabel">Bonus fournisseur</h5>
+                    <h5 class="modal-title" id="addStockModalLabel">Envoyé au Magasin</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <!-- Sélecteur d'entreprise -->
-                    <div class="mb-3">
-                        <label for="fournisseur_id" class="form-label">Fournisseurs</label>
-                        <select name="fournisseur_id" id="fournisseur_id" class="form-control" required>
-                            @foreach ($fournisseurs as $fournisseur)
-                                <option value="{{ $fournisseur->id }}">{{ $fournisseur->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                <div class="modal-body">                    
 
                     <div class="mb-3">
-                        <label for="business_id" class="form-label">Produit</label>
-                        <select name="business_id" id="business_id" class="form-control" required>
-                            @foreach ($businesses as $business)
-                                <option value="{{ $business->id }}">{{ $business->name }}</option>
+                        <label for="stock_id" class="form-label">Produit</label>
+                        <select name="stock_id" id="stock_id" class="form-control" required>
+                            @foreach ($stocks as $stock)
+                                <option value="{{ $stock->id }}">{{ $stock->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -34,9 +25,12 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="factures_achat" class="form-label">Facture d'achat</label>
-                        <input type="file" class="form-control" id="factures_achat" name="factures_achat[]" multiple required>
-                    </div>
+                        <label for="magasin" class="form-label">Magasin</label>
+                        <select name="magasin_id" id="magasin_id" class="form-control" required>
+                            @foreach ($magasins as $magasin)
+                                <option value="{{ $magasin->id }}">{{ $magasin->name }}</option>
+                            @endforeach
+                        </select>                    </div>
 
                 </div>
                 <div class="modal-footer">
