@@ -231,7 +231,7 @@
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);" class="{{ request()->routeIs('stock.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);" class="{{ request()->routeIs('stock.*') || request()->routeIs('cat_prod.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
                                                 <span>Stock</span>
                                                 <span class="menu-arrow"></span>
                                             </a>

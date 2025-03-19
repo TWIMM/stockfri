@@ -109,7 +109,20 @@ Route::middleware(['auth'])->group(function () {
     Route::put('fournisseurs/{fournisseur}', [FournisseurController::class, 'update'])->name('fournisseurs.update'); // Update supplier
     Route::patch('fournisseurs/{fournisseur}', [FournisseurController::class, 'update']); // Alternative to PUT for update
     Route::delete('fournisseurs/{fournisseur}', [FournisseurController::class, 'destroy'])->name('fournisseurs.destroy'); // Delete supplier
+    // Route to store a new category
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
 
+    // Route to show a single category
+    Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+
+    // Route to show the edit form for a category
+    Route::get('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
+
+    // Route to update a category
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+
+    // Route to delete a category
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
 });
 
