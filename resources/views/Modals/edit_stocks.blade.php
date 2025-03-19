@@ -22,11 +22,7 @@
                         <textarea class="form-control" id="description_edit" name="description" rows="3"></textarea>
                     </div>
 
-                    <!-- Champ pour la quantité -->
-                    <div class="mb-3">
-                        <label for="quantity_edit" class="form-label">Quantité</label>
-                        <input type="number" class="form-control" id="quantity_edit" name="quantity" required>
-                    </div>
+                    A
 
                     <!-- Champ pour le prix -->
                     <div class="mb-3">

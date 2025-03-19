@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Stock;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Business;
 
 
 class StockController extends Controller
@@ -44,7 +45,7 @@ class StockController extends Controller
           Stock::create([
               'name' => $request->name,
               'description' => $request->description,
-              'quantity' => $request->quantity,
+              'quantity' => 0,
               'quantite_inventorie' => 0,
 
               'price' => $request->price,
@@ -57,8 +58,10 @@ class StockController extends Controller
       public function edit($id)
       {
           $stock = Stock::findOrFail($id);
-          $businesses = Business::all(); 
-          return view('stock.edit', compact('stock', 'businesses'));
+          //$businesses = Business::all(); 
+          return response()->json([
+            'stock'       => $stock,
+          ]);
       }
   
       public function update(Request $request, $id)

@@ -241,13 +241,12 @@
                                         </li>
 
                                         <li class="submenu">
-                                            <a href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
-                                                <span>Magasin</span>
+                                            <a class="{{ request()->routeIs('magasins.*') ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                                <span>Magasins</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="audio-call.html">Liste des magasins</a></li>
-                                                <li><a href="audio-call.html">Ajouter stock au magasin</a></li>
+                                                <li><a  href="{{ route('magasins.listes') }}" class="{{ request()->routeIs('magasins.listes') ? 'active' : ''  }}">Gestion des magasins</a></li>
                                             </ul>
                                         </li>
                                     @endif

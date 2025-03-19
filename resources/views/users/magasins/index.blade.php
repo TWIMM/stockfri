@@ -5,28 +5,18 @@
 @section('content')
 
     @include('Modals.add_stocks')
-    @include('Modals.addup_quantity')
     @include('Modals.edit_stocks')
     @include('Modals.make_ineventory')
-    @include('Modals.remove_from_magasin')
-    @include('Modals.bonus_from_fournisseur')
 
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
-                        Ajouter Produits
-                    </button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuantityStockModal">
                         Ajouter Stock
                     </button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#remove_from_magasin">
-                        Retrait de magasin
-                    </button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bonus_from_fournisseur">
-                        Bonus Fournisseur
-                    </button>
+
+                   
                 </div>
 
                 <div class="card-body">
@@ -95,7 +85,7 @@
                             const data = JSON.parse(xhr.responseText); // Parse the JSON response
 
                             // Populate the modal with the service data
-                           // document.getElementById('quantity_edit').value = data.stock.quantity;
+                            document.getElementById('quantity_edit').value = data.stock.quantity;
                             document.getElementById('name_edit').value = data.stock.name;
                             document.getElementById('description_edit').value = data.stock.description;
                             document.getElementById('price_edit').value = data.stock.price;

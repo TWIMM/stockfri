@@ -10,6 +10,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\MagasinsController;
 
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -94,6 +95,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock/confirmer_inventaire/{id}', [StockController::class, 'confirmInventory'])->name('stock.confirmer_inventaire');
 
 
+    //mnagasins
+    Route::get('/magasins_list', [MagasinsController::class, 'index'])->name('magasins.listes');
 
 });
 
