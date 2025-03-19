@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Magasins;
 
 class MagasinsController extends Controller
 {
@@ -32,22 +34,23 @@ class MagasinsController extends Controller
           $request->validate([
               'name' => 'required|max:255',
               'description' => 'nullable|max:1000',
-              'category_id' => 'required|exists:categorie_produits,id',
-              'price' => 'required|numeric|min:0',
+              'tel' => 'required|string',
+              'address' => 'required|string',
+              'email' => 'required|string',
               'business_id' => 'required|exists:business,id',
           ]);
   
-          Stock::create([
+          Magasins::create([
               'name' => $request->name,
               'description' => $request->description,
-              'quantity' => 0,
-              'quantite_inventorie' => 0,
-              'category_id'=> $request->category_id,
-              'price' => $request->price,
-              'user_id' => Auth::id(), 
+              'address' => $request->address,
+
+              'tel' =>  $request->tel,
+              'email' => $request->email,
               'business_id' => $request->business_id,
+              'user_id' => Auth::id(), 
           ]);
   
-          return redirect()->back()->with('success', 'Stock ajouté avec succès!');
+          return redirect()->back()->with('success', 'Magasin ajouté avec succès!');
     }
 }

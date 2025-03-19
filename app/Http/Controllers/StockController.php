@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Stock;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Business;
+use App\Models\MouvementDeStocks;
 
 
 class StockController extends Controller
@@ -33,9 +34,46 @@ class StockController extends Controller
             'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
     }
 
-    public function add_up_quantity(Request $request , $id){
-
+    public function add_up_quantity(Request $request)
+    {
+        
+        $request->validate([
+            'fournisseur_id' => 'required|exists:fournisseurs,id',
+            'stock_id' => 'required|exists:stocks,id', 
+            'quantity' => 'required|numeric|min:1',
+            'factures_achat' => 'required|array', 
+            'factures_achat.*' => 'mimes:pdf,jpeg,jpg,png|max:2048',
+        ]);
+    
+        // Retrieve the product/stock by stock_id
+        $stock = Stock::findOrFail($request->stock_id); // Corrected 'business_id' to 'stock_id'
+    
+        // Update the stock quantity
+        $stock->quantity += $request->quantity;
+        $stock->save();
+    
+        // Handle file uploads
+        $filePaths = [];
+        if ($request->hasFile('factures_achat')) {
+            foreach ($request->file('factures_achat') as $file) {
+                // Store each file in the 'factures_add_up_quantity' directory inside 'public' disk
+                $filePath = $file->store('factures_add_up_quantity', 'public');
+                $filePaths[] = $filePath; // Save the file path in the array for later use
+            }
+        }
+    
+        MouvementDeStocks::create([
+            'stock_id' => $stock->id,
+            'fournisseur_id' => $request->fournisseur_id,
+            'quantity' => $request->quantity,
+            'user_id' => Auth::id(),
+            'type_de_mouvement' => env('ACHAT_DE_STOCK'),
+            'files_paths' => json_encode($filePaths)
+        ]);
+    
+        return back()->with('success', 'Quantité mise à jour avec succès et factures téléchargées!');
     }
+    
 
 
 

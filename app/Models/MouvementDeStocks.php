@@ -9,11 +9,16 @@ class MouvementDeStocks extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'user_id', 'stock_id', 'type_de_mouvement'];
+    protected $fillable = [ 'user_id' , 'fournisseur_id', 'stock_id', 'type_de_mouvement' , 'files_paths' , 'quantity'];
 
     public function stock()
     {
         return $this->belongsTo(Stock::class);
+    }
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
     }
 
     public function user()

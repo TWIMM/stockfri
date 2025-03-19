@@ -1,7 +1,7 @@
 <!-- Modal pour ajouter un stock -->
 <div class="modal fade" id="addQuantityStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="addStockForm" method="POST" action="{{ route('stock.add_up_quantity') }}">
+        <form id="addStockForm" method="POST" action="{{ route('stock.add_up_quantity') }}"  enctype="multipart/form-data">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
@@ -22,7 +22,7 @@
 
                     <div class="mb-3">
                         <label for="business_id" class="form-label">Produit</label>
-                        <select name="business_id" id="business_id" class="form-control" required>
+                        <select name="stock_id" id="stock_id" class="form-control" required>
                             @foreach ($stocks as $product)
                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                             @endforeach

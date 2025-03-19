@@ -102,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
 
     //mnagasins
     Route::get('/magasins_list', [MagasinsController::class, 'index'])->name('magasins.listes');
+    Route::post('/magasins_store', [MagasinsController::class, 'store'])->name('magasins.store');
 
 
     Route::get('fournisseurs/create', [FournisseurController::class, 'create'])->name('fournisseurs.create'); // Show create form
