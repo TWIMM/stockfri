@@ -103,7 +103,7 @@ Route::middleware(['auth'])->group(function () {
     //mnagasins
     Route::get('/magasins_list', [MagasinsController::class, 'index'])->name('magasins.listes');
     Route::post('/magasins_store', [MagasinsController::class, 'store'])->name('magasins.store');
-
+    Route::post('/magasins_add_produits' , [MagasinsController::class, 'magasins_add_produits'])->name('magasins.magasins_add_produits');
 
     Route::get('fournisseurs/create', [FournisseurController::class, 'create'])->name('fournisseurs.create'); // Show create form
     Route::post('fournisseurs', [FournisseurController::class, 'store'])->name('fournisseurs.store'); // Store new supplier

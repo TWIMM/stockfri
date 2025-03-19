@@ -31,4 +31,9 @@ class Stock extends Model
         return $this->hasMany(Commandes::class);
 
     }
+    // Many-to-many relationship with Stock
+    public function magasins()
+    {
+        return $this->belongsToMany(Magasins::class, 'magasin_stock', 'magasin_id', 'stock_id')->withPivot('quantity');
+    }
 }

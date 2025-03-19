@@ -16,6 +16,12 @@ class Magasins extends Model
         return $this->belongsTo(Business::class);
     }
 
+    public function stocks()
+    {
+        return $this->belongsToMany(Stock::class, 'magasin_stock', 'magasin_id', 'stock_id')->withPivot('quantity'); // Include the pivot column 'quantity'
+
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
