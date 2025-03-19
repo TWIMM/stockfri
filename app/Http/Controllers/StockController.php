@@ -25,11 +25,18 @@ class StockController extends Controller
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
+        $categories = $user->categorieProduits; 
+        $fournisseurs = $user->fournisseurs; 
 
-        $stocks = Stock::paginate(10); 
+        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
         return view('users.stocks.index', compact('stocks','hasPhysique', 
-            'hasPrestation', "businesses",  'user'));
+            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
     }
+
+    public function add_up_quantity(Request $request , $id){
+
+    }
+
 
 
       public function store(Request $request)
@@ -37,7 +44,7 @@ class StockController extends Controller
           $request->validate([
               'name' => 'required|max:255',
               'description' => 'nullable|max:1000',
-              //'quantity' => 'required|integer|min:0',
+              'category_id' => 'required|exists:categorie_produits,id',
               'price' => 'required|numeric|min:0',
               'business_id' => 'required|exists:business,id',
           ]);
@@ -47,9 +54,10 @@ class StockController extends Controller
               'description' => $request->description,
               'quantity' => 0,
               'quantite_inventorie' => 0,
-
+              'category_id'=> $request->category_id,
               'price' => $request->price,
               'business_id' => $request->business_id,
+              'user_id' => Auth::id(), 
           ]);
   
           return redirect()->back()->with('success', 'Stock ajouté avec succès!');
@@ -73,12 +81,14 @@ class StockController extends Controller
               'description' => 'nullable|max:1000',
               'quantity' => 'required|integer|min:0',
               'price' => 'required|numeric|min:0',
+              'category_id' => 'required|exists:categorie_produits,id',
               'business_id' => 'required|exists:businesses,id',
           ]);
   
           $stock->update([
               'name' => $request->name,
               'description' => $request->description,
+              'category_id'=> $request->category_id,
               'quantity' => $request->quantity,
               'price' => $request->price,
               'business_id' => $request->business_id,

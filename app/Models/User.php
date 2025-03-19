@@ -67,6 +67,14 @@ class User extends Authenticatable
         return $this->hasMany(Team::class);
     }
 
+    public function categorieProduits()
+    {
+        return $this->hasMany(CategorieProduits::class);
+    }
+    public function fournisseurs()
+    {
+        return $this->hasMany(Fournisseur::class);
+    }
 
     public function clients()
     {

@@ -11,14 +11,13 @@
                 <div class="modal-body">
                     <!-- Sélecteur d'entreprise -->
                     <div class="mb-3">
-                        <label for="business_id" class="form-label">Fournisseurs</label>
-                        <select name="business_id" id="business_id" class="form-control" required>
-                            @foreach ($businesses as $business)
-                                <option value="{{ $business->id }}">{{ $business->name }}</option>
+                        <label for="fournisseur_id" class="form-label">Fournisseurs</label>
+                        <select name="fournisseur_id" id="fournisseur_id" class="form-control" required>
+                            @foreach ($fournisseurs as $fournisseur)
+                                <option value="{{ $fournisseur->id }}">{{ $fournisseur->name }}</option>
                             @endforeach
                         </select>
                     </div>
-
 
                     <div class="mb-3">
                         <label for="business_id" class="form-label">Produit</label>

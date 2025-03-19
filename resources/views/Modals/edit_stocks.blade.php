@@ -22,12 +22,21 @@
                         <textarea class="form-control" id="description_edit" name="description" rows="3"></textarea>
                     </div>
 
-                    A
+                
 
                     <!-- Champ pour le prix -->
                     <div class="mb-3">
                         <label for="price_edit" class="form-label">Prix</label>
                         <input type="number" class="form-control" id="price_edit" name="price" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Categorie du produit</label>
+                        <select name="category_id" id="category_id_edit" class="form-control" required>
+                            @foreach($categories as $categorie)
+                                <option value="{{ $categorie->id }}">{{ $categorie->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Sélecteur d'entreprise -->

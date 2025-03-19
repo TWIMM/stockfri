@@ -5,20 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Magasins extends Model
+class MouvementDeStocks extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['business_id', 'user_id', 'name', 'description', 'address', 'email' , 'tel'];
+    protected $fillable = [ 'user_id', 'stock_id', 'type_de_mouvement'];
 
-    public function business()
+    public function stock()
     {
-        return $this->belongsTo(Business::class);
+        return $this->belongsTo(Stock::class);
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-   
 }

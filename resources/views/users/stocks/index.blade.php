@@ -100,7 +100,7 @@
                             document.getElementById('description_edit').value = data.stock.description;
                             document.getElementById('price_edit').value = data.stock.price;
                             document.getElementById('business_id_edit').value = data.stock.business_id;
-
+                            document.getElementById('category_id_edit').value = data.stock.category_id;
                             // Set the form action for updating the service
                             let editServiceForm = document.getElementById('editServiceForm');
                             editServiceForm.action = `/services/${data.service.id}/update`;

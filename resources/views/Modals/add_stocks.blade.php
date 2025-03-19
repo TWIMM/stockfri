@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <!-- Champ pour le nom du stock -->
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nom du Stock</label>
+                        <label for="name" class="form-label">Nom du produit</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
 
@@ -31,6 +31,16 @@
                     <div class="mb-3">
                         <label for="price" class="form-label">Prix</label>
                         <input type="number" class="form-control" id="price" name="price" required>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="business_id" class="form-label">Categorie du produit</label>
+                        <select name="category_id" id="category_id" class="form-control" required>
+                            @foreach($categories as $categorie)
+                                <option value="{{ $categorie->id }}">{{ $categorie->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Sélecteur d'entreprise -->

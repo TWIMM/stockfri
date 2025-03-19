@@ -15,4 +15,10 @@ class CategorieProduits extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class);
+    }
 }

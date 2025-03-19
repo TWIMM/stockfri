@@ -18,7 +18,7 @@ class CategorieProduitController extends Controller
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
 
-        $categories = CategorieProduits::paginate(10); 
+        $categories = CategorieProduits::where('user_id' ,$user->id)->paginate(10);
         return view('users.categorie_produits.index', compact('categories','hasPhysique', 
             'hasPrestation', "businesses",  'user'));
     }

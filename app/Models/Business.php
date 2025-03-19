@@ -27,6 +27,17 @@ class Business extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function magasins()
+    {
+        return $this->hasMany(Magasins::class);
+    }
+
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class);
+    }
+
+
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'business_team')->withTimestamps();

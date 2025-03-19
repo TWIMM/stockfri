@@ -9,11 +9,21 @@ class Stock extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['business_id', 'name', 'description','quantite_inventorie', 'quantity', 'price'];
+    protected $fillable = ['business_id' , 'user_id' ,'category_id', 'name', 'description','quantite_inventorie', 'quantity', 'price'];
 
     public function business()
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function categorieProduits()
+    {
+        return $this->belongsTo(CategorieProduits::class);
     }
 
     public function purchase()
