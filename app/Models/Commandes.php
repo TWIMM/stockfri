@@ -18,6 +18,8 @@ class Commandes extends Model
         'mobile_number',
         'mobile_reference',
         'bank_name',
+        'already_paid',
+        'rest_to_pay',
         'bank_reference',
         'card_type',
         'card_reference',
@@ -26,7 +28,7 @@ class Commandes extends Model
     
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Clients::class);
     }
     
     public function commandeItems()

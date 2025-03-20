@@ -8,17 +8,154 @@ use App\Models\Clients;
 use App\Models\Commandes;
 use App\Models\CommandeItem;
 use App\Models\Stock;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\InvoiceService;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    //
+    protected $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
+    /**
+     * Generate an invoice for an existing order
+     * 
+     * @param int $commande_id
+     * @return \Illuminate\Http\Response
+     */
+    public function generateOrderInvoice($commande_id)
+    {
+        try {
+            $commande = Commandes::with(['client', 'items.stock'])->findOrFail($commande_id);
+            
+            // Generate and save invoice
+            $invoice = $this->generateInvoiceFromOrder($commande);
+            
+            return redirect()->back()->with('success', 'Facture générée avec succès. Lien: ' . $invoice->invoice_link);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la génération de la facture: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to generate invoice from order
+     * 
+     * @param Commandes $commande
+     * @return Invoice
+     */
+    private function generateInvoiceFromOrder(Commandes $commande)
+    {
+        // Format client data
+        $clientData = [
+            'name' => $commande->client->name,
+            'phone' => $commande->client->phone,
+            'custom_fields' => [
+                'ID Client' => $commande->client->id,
+                'Email' => $commande->client->email ?? '',
+            ],
+        ];
+
+        // Format customer data (using the same client data for now)
+        $customerData = [
+            'name' => $commande->client->name,
+            'address' => $commande->client->address ?? '',
+            'code' => 'CMD-' . $commande->id,
+            'custom_fields' => [
+                'Date Commande' => $commande->created_at->format('d/m/Y'),
+            ],
+            'email' => $commande->client->email ?? '',
+        ];
+
+        // Format items data
+        $itemsData = [];
+        foreach ($commande->commandeItems as $item) {
+            $itemsData[] = [
+                'name' => $item->stock->name,
+                'description' => $item->stock->description ?? 'Produit',
+                'price' => $item->unit_price,
+                'quantity' => $item->quantity,
+                'discount' => $item->discount,
+            ];
+        }
+
+        // Add notes
+        $notes = [
+            'Mode de paiement: ' . $this->getPaymentModeLabel($commande->payment_mode),
+            'TVA: ' . $commande->tva . '%',
+            'Statut: ' . $this->getInvoiceStatusLabel($commande->invoice_status),
+        ];
+
+        // Generate the invoice using the service
+        $invoiceLink = $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes);
+        
+        // Create invoice record in database
+        $invoiceNumber = 'INV-' . date('Ymd') . '-' . $commande->id;
+        
+        $invoice = Invoice::create([
+            'commande_id' => $commande->id,
+            'invoice_number' => $invoiceNumber,
+            'invoice_date' => Carbon::now(),
+            'invoice_link' => $invoiceLink,
+            'total_amount' => $commande->total_price,
+            'status' => $this->mapInvoiceStatus($commande->invoice_status)
+        ]);
+        
+        return $invoice;
+    }
+    
+    /**
+     * Map invoice status from order status
+     */
+    private function mapInvoiceStatus($orderStatus)
+    {
+        switch ($orderStatus) {
+            case 'paid':
+                return 'paid';
+            case 'partially_paid':
+                return 'partial';
+            case 'unpaid':
+                return 'pending';
+            default:
+                return 'generated';
+        }
+    }
+    
+    /**
+     * Get user-friendly payment mode label
+     */
+    private function getPaymentModeLabel($mode)
+    {
+        $modes = [
+            'cash' => 'Espèces',
+            'credit_card' => 'Carte de crédit',
+            'mobile_money' => 'Mobile Money',
+            'bank_transfer' => 'Virement bancaire'
+        ];
+        
+        return $modes[$mode] ?? $mode;
+    }
+    
+    /**
+     * Get user-friendly invoice status label
+     */
+    private function getInvoiceStatusLabel($status)
+    {
+        $statuses = [
+            'paid' => 'Payée',
+            'partially_paid' => 'Partiellement payée',
+            'unpaid' => 'Non payée'
+        ];
+        
+        return $statuses[$status] ?? $status;
+    }
 
     public function store(Request $request)
     {
-       // dd($request->all());
-        // Validate the incoming request
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'products' => 'required|array',
@@ -28,15 +165,78 @@ class OrderController extends Controller
             'products.*.discount' => 'nullable|numeric|min:0|max:100',
             'tva' => 'required|numeric|min:0',
             'payment_mode' => 'required|string',
-            'invoice_status' => 'required|string',
-            // Conditional validation for payment details
-            'mobile_number' => 'required_if:payment_mode,mobile_money',
-            'mobile_reference' => 'required_if:payment_mode,mobile_money',
-            'bank_name' => 'required_if:payment_mode,bank_transfer',
-            'bank_reference' => 'required_if:payment_mode,bank_transfer',
-            'card_type' => 'required_if:payment_mode,credit_card',
-            'card_reference' => 'required_if:payment_mode,credit_card',
-            'cash_reference' => 'required_if:payment_mode,cash',
+            'invoice_status' => 'required|string|in:paid,partially_paid,unpaid',
+            
+            // Mobile Money payment details
+            'mobile_number' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'mobile_money' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('Le numéro mobile est requis pour les paiements par mobile money lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
+            'mobile_reference' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'mobile_money' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('La référence mobile est requise pour les paiements par mobile money lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
+            
+            // Bank Transfer payment details
+            'bank_name' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'bank_transfer' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('Le nom de la banque est requis pour les virements bancaires lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
+            'bank_reference' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'bank_transfer' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('La référence bancaire est requise pour les virements bancaires lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
+            
+            // Credit Card payment details
+            'card_type' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'credit_card' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('Le type de carte est requis pour les paiements par carte de crédit lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
+            'card_reference' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'credit_card' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('La référence de carte est requise pour les paiements par carte de crédit lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
+            
+            // Cash payment details
+            'cash_reference' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->payment_mode === 'cash' && 
+                        in_array($request->invoice_status, ['paid', 'partially_paid']) && 
+                        empty($value)) {
+                        $fail('La référence du paiement en espèces est requise lorsque la facture est payée ou partiellement payée.');
+                    }
+                }
+            ],
         ]);
         
         try {
@@ -100,10 +300,13 @@ class OrderController extends Controller
             $commande->total_price = $totalWithTva;
             $commande->save();
             
+            // Generate the invoice for this order
+            $invoice = $this->generateInvoiceFromOrder($commande);
+            
             // Commit the transaction
             DB::commit();
             
-            return redirect()->back()->with('success', 'Commande créée avec succès');
+            return redirect()->back()->with('success', 'Commande créée avec succès. Facture générée: ' . $invoice->invoice_link);
         } catch (\Exception $e) {
             // Rollback the transaction if something goes wrong
             DB::rollBack();
