@@ -16,6 +16,9 @@
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addToMagasinsModal">
                         Transférer au Magasin
                     </button>
+                    <button type="button"  id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVente">
+                        <i class="ti ti-receipt"></i>
+                    </button> 
                 </div>
 
                 <div class="card-body">
@@ -38,9 +41,7 @@
 
                                         <td>{{ $stock->price }} FCFA</td>
                                         <td>
-                                            <button type="button" data-id='{{$stock->id}}' id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVente">
-                                                <i class="ti ti-receipt"></i>
-                                           </button> 
+                                            
                                             <form action="{{ route('stock.return_to_magasin', $stock->id) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
