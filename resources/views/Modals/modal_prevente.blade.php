@@ -6,7 +6,8 @@
                 <h5 class="modal-title" id="modalVenteLabel">Nouvelle Vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/vendre" method="POST">
+            <form action="{{route("stock.stock_fri_order_stock")}}" method="POST">
+                @csrf
                 <div class="modal-body">
                     <!-- Sélectionner un client -->
                     <div class="mb-3">
@@ -27,7 +28,7 @@
                                 <!-- Produit -->
                                 <div class="flex-fill">
                                     <label for="productSelect" class="form-label">Produit</label>
-                                    <select class="form-select productSelect" name="products[][product_id]" required>
+                                    <select class="form-select productSelect" name="products[0][product_id]" required>
                                         <option value="" disabled selected>Choisir un produit</option>
                                         @foreach ($stocks as $stock)
                                             <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
@@ -40,21 +41,21 @@
                                 <!-- Quantité -->
                                 <div class="flex-fill ms-2">
                                     <label for="quantity" class="form-label">Quantité</label>
-                                    <input type="number" class="form-control" name="products[][quantity]"
+                                    <input type="number" class="form-control" name="products[0][quantity]"
                                         min="1" required>
                                 </div>
 
                                 <!-- Remise -->
                                 <div class="flex-fill ms-2">
                                     <label for="discount" class="form-label">Remise (%)</label>
-                                    <input type="number" class="form-control" name="products[][discount]"
+                                    <input type="number" class="form-control" name="products[0][discount]"
                                         min="0" max="100">
                                 </div>
 
                                 <!-- Prix Unitaire -->
                                 <div class="flex-fill ms-2">
                                     <label for="price" class="form-label">Prix Unitaire</label>
-                                    <input type="number" class="form-control" name="products[][price]" required
+                                    <input type="number" class="form-control" name="products[0][price]" required
                                         readonly>
                                 </div>
 
@@ -179,16 +180,18 @@
 
 <script>
     // Function to create a new product row dynamically
+    let productIndex = 0;
     function createProductRow() {
         const productRow = document.createElement('div');
         productRow.classList.add('productRow', 'mb-3');
+        productRow.setAttribute('data-index', productIndex); 
 
         productRow.innerHTML = `
         <div class="d-flex">
             <!-- Produit -->
             <div class="flex-fill">
                 <label for="productSelect" class="form-label">Produit</label>
-                <select class="form-select productSelect" name="products[][product_id]" required>
+                <select class="form-select productSelect" name="products[${productIndex}][product_id]" required>
                     <option value="" disabled selected>Choisir un produit</option>
                     @foreach ($stocks as $stock)
                         <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
@@ -201,19 +204,19 @@
             <!-- Quantité -->
             <div class="flex-fill ms-2">
                 <label for="quantity" class="form-label">Quantité</label>
-                <input type="number" class="form-control" name="products[][quantity]" min="1" required>
+                <input type="number" class="form-control" name="products[${productIndex}][quantity]" min="1" required>
             </div>
 
             <!-- Remise -->
             <div class="flex-fill ms-2">
                 <label for="discount" class="form-label">Remise (%)</label>
-                <input type="number" class="form-control" name="products[][discount]" min="0" max="100">
+                <input type="number" class="form-control" name="products[${productIndex}][discount]" min="0" max="100">
             </div>
 
             <!-- Prix Unitaire -->
             <div class="flex-fill ms-2">
                 <label for="price" class="form-label">Prix Unitaire</label>
-                <input type="number" class="form-control" name="products[][price]" required readonly>
+                <input type="number" class="form-control" name="products[${productIndex}][price]" required readonly>
             </div>
 
             <!-- Supprimer Produit -->
@@ -230,9 +233,10 @@
         productSelect.addEventListener('change', function() {
             const selectedOption = productSelect.options[productSelect.selectedIndex];
             const price = selectedOption.getAttribute('data-price');
-            const priceInput = productRow.querySelector('input[name="products[][price]"]');
+            const priceInput = productRow.querySelector('input[name="products[${productIndex}][price]"]');
             priceInput.value = price; // Update the price input field
         });
+        productIndex++;
 
         return productRow;
     }
@@ -243,8 +247,8 @@
         if (firstProductSelect) {
             const selectedOption = firstProductSelect.options[firstProductSelect.selectedIndex];
             const price = selectedOption.getAttribute('data-price');
-            const priceInput = firstProductSelect.closest('.productRow').querySelector(
-                'input[name="products[][price]"]');
+            const priceInput = document.querySelector(`input[name="products[${productIndex}][price]"]`);
+
             priceInput.value = price; // Update the price input field for the first row
         }
     }
@@ -290,6 +294,7 @@
         if (e.target && e.target.classList.contains('removeProduct')) {
             const productRow = e.target.closest('.productRow');
             productRow.remove();
+            productIndex--;
         }
     });
 
