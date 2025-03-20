@@ -86,6 +86,7 @@
                             <option value="" disabled selected>Choisir un mode de règlement</option>
                             <option value="cash">Espèces</option>
                             <option value="credit_card">Carte de crédit</option>
+                            <option value="mobile_money">Mobile Money</option>
                             <option value="bank_transfer">Virement bancaire</option>
                         </select>
                     </div>
@@ -96,8 +97,8 @@
                         <select class="form-select" id="invoiceStatus" name="invoice_status" required>
                             <option value="" disabled selected>Choisir un statut</option>
                             <option value="paid">Payée</option>
+                            <option value="partially_paid">Partiellement payée</option>
                             <option value="unpaid">Non payée</option>
-                            <option value="pending">En attente</option>
                         </select>
                     </div>
                 </div>
