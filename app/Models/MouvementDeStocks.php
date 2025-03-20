@@ -9,7 +9,7 @@ class MouvementDeStocks extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'user_id' , 'fournisseur_id', 'stock_id', 'type_de_mouvement' , 'files_paths' , 'quantity'];
+    protected $fillable = [ 'user_id', 'magasin_id' , 'fournisseur_id', 'stock_id', 'type_de_mouvement' , 'files_paths' , 'quantity'];
 
     public function stock()
     {

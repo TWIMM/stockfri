@@ -13,7 +13,9 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\MagasinsController;
 use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\CategorieProduitController;
+use App\Http\Controllers\InvoiceController;
 
+Route::get('/invoice', [InvoiceController::class, 'generateInvoice'])->name('invoice');
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
@@ -105,6 +107,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/magasins_store', [MagasinsController::class, 'store'])->name('magasins.store');
     Route::post('/magasins_add_produits' , [MagasinsController::class, 'addStockProduitToMagasin'])->name('magasins.magasins_add_produits');
     Route::get('/magasin_details/{id}', [MagasinsController::class, 'showList'])->name('magasins.detail');
+    Route::get('/return_to_magasin', [StockController::class, 'returnToMagasin'])->name('stock.return_to_magasin');
 
     Route::get('fournisseurs/create', [FournisseurController::class, 'create'])->name('fournisseurs.create'); // Show create form
     Route::post('fournisseurs', [FournisseurController::class, 'store'])->name('fournisseurs.store'); // Store new supplier

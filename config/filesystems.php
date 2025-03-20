@@ -36,6 +36,13 @@ return [
             'throw' => false,
         ],
 
+        'invoices' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/invoices'),
+            'url' => env('APP_URL').'/storage/invoices',
+            'throw' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

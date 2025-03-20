@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\EmailService;
+use App\Services\InvoiceService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,6 +16,9 @@ class AppServiceProvider extends ServiceProvider
         //
         $this->app->singleton(EmailService::class, function ($app) {
             return new EmailService();
+        });
+        $this->app->singleton(InvoiceService::class, function ($app) {
+            return new InvoiceService();
         });
     }
 

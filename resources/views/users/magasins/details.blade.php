@@ -40,7 +40,7 @@
                                             <button type="button" data-id='{{$stock->id}}' id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editStockModal">
                                                 <i class="ti ti-receipt"></i>
                                            </button> 
-                                            <form action="{{ route('stock.delete', $stock->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('stock.return_to_magasin', $stock->id) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger"><i class="ti ti-arrow-back"></i></button>

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Magasins;
 use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
+use App\Models\MouvementDeStocks;
 
 class MagasinsController extends Controller
 {
@@ -135,6 +136,15 @@ class MagasinsController extends Controller
             $magasin->stocks()->attach($stock->id, ['quantity' => $request->quantity]);
     
         }
+
+        MouvementDeStocks::create([
+            'stock_id' => $stock->id,
+            'magasin_id' => $request->magasin_id, //fournisseur id is magasin id in this case
+            'quantity' => $request->quantity,
+            'user_id' => Auth::id(),
+            'type_de_mouvement' => env('ENVOI_VERS_MAGASIN'),
+            'files_paths' => null
+        ]);
 
         $stock->quantity -= $request->quantity;
         $stock->save();
