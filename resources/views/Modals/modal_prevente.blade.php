@@ -101,6 +101,70 @@
                             <option value="unpaid">Non payée</option>
                         </select>
                     </div>
+
+                    <!-- Champs conditionnels pour les détails de paiement -->
+                    <div id="paymentDetailsContainer" class="d-none">
+                        <!-- Pour Mobile Money -->
+                        <div id="mobileMoneyDetails" class="payment-details d-none mb-3">
+                            <h6 class="mb-3">Détails Mobile Money</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="mobileNumber" class="form-label">Numéro Mobile Money</label>
+                                    <input type="text" class="form-control" id="mobileNumber" name="mobile_number">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="mobileReference" class="form-label">Référence de transaction</label>
+                                    <input type="text" class="form-control" id="mobileReference" name="mobile_reference">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pour Virement bancaire -->
+                        <div id="bankTransferDetails" class="payment-details d-none mb-3">
+                            <h6 class="mb-3">Détails du virement bancaire</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="bankName" class="form-label">Nom de la banque</label>
+                                    <input type="text" class="form-control" id="bankName" name="bank_name">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bankReference" class="form-label">Référence du virement</label>
+                                    <input type="text" class="form-control" id="bankReference" name="bank_reference">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pour Carte de crédit -->
+                        <div id="creditCardDetails" class="payment-details d-none mb-3">
+                            <h6 class="mb-3">Détails de la carte de crédit</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="cardType" class="form-label">Type de carte</label>
+                                    <select class="form-select" id="cardType" name="card_type">
+                                        <option value="" disabled selected>Choisir le type de carte</option>
+                                        <option value="visa">Visa</option>
+                                        <option value="mastercard">Mastercard</option>
+                                        <option value="other">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cardReference" class="form-label">Référence de transaction</label>
+                                    <input type="text" class="form-control" id="cardReference" name="card_reference">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pour Espèces (Cash) -->
+                        <div id="cashDetails" class="payment-details d-none mb-3">
+                            <h6 class="mb-3">Détails du paiement en espèces</h6>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="cashReference" class="form-label">Référence du reçu</label>
+                                    <input type="text" class="form-control" id="cashReference" name="cash_reference">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -185,6 +249,36 @@
         }
     }
 
+    // Function to toggle payment details based on invoice status and payment mode
+    function togglePaymentDetails() {
+        const invoiceStatus = document.getElementById('invoiceStatus').value;
+        const paymentMode = document.getElementById('paymentMode').value;
+        const paymentDetailsContainer = document.getElementById('paymentDetailsContainer');
+        
+        // Hide all payment detail fields first
+        document.querySelectorAll('.payment-details').forEach(detail => {
+            detail.classList.add('d-none');
+        });
+        
+        // Only show payment details if invoice status is "paid" or "partially_paid"
+        if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
+            paymentDetailsContainer.classList.remove('d-none');
+            
+            // Show the specific payment detail fields based on payment mode
+            if (paymentMode === 'mobile_money') {
+                document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+            } else if (paymentMode === 'bank_transfer') {
+                document.getElementById('bankTransferDetails').classList.remove('d-none');
+            } else if (paymentMode === 'credit_card') {
+                document.getElementById('creditCardDetails').classList.remove('d-none');
+            } else if (paymentMode === 'cash') {
+                document.getElementById('cashDetails').classList.remove('d-none');
+            }
+        } else {
+            paymentDetailsContainer.classList.add('d-none');
+        }
+    }
+
     // Event listener to add a new product row
     document.getElementById('addProductButton').addEventListener('click', function() {
         const productRow = createProductRow();
@@ -198,6 +292,10 @@
             productRow.remove();
         }
     });
+
+    // Event listeners for invoice status and payment mode changes
+    document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
+    document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
 
     // Initial call to update the price for the first product row when the page is loaded
     updateFirstRowPrice();
