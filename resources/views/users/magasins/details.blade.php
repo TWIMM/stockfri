@@ -6,6 +6,7 @@
     @include('Modals.add_magasin')
     @include('Modals.edit_magasin')
     @include('Modals.transfert_au_magasin')
+    @include('Modals.modal_prevente')
 
     <div class="row">
         <div class="col-sm-12">
@@ -37,7 +38,7 @@
 
                                         <td>{{ $stock->price }} FCFA</td>
                                         <td>
-                                            <button type="button" data-id='{{$stock->id}}' id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editStockModal">
+                                            <button type="button" data-id='{{$stock->id}}' id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVente">
                                                 <i class="ti ti-receipt"></i>
                                            </button> 
                                             <form action="{{ route('stock.return_to_magasin', $stock->id) }}" method="POST" style="display:inline;">
