@@ -11,6 +11,11 @@ class Stock extends Model
 
     protected $fillable = ['business_id' , 'user_id' ,'category_id', 'name', 'description','quantite_inventorie', 'quantity', 'price'];
 
+    public function commandeItems()
+    {
+        return $this->hasMany(CommandeItem::class);
+    }
+
     public function business()
     {
         return $this->belongsTo(Business::class);

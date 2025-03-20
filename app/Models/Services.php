@@ -10,6 +10,11 @@ class Services extends Model
     use HasFactory;
 
     protected $fillable = ['business_id', 'quantity',  'title', 'description', 'price'];
+    
+    public function commandeItems()
+    {
+        return $this->hasMany(CommandeItem::class);
+    }
 
     public function business()
     {
