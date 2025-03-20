@@ -182,6 +182,48 @@
     // Function to create a new product row dynamically
     let productIndex = 1;
     
+    // Function to get all currently selected product IDs
+    function getSelectedProductIds() {
+        const selectedIds = [];
+        document.querySelectorAll('.productSelect').forEach(select => {
+            if (select.value) {
+                selectedIds.push(select.value);
+            }
+        });
+        return selectedIds;
+    }
+    
+    // Function to update available products in all dropdowns
+    function updateAvailableProducts() {
+        const selectedIds = getSelectedProductIds();
+        
+        // Update each product dropdown
+        document.querySelectorAll('.productSelect').forEach(select => {
+            const currentValue = select.value;
+            
+            // Store all options first (clone the original options)
+            if (!select.originalOptions) {
+                const options = Array.from(select.options);
+                select.originalOptions = options;
+            }
+            
+            // Clear current options except the first one (placeholder)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            // Add back options that aren't selected elsewhere (except the current selection)
+            select.originalOptions.forEach(option => {
+                if (option.value === "" || option.value === currentValue || !selectedIds.includes(option.value)) {
+                    // Skip the first empty option since we kept it
+                    if (option.value !== "" || select.options.length === 0) {
+                        select.add(option.cloneNode(true));
+                    }
+                }
+            });
+        });
+    }
+    
     function createProductRow() {
         const productRow = document.createElement('div');
         productRow.classList.add('productRow', 'mb-3');
@@ -242,7 +284,12 @@
             if (selectedOption && selectedOption.getAttribute('data-price')) {
                 priceInput.value = selectedOption.getAttribute('data-price');
             }
+            // Update available products when selection changes
+            updateAvailableProducts();
         });
+        
+        // Update available products in this new dropdown
+        updateAvailableProducts();
 
         productIndex++;
     }
@@ -257,6 +304,8 @@
                     const priceInput = document.querySelector('input[name="products[0][price]"]');
                     priceInput.value = selectedOption.getAttribute('data-price');
                 }
+                // Update available products when selection changes
+                updateAvailableProducts();
             });
         }
     }
@@ -302,6 +351,8 @@
             const productRow = e.target.closest('.productRow');
             if (productRow) {
                 productRow.remove();
+                // Update available products after removal
+                updateAvailableProducts();
             }
         }
     });
@@ -314,6 +365,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         updateFirstRowPrice();
         
+        // Store original options for all product selects
+        document.querySelectorAll('.productSelect').forEach(select => {
+            const options = Array.from(select.options);
+            select.originalOptions = options;
+        });
+        
         // Also initialize the price field for the first row if a product is preselected
         const firstProductSelect = document.querySelector('.productSelect');
         if (firstProductSelect && firstProductSelect.selectedIndex > 0) {
@@ -322,6 +379,8 @@
                 const priceInput = document.querySelector('input[name="products[0][price]"]');
                 priceInput.value = selectedOption.getAttribute('data-price');
             }
+            // Initialize product filtering
+            updateAvailableProducts();
         }
     });
 </script>
