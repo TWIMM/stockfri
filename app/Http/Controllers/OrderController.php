@@ -270,6 +270,11 @@ class OrderController extends Controller
                 $quantity = $productData['quantity'];
                 $discount = isset($productData['discount']) ? $productData['discount'] : 0;
                 $itemTotal = $unitPrice * $quantity;
+
+                if ($discount > 99) {
+                    return back()->with('error', 'Une erreur est survenue: Vous offrez des reduction avoisinant 99,99%');
+
+                }
                 
                 if ($discount > 0) {
                     $itemTotal = $itemTotal - ($itemTotal * ($discount / 100));
