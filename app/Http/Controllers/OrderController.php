@@ -17,7 +17,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
+       // dd($request->all());
         // Validate the incoming request
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
@@ -103,8 +103,7 @@ class OrderController extends Controller
             // Commit the transaction
             DB::commit();
             
-            return redirect()->route('commandes.index')
-                ->with('success', 'Commande créée avec succès');
+            return redirect()->back()->with('success', 'Commande créée avec succès');
         } catch (\Exception $e) {
             // Rollback the transaction if something goes wrong
             DB::rollBack();
