@@ -12,6 +12,7 @@
                     <!-- Sélectionner un client -->
                     <div class="mb-3">
                         <label for="clientSelect" class="form-label">Sélectionner un Client</label>
+                        <input type="hidden" value="{{$magasin->id}}" name="magasin_id">
                         <select class="form-select" id="clientSelect" name="client_id" required>
                             <option value="" disabled selected>Choisir un client</option>
                             @foreach ($clients as $client)

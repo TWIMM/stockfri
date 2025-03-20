@@ -158,6 +158,7 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
+            'magasin_id' => 'required|exists:magasins,id',
             'products' => 'required|array',
             'products.*.product_id' => 'required|exists:stocks,id',
             'products.*.quantity' => 'required|integer|min:1',
@@ -291,8 +292,20 @@ class OrderController extends Controller
                 ]);
                 
                 // Reduce stock quantity
-                $stock->quantity -= $quantity;
-                $stock->save();
+
+                $stockCibled = DB::table('magasin_stock')
+                ->where('magasin_id', $request->magasin_id)
+                ->where('stock_id', $productData['product_id'])
+                ->first(); 
+                if ($stockCibled) {
+                    $newQuantity = $stockCibled->quantity - $quantity;
+                    
+                    DB::table('magasin_stock')
+                        ->where('magasin_id', $request->magasin_id)
+                        ->where('stock_id', $productData['product_id'])
+                        ->update(['quantity' => $newQuantity]);
+                }
+
                 
                 $totalOrderPrice += $itemTotal;
             }
