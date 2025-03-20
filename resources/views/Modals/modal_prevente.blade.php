@@ -180,18 +180,20 @@
 
 <script>
     // Function to create a new product row dynamically
-    let productIndex = 0;
+    let productIndex = 1;
+    
     function createProductRow() {
         const productRow = document.createElement('div');
         productRow.classList.add('productRow', 'mb-3');
-        productRow.setAttribute('data-index', productIndex); 
-
+        
+        const currentIndex = productIndex;
+        
         productRow.innerHTML = `
         <div class="d-flex">
             <!-- Produit -->
             <div class="flex-fill">
-                <label for="productSelect" class="form-label">Produit</label>
-                <select class="form-select productSelect" name="products[${productIndex}][product_id]" required>
+                <label for="productSelect${currentIndex}" class="form-label">Produit</label>
+                <select class="form-select productSelect" id="productSelect${currentIndex}" name="products[${currentIndex}][product_id]" required>
                     <option value="" disabled selected>Choisir un produit</option>
                     @foreach ($stocks as $stock)
                         <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
@@ -203,20 +205,20 @@
 
             <!-- Quantité -->
             <div class="flex-fill ms-2">
-                <label for="quantity" class="form-label">Quantité</label>
-                <input type="number" class="form-control" name="products[${productIndex}][quantity]" min="1" required>
+                <label for="quantity${currentIndex}" class="form-label">Quantité</label>
+                <input type="number" class="form-control" id="quantity${currentIndex}" name="products[${currentIndex}][quantity]" min="1" required>
             </div>
 
             <!-- Remise -->
             <div class="flex-fill ms-2">
-                <label for="discount" class="form-label">Remise (%)</label>
-                <input type="number" class="form-control" name="products[${productIndex}][discount]" min="0" max="100">
+                <label for="discount${currentIndex}" class="form-label">Remise (%)</label>
+                <input type="number" class="form-control" id="discount${currentIndex}" name="products[${currentIndex}][discount]" min="0" max="100">
             </div>
 
             <!-- Prix Unitaire -->
             <div class="flex-fill ms-2">
-                <label for="price" class="form-label">Prix Unitaire</label>
-                <input type="number" class="form-control" name="products[${productIndex}][price]" required readonly>
+                <label for="price${currentIndex}" class="form-label">Prix Unitaire</label>
+                <input type="number" class="form-control" id="price${currentIndex}" name="products[${currentIndex}][price]" required readonly>
             </div>
 
             <!-- Supprimer Produit -->
@@ -226,30 +228,36 @@
                 </button>
             </div>
         </div>
-    `;
+        `;
 
-        // Add event listener to the product select to update the price
-        const productSelect = productRow.querySelector('.productSelect');
+        // Add to DOM first
+        document.getElementById('productsContainer').appendChild(productRow);
+
+        // Then add event listener to the new product select
+        const productSelect = productRow.querySelector(`#productSelect${currentIndex}`);
+        const priceInput = productRow.querySelector(`#price${currentIndex}`);
+        
         productSelect.addEventListener('change', function() {
-            const selectedOption = productSelect.options[productSelect.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-            const priceInput = productRow.querySelector('input[name="products[${productIndex}][price]"]');
-            priceInput.value = price; // Update the price input field
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.getAttribute('data-price')) {
+                priceInput.value = selectedOption.getAttribute('data-price');
+            }
         });
-        productIndex++;
 
-        return productRow;
+        productIndex++;
     }
 
-    // Function to update the default (first) row's price field
+    // Function to update the price for the first row
     function updateFirstRowPrice() {
         const firstProductSelect = document.querySelector('.productSelect');
         if (firstProductSelect) {
-            const selectedOption = firstProductSelect.options[firstProductSelect.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-            const priceInput = document.querySelector(`input[name="products[${productIndex}][price]"]`);
-
-            priceInput.value = price; // Update the price input field for the first row
+            firstProductSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption && selectedOption.getAttribute('data-price')) {
+                    const priceInput = document.querySelector('input[name="products[0][price]"]');
+                    priceInput.value = selectedOption.getAttribute('data-price');
+                }
+            });
         }
     }
 
@@ -285,16 +293,16 @@
 
     // Event listener to add a new product row
     document.getElementById('addProductButton').addEventListener('click', function() {
-        const productRow = createProductRow();
-        document.getElementById('productsContainer').appendChild(productRow);
+        createProductRow();
     });
 
     // Event listener to remove a product row
     document.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('removeProduct')) {
+        if (e.target && (e.target.classList.contains('removeProduct') || e.target.closest('.removeProduct'))) {
             const productRow = e.target.closest('.productRow');
-            productRow.remove();
-            productIndex--;
+            if (productRow) {
+                productRow.remove();
+            }
         }
     });
 
@@ -302,9 +310,18 @@
     document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
     document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
 
-    // Initial call to update the price for the first product row when the page is loaded
-    updateFirstRowPrice();
-
-    // Add event listener to the first product select to update price on change
-    document.querySelector('.productSelect').addEventListener('change', updateFirstRowPrice);
+    // Initialize the event listeners for the first row
+    document.addEventListener('DOMContentLoaded', function() {
+        updateFirstRowPrice();
+        
+        // Also initialize the price field for the first row if a product is preselected
+        const firstProductSelect = document.querySelector('.productSelect');
+        if (firstProductSelect && firstProductSelect.selectedIndex > 0) {
+            const selectedOption = firstProductSelect.options[firstProductSelect.selectedIndex];
+            if (selectedOption && selectedOption.getAttribute('data-price')) {
+                const priceInput = document.querySelector('input[name="products[0][price]"]');
+                priceInput.value = selectedOption.getAttribute('data-price');
+            }
+        }
+    });
 </script>
