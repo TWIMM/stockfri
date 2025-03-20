@@ -254,12 +254,14 @@
                                         </li>
 
                                         <li class="submenu">
-                                            <a class="{{ request()->routeIs('magasins.*') ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a class="{{ request()->routeIs('magasins.*') ||  request()->routeIs('clients.*') ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
                                                 <span>Magasins</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
                                                 <li><a  href="{{ route('magasins.listes') }}" class="{{ request()->routeIs('magasins.listes') ? 'active' : ''  }}">Gestion des magasins</a></li>
+
+                                                <li><a  href="{{ route('clients.listes') }}" class="{{ request()->routeIs('clients.listes') ? 'active' : ''  }}">Gestion des clients</a></li>
                                             </ul>
                                         </li>
                                     @endif

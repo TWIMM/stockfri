@@ -13,10 +13,9 @@
                         <label for="clientSelect" class="form-label">Sélectionner un Client</label>
                         <select class="form-select" id="clientSelect" name="client_id" required>
                             <option value="" disabled selected>Choisir un client</option>
-                            <!-- Remplir dynamiquement avec les clients -->
-                            <option value="1">Client 1</option>
-                            <option value="2">Client 2</option>
-                            <option value="3">Client 3</option>
+                            @foreach ($clients as $client)
+                                <option value="{{ $client->id }}">{{ $client->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -30,34 +29,39 @@
                                     <label for="productSelect" class="form-label">Produit</label>
                                     <select class="form-select productSelect" name="products[][product_id]" required>
                                         <option value="" disabled selected>Choisir un produit</option>
-                                        <!-- Remplir dynamiquement avec les produits -->
-                                        <option value="1">Produit A</option>
-                                        <option value="2">Produit B</option>
-                                        <option value="3">Produit C</option>
+                                        @foreach ($stocks as $stock)
+                                            <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
+                                                {{ $stock->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
 
                                 <!-- Quantité -->
                                 <div class="flex-fill ms-2">
                                     <label for="quantity" class="form-label">Quantité</label>
-                                    <input type="number" class="form-control" name="products[][quantity]" min="1" required>
+                                    <input type="number" class="form-control" name="products[][quantity]"
+                                        min="1" required>
                                 </div>
 
                                 <!-- Remise -->
                                 <div class="flex-fill ms-2">
                                     <label for="discount" class="form-label">Remise (%)</label>
-                                    <input type="number" class="form-control" name="products[][discount]" min="0" max="100">
+                                    <input type="number" class="form-control" name="products[][discount]"
+                                        min="0" max="100">
                                 </div>
 
                                 <!-- Prix Unitaire -->
                                 <div class="flex-fill ms-2">
                                     <label for="price" class="form-label">Prix Unitaire</label>
-                                    <input type="number" class="form-control" name="products[][price]" required>
+                                    <input type="number" class="form-control" name="products[][price]" required
+                                        readonly>
                                 </div>
 
                                 <!-- Supprimer Produit -->
                                 <div class="flex-fill ms-2">
-                                    <button type="button" class="btn btn-danger removeProduct" aria-label="Supprimer produit">
+                                    <button type="button" class="btn btn-danger removeProduct"
+                                        aria-label="Supprimer produit">
                                         <i class="ti ti-trash"></i>
                                     </button>
                                 </div>
@@ -71,7 +75,8 @@
                     <!-- TVA -->
                     <div class="mb-3 mt-4">
                         <label for="tva" class="form-label">TVA (%)</label>
-                        <input type="number" class="form-control" id="tva" name="tva" min="0" required>
+                        <input type="number" class="form-control" id="tva" name="tva" min="0"
+                            required>
                     </div>
 
                     <!-- Mode de règlement -->
@@ -106,67 +111,96 @@
     </div>
 </div>
 
-<!-- Scripts nécessaires pour gérer les produits dynamiques -->
+
 <script>
-    // Fonction pour créer un nouveau produit
+    // Function to create a new product row dynamically
     function createProductRow() {
         const productRow = document.createElement('div');
         productRow.classList.add('productRow', 'mb-3');
-        
+
         productRow.innerHTML = `
-            <div class="d-flex">
-                <!-- Produit -->
-                <div class="flex-fill">
-                    <label for="productSelect" class="form-label">Produit</label>
-                    <select class="form-select productSelect" name="products[][product_id]" required>
-                        <option value="" disabled selected>Choisir un produit</option>
-                        <option value="1">Produit A</option>
-                        <option value="2">Produit B</option>
-                        <option value="3">Produit C</option>
-                    </select>
-                </div>
-
-                <!-- Quantité -->
-                <div class="flex-fill ms-2">
-                    <label for="quantity" class="form-label">Quantité</label>
-                    <input type="number" class="form-control" name="products[][quantity]" min="1" required>
-                </div>
-
-                <!-- Remise -->
-                <div class="flex-fill ms-2">
-                    <label for="discount" class="form-label">Remise (%)</label>
-                    <input type="number" class="form-control" name="products[][discount]" min="0" max="100">
-                </div>
-
-                <!-- Prix Unitaire -->
-                <div class="flex-fill ms-2">
-                    <label for="price" class="form-label">Prix Unitaire</label>
-                    <input type="number" class="form-control" name="products[][price]" required>
-                </div>
-
-                <!-- Supprimer Produit -->
-                <div class="flex-fill ms-2">
-                    <button type="button" class="btn btn-danger removeProduct" aria-label="Supprimer produit">
-                        <i class="ti ti-trash"></i>
-                    </button>
-                </div>
+        <div class="d-flex">
+            <!-- Produit -->
+            <div class="flex-fill">
+                <label for="productSelect" class="form-label">Produit</label>
+                <select class="form-select productSelect" name="products[][product_id]" required>
+                    <option value="" disabled selected>Choisir un produit</option>
+                    @foreach ($stocks as $stock)
+                        <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
+                            {{ $stock->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-        `;
-        
+
+            <!-- Quantité -->
+            <div class="flex-fill ms-2">
+                <label for="quantity" class="form-label">Quantité</label>
+                <input type="number" class="form-control" name="products[][quantity]" min="1" required>
+            </div>
+
+            <!-- Remise -->
+            <div class="flex-fill ms-2">
+                <label for="discount" class="form-label">Remise (%)</label>
+                <input type="number" class="form-control" name="products[][discount]" min="0" max="100">
+            </div>
+
+            <!-- Prix Unitaire -->
+            <div class="flex-fill ms-2">
+                <label for="price" class="form-label">Prix Unitaire</label>
+                <input type="number" class="form-control" name="products[][price]" required readonly>
+            </div>
+
+            <!-- Supprimer Produit -->
+            <div class="flex-fill ms-2">
+                <button type="button" class="btn btn-danger removeProduct" aria-label="Supprimer produit">
+                    <i class="ti ti-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+        // Add event listener to the product select to update the price
+        const productSelect = productRow.querySelector('.productSelect');
+        productSelect.addEventListener('change', function() {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const priceInput = productRow.querySelector('input[name="products[][price]"]');
+            priceInput.value = price; // Update the price input field
+        });
+
         return productRow;
     }
 
-    // Ajouter un produit
-    document.getElementById('addProductButton').addEventListener('click', function () {
+    // Function to update the default (first) row's price field
+    function updateFirstRowPrice() {
+        const firstProductSelect = document.querySelector('.productSelect');
+        if (firstProductSelect) {
+            const selectedOption = firstProductSelect.options[firstProductSelect.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const priceInput = firstProductSelect.closest('.productRow').querySelector(
+                'input[name="products[][price]"]');
+            priceInput.value = price; // Update the price input field for the first row
+        }
+    }
+
+    // Event listener to add a new product row
+    document.getElementById('addProductButton').addEventListener('click', function() {
         const productRow = createProductRow();
         document.getElementById('productsContainer').appendChild(productRow);
     });
 
-    // Supprimer un produit
-    document.addEventListener('click', function (e) {
+    // Event listener to remove a product row
+    document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('removeProduct')) {
             const productRow = e.target.closest('.productRow');
             productRow.remove();
         }
     });
+
+    // Initial call to update the price for the first product row when the page is loaded
+    updateFirstRowPrice();
+
+    // Add event listener to the first product select to update price on change
+    document.querySelector('.productSelect').addEventListener('change', updateFirstRowPrice);
 </script>

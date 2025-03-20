@@ -14,6 +14,7 @@ use App\Http\Controllers\MagasinsController;
 use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\CategorieProduitController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ClientController;
 
 Route::get('/invoice', [InvoiceController::class, 'generateInvoice'])->name('invoice');
 
@@ -129,6 +130,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Route to delete a category
     Route::delete('/categories/{id}', [CategorieProduitController::class, 'destroy'])->name('categories.destroy');
+    Route::post('clients_store', [ClientController::class, 'store'])->name('clients.store'); 
+    Route::get('/clients_list', [ClientController::class, 'index'])->name('clients.listes');
+    Route::delete('clients_destroy/{id}', [ClientController::class, 'destroy'])->name('clients.destroy'); // Delete supplier
+    Route::get('clients/{id}', [ClientController::class, 'edit'])->name('clients.show'); // Show individual supplier
+    Route::put('clients/update/{id}', [ClientController::class, 'update'])->name('clients.edit'); // Show individual supplier
 
 });
 

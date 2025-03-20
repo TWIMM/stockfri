@@ -8,6 +8,7 @@ use App\Models\Magasins;
 use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
 use App\Models\MouvementDeStocks;
+use App\Models\clients;
 
 class MagasinsController extends Controller
 {
@@ -69,9 +70,11 @@ class MagasinsController extends Controller
                 ];
             }
         }
+        $clients = Clients::where('user_id' ,$user->id)->get();
+
        // dd($stocksArray);
         return view('users.magasins.details', compact('magasin', 'magasins','hasPhysique', 
-            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs" , "stocks" , "stocksArray"));
+            'hasPrestation', "businesses", 'clients',  'user' , "categories" , "fournisseurs" , "stocks" , "stocksArray"));
 
     }
 

@@ -7,6 +7,7 @@
     @include('Modals.edit_magasin')
     @include('Modals.transfert_au_magasin')
     @include('Modals.modal_prevente')
+    @include('Modals.add_client')
 
     <div class="row">
         <div class="col-sm-12">
@@ -18,6 +19,9 @@
                     </button>
                     <button type="button"  id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVente">
                         <i class="ti ti-receipt"></i>
+                    </button> 
+                    <button type="button"  id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addClientModal">
+                        <i class="ti ti-plus"></i>
                     </button> 
                 </div>
 
