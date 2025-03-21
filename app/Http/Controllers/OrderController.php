@@ -139,6 +139,18 @@ class OrderController extends Controller
             'hasPrestation' , 'getClientScoreDataByClientId' , 'getBadge', 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
     }
 
+    public function showClientDetails($id)
+    {
+        $client = Clients::findOrFail($id);  
+
+        $clientData = $client->getClientDetails();
+
+        return response()->json([
+            'clientData' => $clientData,
+        ]);
+    }
+
+
     /**
      * Helper method to generate invoice from order
      * 

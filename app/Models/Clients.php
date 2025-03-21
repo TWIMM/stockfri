@@ -38,17 +38,17 @@ class Clients extends Model
 
     public function purchases()
     {
-        return $this->hasMany(Commandes::class);
+        return $this->hasMany(Commandes::class , 'client_id');
     }
 
-    public function payments()
+    public function paiements()
     {
-        return $this->hasMany(Paiement::class);
+        return $this->hasMany(Paiement::class, 'client_id'); // Use 'client_id' here
     }
 
     public function creditHistory()
     {
-        return $this->hasMany(CreditHistory::class);
+        return $this->hasMany(CreditHistory::class , 'client_id');
     }
 
     /**
@@ -65,8 +65,8 @@ class Clients extends Model
         $transactionWeight = 0.15;
 
         // 1. Calcul de la ponctualité des paiements
-        $allPayments = $this->payments()->where('created_at', '>=', Carbon::now()->subMonths(6))->get();
-        $latePayments = $this->payments()->where('is_late', true)
+        $allPayments = $this->paiements()->where('created_at', '>=', Carbon::now()->subMonths(6))->get();
+        $latePayments = $this->paiements()->where('is_late', true)
                                ->where('created_at', '>=', Carbon::now()->subMonths(6))->count();
         
         $totalPayments = $allPayments->count();
@@ -74,8 +74,8 @@ class Clients extends Model
             100 * (($totalPayments - $latePayments) / $totalPayments) : 50;
 
         // 2. Calcul du pourcentage de remboursement
-        $totalDebt = $this->purchases()->where('rest_to_pay' , '>', 0.00)->sum('total');
-        $totalPaid = $this->payments()->where('created_at', '>=', Carbon::now()->subMonths(6))->sum('amount');
+        $totalDebt = $this->purchases()->where('rest_to_pay' , '>', 0.00)->sum('total_price');
+        $totalPaid = $this->paiements()->where('created_at', '>=', Carbon::now()->subMonths(6))->sum('amount');
         $repaymentScore = ($totalDebt + $totalPaid) > 0 ? 
             min(100, 100 * ($totalPaid / ($totalDebt + $totalPaid))) : 50;
 
@@ -108,7 +108,7 @@ class Clients extends Model
         // Mettre à jour le score du client
         $this->credit_score = $finalScore;
         $this->last_score_update = Carbon::now();
-        $this->updateCreditLimit(); // Met à jour la limite de crédit en fonction du score
+        //$this->updateCreditLimit(); // Met à jour la limite de crédit en fonction du score
         $this->save();
 
         return $finalScore;
@@ -117,21 +117,10 @@ class Clients extends Model
     /**
      * Met à jour la limite de crédit en fonction du score
      */
-    public function updateCreditLimit()
+    public function updateCreditLimit($baseLimit)
     {
-        $baseLimit = $this->user->limite_credit;  //limit de credit a updatepar user dans les settings
         
-        if ($this->credit_score >= 90) {
-            $this->credit_limit = $baseLimit;
-        } elseif ($this->credit_score >= 70) {
-            $this->credit_limit = $baseLimit * 0.75;
-        } elseif ($this->credit_score >= 50) {
-            $this->credit_limit = $baseLimit * 0.5;
-        } elseif ($this->credit_score >= 30) {
-            $this->credit_limit = $baseLimit * 0.25;
-        } else {
-            $this->credit_limit = 0;
-        }
+        $this->credit_limit = $baseLimit;
     }
 
     /**
@@ -174,7 +163,7 @@ class Clients extends Model
      * 
      * @param float $amount
      * @return void
-     */
+    */
     public function reduceDebt($amount)
     {
         $this->current_debt = max(0, $this->current_debt - $amount);
@@ -198,5 +187,29 @@ class Clients extends Model
         if ($this->credit_score >= 50) return 'Moyen';
         if ($this->credit_score >= 30) return 'Élevé';
         return 'Très élevé';
+    }
+
+    /**
+     * Retourne les données détaillées du client
+     * 
+     * @return array
+     */
+    public function getClientDetails()
+    {
+        // Calculer les données supplémentaires si nécessaire
+        $this->calculateCreditScore(); // Vous pouvez calculer le score de crédit si nécessaire
+
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->tel,
+            'address' => $this->address,
+            'credit_score' => $this->credit_score,
+            'risk_level' => $this->getRiskLevel(),
+            'available_credit' => $this->credit_limit - $this->current_debt, // Calcul du crédit disponible
+            'credit_limit' => $this->credit_limit,
+            'current_debt' => $this->current_debt,
+            'last_score_update' => $this->last_score_update,
+        ];
     }
 }

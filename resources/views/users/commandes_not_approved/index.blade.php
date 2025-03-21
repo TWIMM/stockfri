@@ -5,6 +5,9 @@
 @section('content')
 
     @include('Modals.listes_des_produits')
+    @include('Modals.order_clients')
+
+    @include('Modals.orderpay')
 
     <div class="row">
         <div class="col-sm-12">
@@ -39,19 +42,19 @@
                                         @php
                                             $client = $getClientFromId($eachcommandeNotApproved->client_id);
                                         @endphp
+                                        <td><button type="button" data-client-id="{{ $client->id}}" data-id='{{ $eachcommandeNotApproved->id }}'
+                                                id='precommande-btn' class="btn bg-violet" data-bs-toggle="modal"
+                                                data-bs-target="#clientDetailsModal">
+                                                <i style="color: white" class="ti ti-user"></i>
+                                            </button></td>
                                         <td><button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
-                                            id='precommande-btn' class="btn bg-violet" data-bs-toggle="modal"
-                                            data-bs-target="#mmodalDetailClient">
-                                            <i style="color: white" class="ti ti-user"></i>
-                                        </button></td>
-                                        <td><button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
-                                            id='precommande-btn' class="btn bg-green" data-bs-toggle="modal"
-                                            data-bs-target="#mmodalDetailPay">
-                                            <i style="color: white" class="ti ti-receipt"></i>
-                                        </button></td>
+                                                id='precommande-btn' class="btn bg-green" data-bs-toggle="modal"
+                                                data-bs-target="#paymentDetailsModal">
+                                                <i style="color: white" class="ti ti-receipt"></i>
+                                            </button></td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
-                                        <td>{{ count($eachcommandeNotApproved->commandeItems)}} </td>
+                                        <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
                                             <button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
@@ -435,6 +438,33 @@
         // Add event listener for payment mode change
         document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').addEventListener('change',
             togglePaymentDetails);
+    </script>
+    <script>
+        // Assuming the modal is triggered by a button with the 'data-client-id' attribute
+        document.getElementById('clientDetailsModal').addEventListener('show.bs.modal', function(event) {
+            const clientId = event.relatedTarget.getAttribute('data-client-id');
+
+            // Fetch client data from the API
+            fetch(`/clients_data/${clientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const clientData = data.clientData;
+                    loadClientDetails(clientData);
+                })
+                .catch(error => {
+                    console.error('Error fetching client data:', error);
+                });
+        });
+
+        function loadClientDetails(clientData) {
+            document.getElementById('clientName').innerText = clientData.name;
+            document.getElementById('clientEmail').innerText = clientData.email;
+            document.getElementById('clientPhone').innerText = clientData.phone;
+            document.getElementById('clientAddress').innerText = clientData.address;
+            document.getElementById('clientCreditScore').innerText = clientData.credit_score;
+            document.getElementById('clientRiskLevel').innerText = clientData.risk_level;
+            document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
+        }
     </script>
 
 @endsection
