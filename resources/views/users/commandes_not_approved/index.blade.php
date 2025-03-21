@@ -44,7 +44,7 @@
                                                 {{ $eachcommandeNotApproved->payment_mode }}</span></td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
                                         <td>{{$getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'credit_score')}}</td>
-                                        <td>{{$getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'risk_level')}}</td>
+                                        <td>{!! $getBadge($getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'risk_level')) !!}</td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
 
                                         <td>

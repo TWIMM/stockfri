@@ -69,6 +69,25 @@ class OrderController extends Controller
         //dd($commandeNotApproved);
         $clients = Clients::where('user_id' ,$user->id)->get();
 
+
+        $getBadge = function($riskLevel)
+        {
+            switch ($riskLevel) {
+                case 'Très faible':
+                    return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
+                case 'Faible':
+                    return '<span class="badge badge-pill badge-status bg-info">Faible</span>';
+                case 'Moyen':
+                    return '<span class="badge badge-pill badge-status bg-warning">Moyen</span>';
+                case 'Élevé':
+                    return '<span class="badge badge-pill badge-status bg-danger">Élevé</span>';
+                case 'Très élevé':
+                    return '<span class="badge badge-pill badge-status bg-dark">Très élevé</span>';
+                default:
+                    return '<span class="badge badge-pill badge-status bg-secondary">Inconnu</span>';
+            }
+        };
+
         $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
             $client = Clients::find($id);
             
@@ -107,7 +126,7 @@ class OrderController extends Controller
         };
 
         return view('users.commandes_not_approved.index', compact('commandeNotApproved','hasPhysique', 
-            'hasPrestation' , 'getClientScoreDataByClientId' , 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
+            'hasPrestation' , 'getClientScoreDataByClientId' , 'getBadge', 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
     }
 
     /**
