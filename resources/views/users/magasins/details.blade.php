@@ -15,7 +15,7 @@
                 <div class="card-header">
                  
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addToMagasinsModal">
-                        Transférer au Magasin
+                        <i class="ti ti-arrow-forward"></i>  Transférer au Magasin  
                     </button>
                     <button type="button"  id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVente">
                         <i class="ti ti-receipt"></i>
@@ -41,9 +41,13 @@
                                 @foreach($stocksArray as $stock)
                                     <tr>
                                         <td>{{ $stock->name }}</td>
-                                        <td>{{ $stock->quantity }}</td>
+                                        <td><span class="badge badge-pill badge-status bg-green">
+                                            {{ $stock->quantity }} 
+                                            </span></td>
 
-                                        <td>{{ $stock->price }} FCFA</td>
+                                        <td><span class="badge badge-pill badge-status bg-blue">
+                                            {{ $stock->price }} FCFA
+                                            </span></td>
                                         <td>
                                             
                                             <form action="{{ route('stock.return_to_magasin', $stock->id) }}" method="POST" style="display:inline;">

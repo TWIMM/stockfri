@@ -38,7 +38,8 @@
                                             $client = $getClientFromId($eachcommandeNotApproved->client_id);
                                         @endphp
                                         <td>{{ $client->name }}</td>
-                                        <td>{{ $eachcommandeNotApproved->payment_mode }}</td>
+                                        <td><span class="badge badge-pill badge-status bg-violet">
+                                                {{ $eachcommandeNotApproved->payment_mode }}</span></td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
                                         <td>{{ $eachcommandeNotApproved->rest_to_pay }}</td>
 
@@ -137,11 +138,14 @@
                                     createProductRow();
 
                                     const productSelect = document.querySelector(
-                                        `select[name="products[${index}][product_id]"]`);
+                                        `select[name="products[${index}][product_id]"]`
+                                    );
                                     const quantityInput = document.querySelector(
-                                        `input[name="products[${index}][quantity]"]`);
+                                        `input[name="products[${index}][quantity]"]`
+                                    );
                                     const discountInput = document.querySelector(
-                                        `input[name="products[${index}][discount]"]`);
+                                        `input[name="products[${index}][discount]"]`
+                                    );
                                     const priceInput = document.querySelector(
                                         `input[name="products[${index}][price]"]`);
 
@@ -203,10 +207,10 @@
         // Fonction pour réinitialiser complètement le conteneur des produits
         function resetProductsContainer() {
             const productsContainer = document.getElementById('productsContainer');
-            
+
             // Vider complètement le conteneur
             productsContainer.innerHTML = '';
-            
+
             // Créer la première ligne par défaut
             const template = document.createElement('div');
             template.className = 'product-row mb-3';
@@ -217,7 +221,7 @@
 
                         <select name="products[0][product_id]" class="form-control product-select" required>
                             <option value="">-- Sélectionner un produit --</option>
-                            @foreach($stocks as $product)
+                            @foreach ($stocks as $product)
                             <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
                             @endforeach
                         </select>
@@ -242,9 +246,9 @@
                     </div>
                 </div>
             `;
-            
+
             productsContainer.appendChild(template);
-            
+
             // Ajouter les event listeners nécessaires pour cette première ligne
             addProductRowEventListeners(template);
         }
@@ -253,7 +257,7 @@
         function createProductRow() {
             const productsContainer = document.getElementById('productsContainer');
             const rowCount = productsContainer.children.length;
-            
+
             const newRow = document.createElement('div');
             newRow.className = 'product-row mb-3';
             newRow.innerHTML = `
@@ -263,7 +267,7 @@
 
                         <select name="products[${rowCount}][product_id]" class="form-control product-select" required>
                             <option value="">-- Sélectionner un produit --</option>
-                            @foreach($stocks as $product)
+                            @foreach ($stocks as $product)
                             <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
                             @endforeach
                         </select>
@@ -289,19 +293,19 @@
                     </div>
                 </div>
             `;
-            
+
             productsContainer.appendChild(newRow);
-            
+
             // Ajouter les event listeners pour cette nouvelle ligne
             addProductRowEventListeners(newRow);
-            
+
             // Ajouter l'event listener pour le bouton de suppression
             newRow.querySelector('.remove-product-btn').addEventListener('click', function() {
                 productsContainer.removeChild(newRow);
                 // Réindexer les champs
                 reindexProductRows();
             });
-            
+
             return newRow;
         }
 
@@ -309,7 +313,7 @@
         function reindexProductRows() {
             const productsContainer = document.getElementById('productsContainer');
             const rows = productsContainer.querySelectorAll('.product-row');
-            
+
             rows.forEach((row, index) => {
                 // Mettre à jour les attributs name avec le nouvel index
                 row.querySelector('.product-select').name = `products[${index}][product_id]`;
@@ -326,22 +330,22 @@
             const quantityInput = row.querySelector('.product-quantity');
             const discountInput = row.querySelector('.product-discount');
             const priceInput = row.querySelector('.product-price');
-            
+
             // Ajouter les event listeners
             productSelect.addEventListener('change', updatePrice);
             quantityInput.addEventListener('input', updatePrice);
             discountInput.addEventListener('input', updatePrice);
-            
+
             // Fonction pour mettre à jour le prix
             function updatePrice() {
                 if (productSelect.value) {
                     const basePrice = parseFloat(productSelect.options[productSelect.selectedIndex].dataset.price);
                     const quantity = parseFloat(quantityInput.value) || 0;
                     const discount = parseFloat(discountInput.value) || 0;
-                    
-                    const finalPrice = basePrice * quantity * (1 - discount/100);
+
+                    const finalPrice = basePrice * quantity * (1 - discount / 100);
                     priceInput.value = finalPrice.toFixed(2);
-                    
+
                     // Mettre à jour le total
                     updateTotalPrice();
                 }
@@ -352,11 +356,11 @@
         function updateTotalPrice() {
             const priceInputs = document.querySelectorAll('.product-price');
             let total = 0;
-            
+
             priceInputs.forEach(input => {
                 total += parseFloat(input.value) || 0;
             });
-            
+
             // Si vous avez un champ pour afficher le total
             if (document.getElementById('totalPrice')) {
                 document.getElementById('totalPrice').textContent = total.toFixed(2);
@@ -389,7 +393,7 @@
             const paymentDetailsContainers = document.querySelectorAll('.payment-details');
             paymentDetailsContainers.forEach(container => {
                 container.style.display = 'none';
-                
+
                 // Vider les champs
                 const inputs = container.querySelectorAll('input');
                 inputs.forEach(input => {
@@ -406,12 +410,12 @@
         // Function to toggle payment details based on payment mode
         function togglePaymentDetails() {
             const paymentMode = document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').value;
-            
+
             // Hide all payment detail sections
             document.querySelectorAll('.payment-details').forEach(el => {
                 el.style.display = 'none';
             });
-            
+
             // Show the relevant payment detail section
             if (paymentMode !== '') {
                 document.getElementById(`${paymentMode}Details`).style.display = 'block';
@@ -419,7 +423,8 @@
         }
 
         // Add event listener for payment mode change
-        document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').addEventListener('change', togglePaymentDetails);
+        document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').addEventListener('change',
+            togglePaymentDetails);
     </script>
 
 @endsection

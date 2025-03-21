@@ -12,7 +12,10 @@
 
                     <div class="mb-3">
                         <label for="stock_id" class="form-label">Produit</label>
+                        <input type="hidden" value="{{$magasin->id}}" name="magasin_id">
+
                         <select name="stock_id" id="stock_id" class="form-control" required>
+                            
                             @foreach ($stocks as $stock)
                                 <option value="{{ $stock->id }}">{{ $stock->name }}</option>
                             @endforeach
@@ -24,13 +27,7 @@
                         <input type="number" class="form-control" id="quantity" name="quantity" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="magasin" class="form-label">Magasin</label>
-                        <select name="magasin_id" id="magasin_id" class="form-control" required>
-                            @foreach ($magasins as $magasin)
-                                <option value="{{ $magasin->id }}">{{ $magasin->name }}</option>
-                            @endforeach
-                        </select>                    </div>
+                   
 
                 </div>
                 <div class="modal-footer">
