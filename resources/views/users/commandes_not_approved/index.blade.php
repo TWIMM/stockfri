@@ -464,57 +464,57 @@
 
         // Fonction pour charger les détails du paiement dans le modal
         function loadPaymentDetails(paymentId) {
-            // Make an AJAX request to fetch the payment details
-            fetch(`/commande_data/${paymentId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const paymentDetails = data.commande; // Get the payment data from the response
+    // Make an AJAX request to fetch the payment details
+    fetch(`/commande_data/${paymentId}`)
+        .then(response => response.json())
+        .then(data => {
+            const paymentDetails = data.commande; // Get the payment data from the response
 
-                    // Remplissage des informations dans le modal
-                    document.getElementById('totalAmount').innerText = paymentDetails.total_price;
-                    document.getElementById('amountPaid').innerText = paymentDetails.already_paid;
-                    document.getElementById('paymentModeOrderDet').innerText = paymentDetails.payment_mode;
+            // Remplissage des informations dans le modal
+            document.getElementById('client').innerText = paymentDetails.client || 'N/A';
+            document.getElementById('magasin').innerText = paymentDetails.magasin || 'N/A';
+            document.getElementById('user').innerText = paymentDetails.user || 'N/A';
+            document.getElementById('totalAmount').innerText = paymentDetails.total_price || 'N/A';
+            document.getElementById('tva_ORDER').innerText = paymentDetails.tva || 'N/A';
+            document.getElementById('invoiceStatusoRDER').innerText = paymentDetails.invoice_status || 'N/A';
+            document.getElementById('paymentModeOrderDet').innerText = paymentDetails.payment_mode || 'N/A';
+            document.getElementById('amountPaid').innerText = paymentDetails.already_paid || '0.00';
+            document.getElementById('restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
 
-                    // Ensure payment mode is properly formatted
-                    const paymentMode = (paymentDetails.payment_mode || "").trim();
+            // Ensure payment mode is properly formatted
+            const paymentMode = (paymentDetails.payment_mode || "").trim();
+            console.log("Payment mode:", paymentMode);
 
-                    // Log for debugging
-                    console.log("Payment mode:", paymentMode);
+            // First hide all payment details
+            const allPaymentRows = document.querySelectorAll('.payment-details-oder_pay');
+            allPaymentRows.forEach(row => row.classList.add('d-none'));
 
-                    // First hide all payment details
-                    const allPaymentRows = document.querySelectorAll('.payment-details-oder_pay');
-                    allPaymentRows.forEach(row => row.classList.add('d-none'));
+            // Détails supplémentaires selon le mode de paiement
+            if (paymentMode === "mobile_money") {
+                document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+                document.getElementById('mobileMoneyRef').classList.remove('d-none');
+                document.getElementById('mobileNumber').innerText = paymentDetails.mobile_number || 'N/A';
+                document.getElementById('mobileReference').innerText = paymentDetails.mobile_reference || 'N/A';
+            } else if (paymentMode === "credit_card") {
+                document.getElementById('creditCardDetailsType').classList.remove('d-none');
+                document.getElementById('creditCardDetailsRef').classList.remove('d-none');
+                document.getElementById('cardType').innerText = paymentDetails.card_type || 'N/A';
+                document.getElementById('cardReference').innerText = paymentDetails.card_reference || 'N/A';
+            } else if (paymentMode === "bank_transfer") {
+                document.getElementById('bankNameRow').classList.remove('d-none');
+                document.getElementById('bankReferenceRow').classList.remove('d-none');
+                document.getElementById('bankName').innerText = paymentDetails.bank_name || 'N/A';
+                document.getElementById('bankReference').innerText = paymentDetails.bank_reference || 'N/A';
+            } else if (paymentMode === "cash") {
+                document.getElementById('cashDetailsOrderPay').classList.remove('d-none');
+                document.getElementById('cashReference').innerText = paymentDetails.cash_reference || 'N/A';
+            } else {
+                console.log("Unknown payment mode:", paymentMode);
+            }
+        })
+        .catch(error => console.error('Error fetching payment details:', error));
+}
 
-                    // Détails supplémentaires selon le mode de paiement
-                    if (paymentMode === "mobile_money") {
-                        document.getElementById('mobileMoneyDetails').classList.remove('d-none');
-                        document.getElementById('mobileMoneyRef').classList.remove('d-none');
-                        document.getElementById('mobileNumber').innerText = paymentDetails.mobile_number || 'N/A';
-                        document.getElementById('mobileReference').innerText = paymentDetails.mobile_reference || 'N/A';
-
-                    } else if (paymentMode === "credit_card") {
-                        document.getElementById('creditCardDetailsType').classList.remove('d-none');
-                        document.getElementById('creditCardDetailsRef').classList.remove('d-none');
-                        document.getElementById('cardType').innerText = paymentDetails.card_type || 'N/A';
-                        document.getElementById('cardReference').innerText = paymentDetails.card_reference || 'N/A';
-
-                    } else if (paymentMode === "bank_transfer") {
-                        document.getElementById('bankNameRow').classList.remove('d-none');
-                        document.getElementById('bankReferenceRow').classList.remove('d-none');
-                        document.getElementById('bankName').innerText = paymentDetails.bank_name || 'N/A';
-                        document.getElementById('bankReference').innerText = paymentDetails.bank_reference || 'N/A';
-
-                    } else if (paymentMode === "cash") {
-                        document.getElementById('cashDetailsOrderPay').classList.remove('d-none');
-                        document.getElementById('cashReference').innerText = paymentDetails.cash_reference || 'N/A';
-
-                    } else {
-                        console.log("Unknown payment mode:", paymentMode);
-                        // You could display a generic message or show a specific "unknown" section
-                    }
-                })
-                .catch(error => console.error('Error fetching payment details:', error));
-        }
         // Initialisation de la fonction lors de l'ouverture du modal
         document.getElementById('paymentDetailsModal').addEventListener('show.bs.modal', function(event) {
             // Get the paymentId from the button that triggered the modal

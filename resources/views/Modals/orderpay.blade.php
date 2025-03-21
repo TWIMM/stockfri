@@ -19,16 +19,40 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td><strong>Client</strong></td>
+                                <td id="client"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Magasin</strong></td>
+                                <td id="magasin"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Utilisateur</strong></td>
+                                <td id="user"></td>
+                            </tr>
+                            <tr>
                                 <td><strong>Montant Total</strong></td>
                                 <td id="totalAmount"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>TVA</strong></td>
+                                <td id="tva_ORDER"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Statut de la Facture</strong></td>
+                                <td id="invoiceStatusoRDER"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mode de Paiement</strong></td>
+                                <td id="paymentModeOrderDet"></td>
                             </tr>
                             <tr>
                                 <td><strong>Montant Payé</strong></td>
                                 <td id="amountPaid"></td>
                             </tr>
                             <tr>
-                                <td><strong>Mode de Paiement</strong></td>
-                                <td id="paymentModeOrderDet"></td>
+                                <td><strong>Restant à Payer</strong></td>
+                                <td id="restToPay"></td>
                             </tr>
                             <!-- Mobile Money Details -->
                             <tr id="mobileMoneyDetails" class="payment-details-oder_pay d-none">
