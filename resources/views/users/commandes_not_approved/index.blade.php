@@ -20,11 +20,11 @@
                                 <tr>
                                     <th>Produit</th>
                                     <th>Client</th>
-                                    <th>Mode de Paiement </th>
-                                    <th>Total</th>
-                                    <th>Client credit score</th>
-                                    <th>Risque de credit</th>
-                                    <th>Reste a payer</th>
+                                    <th>Details de Paiement </th>
+                                    <th>Prix total </th>
+                                    <th>Montant restant</th>
+                                    <th>Nombre de produit(s)</th>
+
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -39,13 +39,19 @@
                                         @php
                                             $client = $getClientFromId($eachcommandeNotApproved->client_id);
                                         @endphp
-                                        <td>{{ $client->name }}</td>
-                                        <td><span class="badge badge-pill badge-status bg-violet">
-                                                {{ $eachcommandeNotApproved->payment_mode }}</span></td>
+                                        <td><button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
+                                            id='precommande-btn' class="btn bg-violet" data-bs-toggle="modal"
+                                            data-bs-target="#mmodalDetailClient">
+                                            <i style="color: white" class="ti ti-user"></i>
+                                        </button></td>
+                                        <td><button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
+                                            id='precommande-btn' class="btn bg-green" data-bs-toggle="modal"
+                                            data-bs-target="#mmodalDetailPay">
+                                            <i style="color: white" class="ti ti-receipt"></i>
+                                        </button></td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
-                                        <td>{{$getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'credit_score')}}</td>
-                                        <td>{!! $getBadge($getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'risk_level')) !!}</td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
+                                        <td>{{ count($eachcommandeNotApproved->commandeItems)}} </td>
 
                                         <td>
                                             <button type="button" data-id='{{ $eachcommandeNotApproved->id }}'

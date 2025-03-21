@@ -96,6 +96,16 @@ class OrderController extends Controller
             }
             
             // Créer un tableau de toutes les données disponibles
+            if($client->trusted === 1){
+                $allData = [
+                    'credit_score' => 90,
+                    'risk_level' => 'Très faible',
+                    'available_credit' => $client->limit_credit_for_this_user - $client->current_debt,
+                    'credit_limit' => $client->limit_credit_for_this_user,
+                    'current_debt' => $client->current_debt,
+                    'last_score_update' => $client->last_score_update
+                ];
+            }
             $allData = [
                 'credit_score' => $client->credit_score,
                 'risk_level' => $client->getRiskLevel(),

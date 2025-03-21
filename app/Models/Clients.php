@@ -15,6 +15,8 @@ class Clients extends Model
         'name', 
         'email', 
         'tel', 
+        'trusted', 
+        'limit_credit_for_this_user',
         'address',
         'credit_score',         // Score de crédit actuel du client
         'credit_limit',         // Limite maximum de crédit autorisée
