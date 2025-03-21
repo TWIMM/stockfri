@@ -69,8 +69,45 @@ class OrderController extends Controller
         //dd($commandeNotApproved);
         $clients = Clients::where('user_id' ,$user->id)->get();
 
+        $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
+            $client = Clients::find($id);
+            
+            if (!$client) {
+                return null; // Retourne null si le client n'existe pas
+            }
+            
+            // Créer un tableau de toutes les données disponibles
+            $allData = [
+                'credit_score' => $client->credit_score,
+                'risk_level' => $client->getRiskLevel(),
+                'available_credit' => $client->credit_limit - $client->current_debt,
+                'credit_limit' => $client->credit_limit,
+                'current_debt' => $client->current_debt,
+                'last_score_update' => $client->last_score_update
+            ];
+            
+            // Si une clé spécifique est demandée et existe dans le tableau
+            if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
+                return $allData[$dataToReturn];
+            }
+            
+            // Si un tableau de clés est fourni
+            if (is_array($dataToReturn)) {
+                $result = [];
+                foreach ($dataToReturn as $key) {
+                    if (array_key_exists($key, $allData)) {
+                        $result[$key] = $allData[$key];
+                    }
+                }
+                return $result;
+            }
+            
+            // Par défaut, retourner toutes les données
+            return (object)$allData;
+        };
+
         return view('users.commandes_not_approved.index', compact('commandeNotApproved','hasPhysique', 
-            'hasPrestation' , 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
+            'hasPrestation' , 'getClientScoreDataByClientId' , 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
     }
 
     /**

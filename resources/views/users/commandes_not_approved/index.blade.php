@@ -22,6 +22,8 @@
                                     <th>Client</th>
                                     <th>Mode de Paiement </th>
                                     <th>Total</th>
+                                    <th>Client credit score</th>
+                                    <th>Risque de credit</th>
                                     <th>Reste a payer</th>
                                     <th>Actions</th>
                                 </tr>
@@ -41,7 +43,9 @@
                                         <td><span class="badge badge-pill badge-status bg-violet">
                                                 {{ $eachcommandeNotApproved->payment_mode }}</span></td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
-                                        <td>{{ $eachcommandeNotApproved->rest_to_pay }}</td>
+                                        <td>{{$getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'credit_score')}}</td>
+                                        <td>{{$getClientScoreDataByClientId($eachcommandeNotApproved->client_id, 'risk_level')}}</td>
+                                        <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
 
                                         <td>
                                             <button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
