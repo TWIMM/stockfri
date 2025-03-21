@@ -16,6 +16,7 @@ use App\Http\Controllers\CategorieProduitController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\LivraisonController;
 
 Route::get('/invoice', [InvoiceController::class, 'generateInvoice'])->name('invoice');
 
@@ -137,6 +138,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('clients/{id}', [ClientController::class, 'edit'])->name('clients.show'); // Show individual supplier
     Route::put('clients/update/{id}', [ClientController::class, 'update'])->name('clients.edit'); // Show individual supplier
     Route::post('/stock_fri_order_stock', [OrderController::class, 'store'])->name('stock.stock_fri_order_stock'); // Show individual supplier
+    Route::get('/commandes_listes', [OrderController::class, 'index'])->name('commandes.listes');
+    Route::get('/factures_listes', [InvoiceController::class, 'index'])->name('factures.listes');
+    Route::get('/livraisons_listes', [LivraisonController::class, 'index'])->name('livraisons.listes');
+    Route::get('/pre_commandes_listes', [OrderController::class, 'getPreCommandes'])->name('pre_commandes.listes');
+    Route::get('/precommande/{id}', [OrderController::class, 'getPreCommandesSpec'])->name('pre_commandes.spec');
 
 });
 

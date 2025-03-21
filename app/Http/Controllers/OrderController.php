@@ -12,6 +12,9 @@ use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
 use App\Services\InvoiceService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Magasins;
+
 
 class OrderController extends Controller
 {
@@ -40,6 +43,34 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la génération de la facture: ' . $e->getMessage());
         }
+    }
+
+
+    public function getPreCommandes(){
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+        $user = Auth::user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+        $categories = $user->categorieProduits; 
+        $fournisseurs = $user->fournisseurs; 
+        $getClientFromId = function($id) {
+            return Clients::find($id);
+        };
+
+        $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
+
+        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
+        $commandeNotApproved = Commandes::where('user_id' , auth()->id())
+        ->where('validation_status' , 'not_approved')
+        ->paginate(10); 
+        //dd($commandeNotApproved);
+        $clients = Clients::where('user_id' ,$user->id)->get();
+
+        return view('users.commandes_not_approved.index', compact('commandeNotApproved','hasPhysique', 
+            'hasPrestation' , 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
     }
 
     /**
@@ -138,6 +169,24 @@ class OrderController extends Controller
         ];
         
         return $modes[$mode] ?? $mode;
+    }
+
+    public function getPreCommandesSpec($id){
+        $commande = Commandes::findOrFail($id);
+        $products = CommandeItem::where('commande_id', $id)->get();
+        
+        $paymentDetails = [];
+        if ($commande->payment_mode) {
+            // Récupérer les détails de paiement selon le mode
+            // (logique similaire à l'exemple précédent)
+           
+        }
+        
+        return response()->json([
+            'commande' => $commande,
+            'products' => $products,
+            'payment_details' => $paymentDetails
+        ]);
     }
     
     /**
@@ -250,6 +299,7 @@ class OrderController extends Controller
                 'payment_mode' => $request->payment_mode,
                 'invoice_status' => $request->invoice_status,
                 'tva' => $request->tva,
+                'magasin_id' => $request->magasin_id,
                 // Payment details based on payment mode
                 'mobile_number' => $request->mobile_number,
                 'mobile_reference' => $request->mobile_reference,
@@ -258,6 +308,7 @@ class OrderController extends Controller
                 'card_type' => $request->card_type,
                 'card_reference' => $request->card_reference,
                 'cash_reference' => $request->cash_reference,
+                'user_id' => auth()->id(),
             ]);
             
             $totalOrderPrice = 0;

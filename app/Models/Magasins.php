@@ -15,6 +15,10 @@ class Magasins extends Model
     {
         return $this->belongsTo(Business::class);
     }
+    public function commandes()
+    {
+        return $this->hasMany(Commandes::class);
+    }
 
     public function stocks()
     {

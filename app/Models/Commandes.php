@@ -11,8 +11,10 @@ class Commandes extends Model
     
     protected $fillable = [
         'client_id',
+        'user_id',
         'total_price',
         'payment_mode',
+        'magasin_id',
         'invoice_status',
         'tva',
         'mobile_number',
@@ -29,6 +31,14 @@ class Commandes extends Model
     public function client()
     {
         return $this->belongsTo(Clients::class);
+    }
+    public function magasin()
+    {
+        return $this->belongsTo(Magasins::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
     
     public function commandeItems()
