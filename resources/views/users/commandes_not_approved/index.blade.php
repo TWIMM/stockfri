@@ -191,10 +191,7 @@
                                 '#mmodalListeDeProduits button[type="submit"]');
                             submitButton.textContent = 'Mettre à jour la commande';
 
-                            // Ouvrir le modal manuellement
-                            const bsModal = new bootstrap.Modal(document.getElementById(
-                                'mmodalListeDeProduits'));
-                            bsModal.show();
+                           
                         } else {
                             alert('Impossible de récupérer les détails de la commande.');
                         }
