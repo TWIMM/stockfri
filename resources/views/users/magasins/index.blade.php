@@ -5,14 +5,13 @@
 @section('content')
     @include('Modals.add_magasin')
     @include('Modals.edit_magasin')
-    @include('Modals.transfert_au_magasin')
 
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMagasinsModal">
-                        Ajouter Magasins
+                        <i class="ti ti-plus"></i> Ajouter Magasins
                     </button>
                    
                 </div>

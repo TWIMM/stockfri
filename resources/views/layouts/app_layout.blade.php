@@ -254,14 +254,14 @@
                                         </li>
 
                                         <li class="submenu">
-                                            <a class="{{ request()->routeIs('magasins.*') ||  request()->routeIs('clients.*') ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a class="{{ request()->routeIs('magasins.*') ||  request()->routeIs('clients.*') ||  request()->routeIs('livraisons.*') ||  request()->routeIs('pre_commandes.*')  ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
                                                 <span>Magasins</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
                                                 <li><a  href="{{ route('magasins.listes') }}" class="{{ request()->routeIs('magasins.listes') ? 'active' : ''  }}">Gestion des magasins</a></li>
                                                 <li><a  href="{{ route('clients.listes') }}" class="{{ request()->routeIs('clients.listes') ? 'active' : ''  }}">Gestion des clients</a></li>
-                                                <li><a  href="{{ route('pre_commandes.listes') }}" class="{{ request()->routeIs('livraisons.listes') ? 'active' : ''  }}">Approuver des commandes</a></li>
+                                                <li><a  href="{{ route('pre_commandes.listes') }}" class="{{ request()->routeIs('pre_commandes.listes') ? 'active' : ''  }}">Approuver des commandes</a></li>
                                                 <li><a  href="{{ route('commandes.listes') }}" class="{{ request()->routeIs('commandes.listes') ? 'active' : ''  }}">Gestion des Commandes</a></li>
                                                 <li><a  href="{{ route('livraisons.listes') }}" class="{{ request()->routeIs('livraisons.listes') ? 'active' : ''  }}">Gestion des Livraisons</a></li>
                                                 <li><a  href="{{ route('factures.listes') }}" class="{{ request()->routeIs('factures.listes') ? 'active' : ''  }}">Gestion des Factures</a></li>
