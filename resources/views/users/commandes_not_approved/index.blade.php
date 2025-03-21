@@ -213,6 +213,8 @@
             template.innerHTML = `
                 <div class="row">
                     <div class="col-md-4">
+                        <label for="productSelect0" class="form-label">Produit</label>
+
                         <select name="products[0][product_id]" class="form-control product-select" required>
                             <option value="">-- Sélectionner un produit --</option>
                             @foreach($stocks as $product)
@@ -221,12 +223,16 @@
                         </select>
                     </div>
                     <div class="col-md-2">
+                        <label for="quantity0" class="form-label">Quantité</label>
+
                         <input type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
                     </div>
                     <div class="col-md-2">
+                        <label for="discount${0}" class="form-label">Remise (%)</label>
                         <input type="number" name="products[0][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
                     </div>
                     <div class="col-md-3">
+                        <label for="price${0}" class="form-label">Prix Unitaire</label>
                         <input type="number" name="products[0][price]" class="form-control product-price" placeholder="Prix" readonly>
                     </div>
                     <div class="col-md-1">
@@ -253,6 +259,8 @@
             newRow.innerHTML = `
                 <div class="row">
                     <div class="col-md-4">
+                       <label for="productSelect${rowCount}" class="form-label">Produit</label>
+
                         <select name="products[${rowCount}][product_id]" class="form-control product-select" required>
                             <option value="">-- Sélectionner un produit --</option>
                             @foreach($stocks as $product)
@@ -261,12 +269,17 @@
                         </select>
                     </div>
                     <div class="col-md-2">
+                        <label for="quantity${rowCount}" class="form-label">Quantité</label>
+
                         <input type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
                     </div>
                     <div class="col-md-2">
+                        <label for="discount${rowCount}" class="form-label">Remise (%)</label>
                         <input type="number" name="products[${rowCount}][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
                     </div>
                     <div class="col-md-3">
+                        <label for="price${rowCount}" class="form-label">Prix Unitaire</label>
+
                         <input type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
                     </div>
                     <div class="col-md-1">
