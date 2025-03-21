@@ -55,7 +55,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Niveau de risque</strong></td>
-                                <td id="clientRiskLevel"></td>
+                                <td > <span id='clientRiskLevelBadge' style="color: white" class="badge"></span></td>
                             </tr>
                             <tr>
                                 <td><strong>Crédit disponible</strong></td>

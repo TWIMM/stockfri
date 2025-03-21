@@ -462,7 +462,28 @@
             document.getElementById('clientPhone').innerText = clientData.phone;
             document.getElementById('clientAddress').innerText = clientData.address;
             document.getElementById('clientCreditScore').innerText = clientData.credit_score;
-            document.getElementById('clientRiskLevel').innerText = clientData.risk_level;
+            document.getElementById('clientRiskLevelBadge').innerText = clientData.risk_level;
+
+            // Assuming you want to set a badge based on the risk level
+            const riskLevelBadge = document.getElementById('clientRiskLevelBadge');
+
+            if (clientData.risk_level === 'Faible') {
+                riskLevelBadge.className = 'badge bg-success';
+                riskLevelBadge.innerText = 'Faible';
+            } else if (clientData.risk_level === 'Très faible') {
+                riskLevelBadge.className = 'badge bg-warning';
+                riskLevelBadge.innerText = 'Très faible';
+            } else if (clientData.risk_level === 'Moyen') {
+                riskLevelBadge.className = 'badge bg-danger';
+                riskLevelBadge.innerText = 'Moyen';
+            } else if (clientData.risk_level === 'Très Élevé') {
+                riskLevelBadge.className = 'badge bg-secondary';
+                riskLevelBadge.innerText = 'Très Élevé';
+            } else {
+                riskLevelBadge.className = 'badge bg-violet';
+                riskLevelBadge.innerText = 'Élevé';
+            }
+
             document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
         }
     </script>
