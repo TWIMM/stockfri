@@ -26,7 +26,7 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody`>
+                            <tbody>
                                 @foreach ($commandeNotApproved as $eachcommandeNotApproved)
                                     <tr>
                                         <td><button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
@@ -59,7 +59,7 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -99,57 +99,58 @@
                                 'Détails de la Commande';
 
                             // Remplir le formulaire avec les données
-                            document.querySelector('#mmodalListeDeProduits select[name="client_id"]')
+                            document.querySelector(
+                                    '#mmodalListeDeProduits select[name="client_id"]')
                                 .value = data.commande.client_id;
-                            document.querySelector('#mmodalListeDeProduits input[name="tva"]').value = data
+                            document.querySelector('#mmodalListeDeProduits input[name="tva"]')
+                                .value = data
                                 .commande.tva || 0;
-                            document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]')
+                            document.querySelector(
+                                    '#mmodalListeDeProduits select[name="payment_mode"]')
                                 .value = data.commande.payment_mode;
-                            document.querySelector('#mmodalListeDeProduits select[name="invoice_status"]')
+                            document.querySelector(
+                                    '#mmodalListeDeProduits select[name="invoice_status"]')
                                 .value = data.commande.invoice_status;
 
-                            // Vider les produits existants (garder la première ligne)
-                            const productsContainer = document.getElementById(
-                                'productsContainer');
-                            while (productsContainer.children.length > 1) {
-                                productsContainer.removeChild(productsContainer.lastChild);
-                            }
+                            // Vider complètement le conteneur de produits
+                            resetProductsContainer();
 
-                            // Remplir avec le premier produit
-                            if (data.products.length > 0) {
-                                const firstProductSelect = document.querySelector(
-                                    'select[name="products[0][product_id]"]');
-                                const firstQuantityInput = document.querySelector(
-                                    'input[name="products[0][quantity]"]');
-                                const firstDiscountInput = document.querySelector(
-                                    'input[name="products[0][discount]"]');
-                                const firstPriceInput = document.querySelector(
-                                    'input[name="products[0][price]"]');
+                            // Remplir avec les produits de la commande
+                            data.products.forEach((product, index) => {
+                                // Pour le premier produit, utiliser la ligne existante
+                                if (index === 0) {
+                                    const firstProductSelect = document.querySelector(
+                                        'select[name="products[0][product_id]"]');
+                                    const firstQuantityInput = document.querySelector(
+                                        'input[name="products[0][quantity]"]');
+                                    const firstDiscountInput = document.querySelector(
+                                        'input[name="products[0][discount]"]');
+                                    const firstPriceInput = document.querySelector(
+                                        'input[name="products[0][price]"]');
 
-                                firstProductSelect.value = data.products[0].stock_id;
-                                firstQuantityInput.value = data.products[0].quantity;
-                                firstDiscountInput.value = data.products[0].discount || 0;
-                                firstPriceInput.value = data.products[0].price;
-                            }
+                                    firstProductSelect.value = product.stock_id;
+                                    firstQuantityInput.value = product.quantity;
+                                    firstDiscountInput.value = product.discount || 0;
+                                    firstPriceInput.value = product.unit_price;
+                                } else {
+                                    // Pour les produits suivants, créer de nouvelles lignes
+                                    createProductRow();
 
-                            // Ajouter les produits supplémentaires
-                            for (let i = 1; i < data.products.length; i++) {
-                                createProductRow();
+                                    const productSelect = document.querySelector(
+                                        `select[name="products[${index}][product_id]"]`);
+                                    const quantityInput = document.querySelector(
+                                        `input[name="products[${index}][quantity]"]`);
+                                    const discountInput = document.querySelector(
+                                        `input[name="products[${index}][discount]"]`);
+                                    const priceInput = document.querySelector(
+                                        `input[name="products[${index}][price]"]`);
 
-                                const productSelect = document.querySelector(
-                                    `select[name="products[${i}][product_id]"]`);
-                                const quantityInput = document.querySelector(
-                                    `input[name="products[${i}][quantity]"]`);
-                                const discountInput = document.querySelector(
-                                    `input[name="products[${i}][discount]"]`);
-                                const priceInput = document.querySelector(
-                                    `input[name="products[${i}][price]"]`);
-
-                                productSelect.value = data.products[i].stock_id;
-                                quantityInput.value = data.products[i].quantity;
-                                discountInput.value = data.products[i].discount || 0;
-                                priceInput.value = data.products[i].price;
-                            }
+                                    productSelect.value = product.stock_id;
+                                    quantityInput.value = product.quantity;
+                                    discountInput.value = product.discount || 0;
+                                    priceInput.value = product.unit_price;
+                                }
+                            });
 
                             // Afficher les détails de paiement si nécessaire
                             togglePaymentDetails();
@@ -190,8 +191,6 @@
                             const submitButton = document.querySelector(
                                 '#mmodalListeDeProduits button[type="submit"]');
                             submitButton.textContent = 'Mettre à jour la commande';
-
-                           
                         } else {
                             alert('Impossible de récupérer les détails de la commande.');
                         }
@@ -200,6 +199,214 @@
                 });
             });
         });
+
+        // Fonction pour réinitialiser complètement le conteneur des produits
+        function resetProductsContainer() {
+            const productsContainer = document.getElementById('productsContainer');
+            
+            // Vider complètement le conteneur
+            productsContainer.innerHTML = '';
+            
+            // Créer la première ligne par défaut
+            const template = document.createElement('div');
+            template.className = 'product-row mb-3';
+            template.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <select name="products[0][product_id]" class="form-control product-select" required>
+                            <option value="">-- Sélectionner un produit --</option>
+                            @foreach($stocks as $product)
+                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="products[0][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" name="products[0][price]" class="form-control product-price" placeholder="Prix" readonly>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger remove-product-btn">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            productsContainer.appendChild(template);
+            
+            // Ajouter les event listeners nécessaires pour cette première ligne
+            addProductRowEventListeners(template);
+        }
+
+        // Fonction pour créer une nouvelle ligne de produit
+        function createProductRow() {
+            const productsContainer = document.getElementById('productsContainer');
+            const rowCount = productsContainer.children.length;
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'product-row mb-3';
+            newRow.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <select name="products[${rowCount}][product_id]" class="form-control product-select" required>
+                            <option value="">-- Sélectionner un produit --</option>
+                            @foreach($stocks as $product)
+                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="products[${rowCount}][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger remove-product-btn">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            productsContainer.appendChild(newRow);
+            
+            // Ajouter les event listeners pour cette nouvelle ligne
+            addProductRowEventListeners(newRow);
+            
+            // Ajouter l'event listener pour le bouton de suppression
+            newRow.querySelector('.remove-product-btn').addEventListener('click', function() {
+                productsContainer.removeChild(newRow);
+                // Réindexer les champs
+                reindexProductRows();
+            });
+            
+            return newRow;
+        }
+
+        // Fonction pour réindexer les lignes de produits
+        function reindexProductRows() {
+            const productsContainer = document.getElementById('productsContainer');
+            const rows = productsContainer.querySelectorAll('.product-row');
+            
+            rows.forEach((row, index) => {
+                // Mettre à jour les attributs name avec le nouvel index
+                row.querySelector('.product-select').name = `products[${index}][product_id]`;
+                row.querySelector('.product-quantity').name = `products[${index}][quantity]`;
+                row.querySelector('.product-discount').name = `products[${index}][discount]`;
+                row.querySelector('.product-price').name = `products[${index}][price]`;
+            });
+        }
+
+        // Fonction pour ajouter les event listeners aux champs d'une ligne
+        function addProductRowEventListeners(row) {
+            // Sélectionner les éléments pertinents
+            const productSelect = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.product-quantity');
+            const discountInput = row.querySelector('.product-discount');
+            const priceInput = row.querySelector('.product-price');
+            
+            // Ajouter les event listeners
+            productSelect.addEventListener('change', updatePrice);
+            quantityInput.addEventListener('input', updatePrice);
+            discountInput.addEventListener('input', updatePrice);
+            
+            // Fonction pour mettre à jour le prix
+            function updatePrice() {
+                if (productSelect.value) {
+                    const basePrice = parseFloat(productSelect.options[productSelect.selectedIndex].dataset.price);
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    const discount = parseFloat(discountInput.value) || 0;
+                    
+                    const finalPrice = basePrice * quantity * (1 - discount/100);
+                    priceInput.value = finalPrice.toFixed(2);
+                    
+                    // Mettre à jour le total
+                    updateTotalPrice();
+                }
+            }
+        }
+
+        // Fonction pour mettre à jour le prix total
+        function updateTotalPrice() {
+            const priceInputs = document.querySelectorAll('.product-price');
+            let total = 0;
+            
+            priceInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            
+            // Si vous avez un champ pour afficher le total
+            if (document.getElementById('totalPrice')) {
+                document.getElementById('totalPrice').textContent = total.toFixed(2);
+            }
+        }
+
+        // Réinitialiser le modal lors de la fermeture pour nouvelle commande
+        document.getElementById('mmodalListeDeProduits').addEventListener('hidden.bs.modal', function() {
+            // Réinitialiser à 'create' pour la prochaine ouverture
+            this.setAttribute('data-mode', 'create');
+
+            // Réinitialiser le titre
+            document.getElementById('modalVenteLabel').textContent = 'Nouvelle Vente';
+
+            // Réinitialiser l'action du formulaire
+            const form = document.querySelector('#mmodalListeDeProduits form');
+            form.action = "{{ route('stock.stock_fri_order_stock') }}";
+
+            // Réinitialiser le texte du bouton
+            const submitButton = document.querySelector('#mmodalListeDeProduits button[type="submit"]');
+            submitButton.textContent = 'Enregistrer la commande';
+
+            // Réinitialiser les champs du formulaire
+            form.reset();
+
+            // Réinitialiser complètement le conteneur des produits
+            resetProductsContainer();
+
+            // Réinitialiser les détails de paiement
+            const paymentDetailsContainers = document.querySelectorAll('.payment-details');
+            paymentDetailsContainers.forEach(container => {
+                container.style.display = 'none';
+                
+                // Vider les champs
+                const inputs = container.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.value = '';
+                });
+            });
+        });
+
+        // Event listener pour le bouton "Ajouter un produit"
+        document.getElementById('addProductBtn').addEventListener('click', function() {
+            createProductRow();
+        });
+
+        // Function to toggle payment details based on payment mode
+        function togglePaymentDetails() {
+            const paymentMode = document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').value;
+            
+            // Hide all payment detail sections
+            document.querySelectorAll('.payment-details').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Show the relevant payment detail section
+            if (paymentMode !== '') {
+                document.getElementById(`${paymentMode}Details`).style.display = 'block';
+            }
+        }
+
+        // Add event listener for payment mode change
+        document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').addEventListener('change', togglePaymentDetails);
     </script>
 
 @endsection
