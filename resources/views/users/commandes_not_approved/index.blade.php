@@ -42,13 +42,15 @@
                                         @php
                                             $client = $getClientFromId($eachcommandeNotApproved->client_id);
                                         @endphp
-                                        <td><button type="button" data-client-id="{{ $client->id}}" data-id='{{ $eachcommandeNotApproved->id }}'
-                                                id='precommande-btn' class="btn bg-violet" data-bs-toggle="modal"
+                                        <td><button type="button" data-client-id="{{ $client->id }}"
+                                                data-id='{{ $eachcommandeNotApproved->id }}' id='precommande-btn'
+                                                class="btn bg-violet" data-bs-toggle="modal"
                                                 data-bs-target="#clientDetailsModal">
                                                 <i style="color: white" class="ti ti-user"></i>
                                             </button></td>
-                                        <td><button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
-                                                id='precommande-btn' class="btn bg-green" data-bs-toggle="modal"
+                                        <td><button type="button" data-payment-id='{{ $eachcommandeNotApproved->id }}'
+                                                data-id='{{ $eachcommandeNotApproved->id }}' id='precommande-btn'
+                                                class="btn bg-green" data-bs-toggle="modal"
                                                 data-bs-target="#paymentDetailsModal">
                                                 <i style="color: white" class="ti ti-receipt"></i>
                                             </button></td>
@@ -416,9 +418,13 @@
         });
 
         // Event listener pour le bouton "Ajouter un produit"
-        document.getElementById('addProductBtn').addEventListener('click', function() {
-            createProductRow();
-        });
+        const addProductBtn = document.getElementById('addProductBtn');
+        if (addProductBtn) {
+            addProductBtn.addEventListener('click', function() {
+                createProductRow();
+            });
+        }
+
 
         // Function to toggle payment details based on payment mode
         function togglePaymentDetails() {
@@ -455,6 +461,69 @@
                     console.error('Error fetching client data:', error);
                 });
         });
+
+        // Fonction pour charger les détails du paiement dans le modal
+        function loadPaymentDetails(paymentId) {
+            // Make an AJAX request to fetch the payment details
+            fetch(`/commande_data/${paymentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const paymentDetails = data.commande; // Get the payment data from the response
+
+                    // Remplissage des informations dans le modal
+                    document.getElementById('totalAmount').innerText = paymentDetails.total_price;
+                    document.getElementById('amountPaid').innerText = paymentDetails.already_paid;
+                    document.getElementById('paymentModeOrderDet').innerText = paymentDetails.payment_mode;
+
+                    // Ensure payment mode is properly formatted
+                    const paymentMode = (paymentDetails.payment_mode || "").trim();
+
+                    // Log for debugging
+                    console.log("Payment mode:", paymentMode);
+
+                    // First hide all payment details
+                    const allPaymentRows = document.querySelectorAll('.payment-details-oder_pay');
+                    allPaymentRows.forEach(row => row.classList.add('d-none'));
+
+                    // Détails supplémentaires selon le mode de paiement
+                    if (paymentMode === "mobile_money") {
+                        document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+                        document.getElementById('mobileMoneyRef').classList.remove('d-none');
+                        document.getElementById('mobileNumber').innerText = paymentDetails.mobile_number || 'N/A';
+                        document.getElementById('mobileReference').innerText = paymentDetails.mobile_reference || 'N/A';
+
+                    } else if (paymentMode === "credit_card") {
+                        document.getElementById('creditCardDetailsType').classList.remove('d-none');
+                        document.getElementById('creditCardDetailsRef').classList.remove('d-none');
+                        document.getElementById('cardType').innerText = paymentDetails.card_type || 'N/A';
+                        document.getElementById('cardReference').innerText = paymentDetails.card_reference || 'N/A';
+
+                    } else if (paymentMode === "bank_transfer") {
+                        document.getElementById('bankNameRow').classList.remove('d-none');
+                        document.getElementById('bankReferenceRow').classList.remove('d-none');
+                        document.getElementById('bankName').innerText = paymentDetails.bank_name || 'N/A';
+                        document.getElementById('bankReference').innerText = paymentDetails.bank_reference || 'N/A';
+
+                    } else if (paymentMode === "cash") {
+                        document.getElementById('cashDetailsOrderPay').classList.remove('d-none');
+                        document.getElementById('cashReference').innerText = paymentDetails.cash_reference || 'N/A';
+
+                    } else {
+                        console.log("Unknown payment mode:", paymentMode);
+                        // You could display a generic message or show a specific "unknown" section
+                    }
+                })
+                .catch(error => console.error('Error fetching payment details:', error));
+        }
+        // Initialisation de la fonction lors de l'ouverture du modal
+        document.getElementById('paymentDetailsModal').addEventListener('show.bs.modal', function(event) {
+            // Get the paymentId from the button that triggered the modal
+            const paymentId = event.relatedTarget.getAttribute('data-payment-id');
+
+            // Load payment details using the paymentId
+            loadPaymentDetails(paymentId);
+        });
+
 
         function loadClientDetails(clientData) {
             document.getElementById('clientName').innerText = clientData.name;

@@ -150,6 +150,17 @@ class OrderController extends Controller
         ]);
     }
 
+    public function showCommandeDetails($id)
+    {
+        $commande = Commandes::findOrFail($id);  
+
+        $commandeData = $commande->getCommandeDetails();
+
+        return response()->json([
+            'commande' => $commandeData,
+        ]);
+    }
+
 
     /**
      * Helper method to generate invoice from order
