@@ -74,7 +74,7 @@ class Clients extends Model
             100 * (($totalPayments - $latePayments) / $totalPayments) : 50;
 
         // 2. Calcul du pourcentage de remboursement
-        $totalDebt = $this->purchases()->where('rest_to_pay' , '>', 0.00)->sum('total_price');
+        $totalDebt = $this->purchases()->where('validation_status' , 'approved')->where('rest_to_pay' , '>', 0.00)->sum('total_price');
         $totalPaid = $this->paiements()->where('created_at', '>=', Carbon::now()->subMonths(6))->sum('amount');
         $repaymentScore = ($totalDebt + $totalPaid) > 0 ? 
             min(100, 100 * ($totalPaid / ($totalDebt + $totalPaid))) : 50;
