@@ -45,6 +45,99 @@ class OrderController extends Controller
         }
     }
 
+    public function index(){
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+        $user = Auth::user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+        $categories = $user->categorieProduits; 
+        $fournisseurs = $user->fournisseurs; 
+        $getClientFromId = function($id) {
+            return Clients::find($id);
+        };
+
+        $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
+
+        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
+        $commandeNotApproved = Commandes::where('user_id' , auth()->id())
+        ->where('validation_status' , 'approved')
+        ->paginate(10); 
+        //dd($commandeNotApproved);
+        $clients = Clients::where('user_id' ,$user->id)->get();
+
+
+        $getBadge = function($riskLevel)
+        {
+            switch ($riskLevel) {
+                case 'Très faible':
+                    return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
+                case 'Faible':
+                    return '<span class="badge badge-pill badge-status bg-info">Faible</span>';
+                case 'Moyen':
+                    return '<span class="badge badge-pill badge-status bg-warning">Moyen</span>';
+                case 'Élevé':
+                    return '<span class="badge badge-pill badge-status bg-danger">Élevé</span>';
+                case 'Très élevé':
+                    return '<span class="badge badge-pill badge-status bg-dark">Très élevé</span>';
+                default:
+                    return '<span class="badge badge-pill badge-status bg-secondary">Inconnu</span>';
+            }
+        };
+
+        $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
+            $client = Clients::find($id);
+            
+            if (!$client) {
+                return null; // Retourne null si le client n'existe pas
+            }
+            
+            // Créer un tableau de toutes les données disponibles
+            if($client->trusted === 1){
+                $allData = [
+                    'credit_score' => 90,
+                    'risk_level' => 'Très faible',
+                    'available_credit' => $client->limit_credit_for_this_user - $client->current_debt,
+                    'credit_limit' => $client->limit_credit_for_this_user,
+                    'current_debt' => $client->current_debt,
+                    'last_score_update' => $client->last_score_update
+                ];
+            }
+            $allData = [
+                'credit_score' => $client->credit_score,
+                'risk_level' => $client->getRiskLevel(),
+                'available_credit' => $client->credit_limit - $client->current_debt,
+                'credit_limit' => $client->credit_limit,
+                'current_debt' => $client->current_debt,
+                'last_score_update' => $client->last_score_update
+            ];
+            
+            // Si une clé spécifique est demandée et existe dans le tableau
+            if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
+                return $allData[$dataToReturn];
+            }
+            
+            // Si un tableau de clés est fourni
+            if (is_array($dataToReturn)) {
+                $result = [];
+                foreach ($dataToReturn as $key) {
+                    if (array_key_exists($key, $allData)) {
+                        $result[$key] = $allData[$key];
+                    }
+                }
+                return $result;
+            }
+            
+            // Par défaut, retourner toutes les données
+            return (object)$allData;
+        };
+
+        return view('users.commandes_not_approved.index', compact('commandeNotApproved','hasPhysique', 
+            'hasPrestation' , 'getClientScoreDataByClientId' , 'getBadge', 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
+    }
+
 
     public function getPreCommandes(){
         if(auth()->user()->type === 'team_member'){

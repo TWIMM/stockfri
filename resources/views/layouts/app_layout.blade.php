@@ -254,7 +254,7 @@
                                         </li>
 
                                         <li class="submenu">
-                                            <a class="{{ request()->routeIs('magasins.*') ||  request()->routeIs('clients.*') ||  request()->routeIs('livraisons.*') ||  request()->routeIs('pre_commandes.*')  ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a class="{{ request()->routeIs('magasins.*') ||  request()->routeIs('clients.*') ||  request()->routeIs('livraisons.*') ||  request()->routeIs('pre_commandes.*') ||  request()->routeIs('commandes.*')  ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
                                                 <span>Magasins</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
