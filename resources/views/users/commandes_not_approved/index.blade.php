@@ -8,6 +8,7 @@
     @include('Modals.order_clients')
     @include('Modals.risk_high')
     @include('Modals.orderpay')
+    @include('Modals.risk_low')
 
     <div class="row">
         <div class="col-sm-12">
@@ -59,9 +60,9 @@
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
-                                            <button type="button"  data-client-id="{{ $client->id }}" data-id='{{ $eachcommandeNotApproved->id }}'
-                                                id='validate-order-btn' class="btn btn-secondary" data-bs-toggle="modal"
-                                                data-bs-target="#riskConfirmationModal">
+                                            <button type="button" data-client-id="{{ $client->id }}"
+                                                data-id='{{ $eachcommandeNotApproved->id }}' id='validate-order-btn'
+                                                class="btn btn-secondary">
                                                 <i class="ti ti-check"></i>
                                             </button>
                                             <form action="{{ route('stock.delete', $eachcommandeNotApproved->id) }}"
@@ -91,6 +92,49 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Get all edit buttons
             const precommandesee = document.querySelectorAll('#precommande-btn');
+
+            const validatesbUTTONS = document.querySelectorAll('#validate-order-btn');
+
+            validatesbUTTONS.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const clientId = button.getAttribute(
+                        'data-client-id');
+
+                    // Fetch client data from the API
+                    fetch(`/clients_data/${clientId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const clientData = data.clientData;
+                            document.getElementById('risk_credit_score').innerText = clientData
+                                .credit_score;
+                            document.getElementById('risk_level').innerText = clientData
+                                .risk_level;
+                            console.log(clientData)
+                            if (clientData.trusted == 0) {
+                                if (clientData.risk_level === 'Très élevé' || clientData
+                                    .risk_level === 'Élevé') {
+                                    const riskModal = new bootstrap.Modal(document
+                                        .getElementById('riskConfirmationModal'));
+                                    riskModal.show();
+                                } else {
+                                    const riskModal = new bootstrap.Modal(document
+                                        .getElementById('excellentCreditModal'));
+                                    riskModal.show();
+                                }
+                            } else if(clientData.trusted == 1){
+                                document.getElementById('available_credit_limit').value = clientData
+                                .limit_credit_for_this_user;
+                                const riskModal = new bootstrap.Modal(document
+                                        .getElementById('excellentCreditModal'));
+                                    riskModal.show();
+                            }
+
+                        })
+                        .catch(error => {
+                            console.error('Error fetching client data:', error);
+                        });
+                })
+            });
 
             // Loop through each button and add the event listener
             precommandesee.forEach(function(button) {
@@ -293,8 +337,8 @@
                             if (paymentMode === "mobile_money") {
                                 document.getElementById('mobileMoneyDetails').classList.remove(
                                     'd-none');
-                              /*  // document.getElementById('mobileMoneyRef').classList.remove(
-                                    'd-none'); */
+                                /*  // document.getElementById('mobileMoneyRef').classList.remove(
+                                      'd-none'); */
                                 document.getElementById('mobileNumber').innerText =
                                     data.commande.mobile_number || 'N/A';
                                 document.getElementById('mobileReference').innerText =
@@ -708,7 +752,7 @@
             const paymentId = event.relatedTarget.getAttribute('data-payment-id');
 
             // Load payment details using the paymentId
-             loadPaymentDetails(paymentId);
+            loadPaymentDetails(paymentId);
         });
 
         function loadClientDetails(clientData) {
@@ -740,28 +784,6 @@
             }
 
             document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
-        }
-
-
-        document.getElementById('riskConfirmationModal').addEventListener('show.bs.modal', function(event) {
-            const clientId = event.relatedTarget.getAttribute('data-client-id');
-
-            // Fetch client data from the API
-            fetch(`/clients_data/${clientId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const clientData = data.clientData;
-                    loadClientAndCommandDetails(clientData);
-                })
-                .catch(error => {
-                    console.error('Error fetching client data:', error);
-                });
-        });
-
-
-        function loadClientAndCommandDetails(clientData ) {
-            document.getElementById('risk_credit_score').innerText = clientData.credit_score;
-            document.getElementById('risk_level').innerText = clientData.risk_level;
         }
 
 

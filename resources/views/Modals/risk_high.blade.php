@@ -22,7 +22,7 @@
                 
                 <div class="form-group mt-3">
                     <tr class="mt-3">
-                        <td><strong>Confiance</strong></td>
+                        <td><strong>Trust client</strong></td>
                         <td>
                             <select class="form-select" name="trust_status">
                                 <option value="0">Désactiver</option>
@@ -39,6 +39,8 @@
                         Veuillez activer le Trust et ajouter un credit au portefeuille du client .
                     </div>
                 </div>
+
+                
                 
                 <input type="hidden" id="risk_commande_id" value="">
             </div>

@@ -209,6 +209,8 @@ class Clients extends Model
             'available_credit' => $this->credit_limit - $this->current_debt, // Calcul du crédit disponible
             'credit_limit' => $this->credit_limit,
             'current_debt' => $this->current_debt,
+            'limit_credit_for_this_user' =>  $this->limit_credit_for_this_user,
+            'trusted' => $this->trusted,
             'last_score_update' => $this->last_score_update,
         ];
     }
