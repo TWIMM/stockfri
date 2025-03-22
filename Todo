@@ -97,3 +97,29 @@ Le modèle Client que j'ai présenté est conçu pour gérer une évaluation de 
    - L'historique des scores est conservé pour analyse
 
 Ce modèle vous permet d'automatiser les décisions de vente à crédit en vous basant sur l'historique réel de chaque client plutôt que sur des impressions subjectives.
+
+
+
+Transfert au magasin(fromthegeneralstocktothemagasinstock) : User already bought these product and need to transfert them from his Central magasin to the distribution store 
+Achat chez fournisseur(addupquantity) : User Bought the product from the fournisseur and brought it to the general magasin 
+
+
+
+Workflow 
+
+in precommande : 
+user dont paid anything ?
+I user score enough to trust him ? Yes go and apply for a order 
+No ? go to step 3
+is user trusted ? Yes Apply the order in credit , remove amount from credit addup debt 
+No ? trust user , give him credit , and go do step two again
+
+
+user pay_partial ? check if system score is good , ask if user want to trust user and give him credit
+if Yes , do and make the rest payement in the credit  remove amount from credit addup debt 
+
+
+User can not make payement in the system without paying all the money , if they want to 
+they need to be trusted and to have credit , 
+User who have credit can buy in this credit , you cannot sell to a user more than credit allow him
+

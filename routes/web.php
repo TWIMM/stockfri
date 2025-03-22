@@ -145,6 +145,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/precommande/{id}', [OrderController::class, 'getPreCommandesSpec'])->name('pre_commandes.spec');
     Route::get('clients_data/{id}', [OrderController::class, 'showClientDetails'])->name('clients.showData'); // Show individual supplier
     Route::get('commande_data/{id}', [OrderController::class, 'showCommandeDetails'])->name('commandes.showData'); // Show individual supplier
+    Route::post('trust_client', [OrderController::class, 'trustClient'])->name('commandes.trustClient'); // Show individual supplier
+    Route::post('approve_client_order', [OrderController::class, 'approveClientOrder'])->name('commandes.approveClientOrder'); // Show individual supplier
 
 });
 

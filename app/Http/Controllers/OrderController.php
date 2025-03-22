@@ -45,6 +45,43 @@ class OrderController extends Controller
         }
     }
 
+    public function trustClient(Request $request){
+        $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'trusted' => 'required|string',
+            'new_credit_limit' => 'required|numeric|min:0',
+        ]);
+        
+        $client = Clients::find($request->client_id);
+
+        if($request->trusted === 'yes'){
+            $client->trusted = 1;
+        } else {
+            $client->trusted = 0;
+        }
+
+        
+        $client->limit_credit_for_this_user = $request->new_credit_limit;
+        $client->save();
+
+        return redirect()->back()->with('success', 'Success');
+    }
+
+
+    public function approveClientOrder(Request $requestt){
+        $request->validate([
+            'commande_id' => 'required|exists:commandes,id',
+            //'client_id' => 'required|exists:clients,id',
+        ]);
+        
+        //$client = Client::find($request->client_id);
+        $commandeNotApproved = Commandes::find($request->commande_id);
+        $commandeNotApproved->validation_status = 'approved';
+        $commandeNotApproved->save();
+
+        return redirect()->back()->with('success', 'Success');
+    }
+
     public function index(){
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
@@ -589,7 +626,7 @@ class OrderController extends Controller
             } else if ($request->invoice_status  === 'partially_paid') {
                 $already_paid = floatval($request->already_paid ?? 0); 
                 $rest_to_pay = $commande->total_price - $already_paid; 
-                $statutValidation = 'approved';
+                $statutValidation = 'not_approved';
             }
             else if ($request->invoice_status  === 'paid') {
                 $already_paid = $commande->total_price; 
@@ -601,14 +638,16 @@ class OrderController extends Controller
             $commande->validation_status = $statutValidation;
             $commande->save();
 
-            
-            // Generate the invoice for this order
-            $invoice = $this->generateInvoiceFromOrder($commande);
+            if($statutValidation === 'approved'){
+                $invoice = $this->generateInvoiceFromOrder($commande);
+                return redirect()->back()->with('success', 'Commande créée avec succès.' . $invoice->invoice_link);
+            }
+
             
             // Commit the transaction
             DB::commit();
             
-            return redirect()->back()->with('success', 'Commande créée avec succès. Facture générée: ' . $invoice->invoice_link);
+            return redirect()->back()->with('success', 'Pré-Commande créée avec succès.' );
         } catch (\Exception $e) {
             // Rollback the transaction if something goes wrong
             DB::rollBack();

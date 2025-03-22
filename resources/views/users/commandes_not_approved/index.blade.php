@@ -14,7 +14,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>Liste des commandes</h4>
+                    <h4>Liste des Pre-commandes</h4>
                 </div>
 
                 <div class="card-body">
@@ -113,6 +113,7 @@
                             if (clientData.trusted == 0) {
                                 if (clientData.risk_level === 'Très élevé' || clientData
                                     .risk_level === 'Élevé') {
+                                    document.getElementById('client_id_risk_high').value = clientId;
                                     const riskModal = new bootstrap.Modal(document
                                         .getElementById('riskConfirmationModal'));
                                     riskModal.show();
