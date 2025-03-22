@@ -283,7 +283,7 @@
 
                             // First hide all payment details
                             const allPaymentRows = document.querySelectorAll(
-                            '.payment-details');
+                                '.payment-details');
                             allPaymentRows.forEach(row => row.classList.add('d-none'));
 
                             document.getElementById('paymentDetailsContainer').classList.remove(
@@ -293,12 +293,12 @@
                             if (paymentMode === "mobile_money") {
                                 document.getElementById('mobileMoneyDetails').classList.remove(
                                     'd-none');
-                                document.getElementById('mobileMoneyRef').classList.remove(
-                                    'd-none');
+                              /*  // document.getElementById('mobileMoneyRef').classList.remove(
+                                    'd-none'); */
                                 document.getElementById('mobileNumber').innerText =
-                                data.commande.mobile_number || 'N/A';
+                                    data.commande.mobile_number || 'N/A';
                                 document.getElementById('mobileReference').innerText =
-                                data.commande.mobile_reference || 'N/A';
+                                    data.commande.mobile_reference || 'N/A';
                             } else if (paymentMode === "credit_card") {
                                 document.getElementById('creditCardDetailsType').classList
                                     .remove('d-none');
@@ -307,7 +307,7 @@
                                 document.getElementById('cardType').innerText = data.commande
                                     .card_type || 'N/A';
                                 document.getElementById('cardReference').innerText =
-                                data.commande.card_reference || 'N/A';
+                                    data.commande.card_reference || 'N/A';
                             } else if (paymentMode === "bank_transfer") {
                                 document.getElementById('bankNameRow').classList.remove(
                                     'd-none');
@@ -316,12 +316,12 @@
                                 document.getElementById('bankName').innerText = data.commande
                                     .bank_name || 'N/A';
                                 document.getElementById('bankReference').innerText =
-                                data.commande.bank_reference || 'N/A';
+                                    data.commande.bank_reference || 'N/A';
                             } else if (paymentMode === "cash") {
                                 document.getElementById('cashDetailsOrderPay').classList.remove(
                                     'd-none');
                                 document.getElementById('cashReference').innerText =
-                                data.commande.cash_reference || 'N/A';
+                                    data.commande.cash_reference || 'N/A';
                             } else {
                                 console.log("Unknown payment mode:", paymentMode);
                             }
@@ -625,10 +625,6 @@
                 createProductRow();
             });
         }
-
-       
-
-
     </script>
     <script>
         // Assuming the modal is triggered by a button with the 'data-client-id' attribute
@@ -647,6 +643,7 @@
                 });
         });
 
+
         // Fonction pour charger les détails du paiement dans le modal
         function loadPaymentDetails(paymentId) {
             // Make an AJAX request to fetch the payment details
@@ -656,17 +653,51 @@
                     const paymentDetails = data.commande; // Get the payment data from the response
 
                     // Remplissage des informations dans le modal
-                    document.getElementById('client').innerText = paymentDetails.client || 'N/A';
-                    document.getElementById('magasin').innerText = paymentDetails.magasin || 'N/A';
-                    document.getElementById('user').innerText = paymentDetails.user || 'N/A';
-                    document.getElementById('totalAmount').innerText = paymentDetails.total_price || 'N/A';
-                    document.getElementById('tva_ORDER').innerText = paymentDetails.tva || 'N/A';
-                    document.getElementById('invoiceStatusoRDER').innerText = paymentDetails.invoice_status || 'N/A';
-                    document.getElementById('paymentModeOrderDet').innerText = paymentDetails.payment_mode || 'N/A';
-                    document.getElementById('amountPaid').innerText = paymentDetails.already_paid || '0.00';
-                    document.getElementById('restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
+                    document.getElementById('payment_client').innerText = paymentDetails.client || 'N/A';
+                    document.getElementById('payment_magasin').innerText = paymentDetails.magasin || 'N/A';
+                    document.getElementById('payment_user').innerText = paymentDetails.user || 'N/A';
+                    document.getElementById('payment_totalAmount').innerText = paymentDetails.total_price || 'N/A';
+                    document.getElementById('payment_tva').innerText = paymentDetails.tva || 'N/A';
+                    document.getElementById('payment_invoiceStatus').innerText = paymentDetails.invoice_status || 'N/A';
+                    document.getElementById('payment_paymentMode').innerText = paymentDetails.payment_mode || 'N/A';
+                    document.getElementById('payment_amountPaid').innerText = paymentDetails.already_paid || '0.00';
+                    document.getElementById('payment_restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
 
+                    // Ensure payment mode is properly formatted
+                    const paymentMode = (paymentDetails.payment_mode || "").trim();
+                    console.log("Payment mode:", paymentMode);
 
+                    // First hide all payment details
+                    const allPaymentRows = document.querySelectorAll('.payment-details-row');
+                    allPaymentRows.forEach(row => row.classList.add('d-none'));
+
+                    // Détails supplémentaires selon le mode de paiement
+                    if (paymentMode === "mobile_money") {
+                        document.getElementById('payment_mobileMoneyDetails').classList.remove('d-none');
+                        //document.getElementById('payment_mobileMoneyRef').classList.remove('d-none');
+                        document.getElementById('payment_mobileNumber').innerText = paymentDetails.mobile_number ||
+                            'N/A';
+                        document.getElementById('payment_mobileReference').innerText = paymentDetails
+                            .mobile_reference || 'N/A';
+                    } else if (paymentMode === "credit_card") {
+                        document.getElementById('payment_creditCardDetailsType').classList.remove('d-none');
+                        document.getElementById('payment_creditCardDetailsRef').classList.remove('d-none');
+                        document.getElementById('payment_cardType').innerText = paymentDetails.card_type || 'N/A';
+                        document.getElementById('payment_cardReference').innerText = paymentDetails.card_reference ||
+                            'N/A';
+                    } else if (paymentMode === "bank_transfer") {
+                        document.getElementById('payment_bankNameRow').classList.remove('d-none');
+                        document.getElementById('payment_bankReferenceRow').classList.remove('d-none');
+                        document.getElementById('payment_bankName').innerText = paymentDetails.bank_name || 'N/A';
+                        document.getElementById('payment_bankReference').innerText = paymentDetails.bank_reference ||
+                            'N/A';
+                    } else if (paymentMode === "cash") {
+                        document.getElementById('payment_cashDetailsRow').classList.remove('d-none');
+                        document.getElementById('payment_cashReference').innerText = paymentDetails.cash_reference ||
+                            'N/A';
+                    } else {
+                        console.log("Unknown payment mode:", paymentMode);
+                    }
                 })
                 .catch(error => console.error('Error fetching payment details:', error));
         }
@@ -677,7 +708,7 @@
             const paymentId = event.relatedTarget.getAttribute('data-payment-id');
 
             // Load payment details using the paymentId
-            // loadPaymentDetails(paymentId);
+             loadPaymentDetails(paymentId);
         });
 
         function loadClientDetails(clientData) {
@@ -713,44 +744,44 @@
 
 
         // Function to toggle payment details visibility based on invoice status and payment mode
-    function togglePaymentDetails() {
-        const invoiceStatus = document.getElementById('invoiceStatus').value;
-        const paymentMode = document.getElementById('paymentMode').value;
-        const paymentDetailsContainer = document.getElementById('paymentDetailsContainer');
+        function togglePaymentDetails() {
+            const invoiceStatus = document.getElementById('invoiceStatus').value;
+            const paymentMode = document.getElementById('paymentMode').value;
+            const paymentDetailsContainer = document.getElementById('paymentDetailsContainer');
 
-        // Hide all payment detail fields first
-        document.querySelectorAll('.payment-details').forEach(detail => {
-            detail.classList.add('d-none');
-        });
+            // Hide all payment detail fields first
+            document.querySelectorAll('.payment-details').forEach(detail => {
+                detail.classList.add('d-none');
+            });
 
-        // Only show payment details if invoice status is "paid" or "partially_paid"
-        if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
-            paymentDetailsContainer.classList.remove('d-none');
+            // Only show payment details if invoice status is "paid" or "partially_paid"
+            if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
+                paymentDetailsContainer.classList.remove('d-none');
 
-            // Show the specific payment detail fields based on payment mode
-            if (paymentMode === 'mobile_money') {
-                document.getElementById('mobileMoneyDetails').classList.remove('d-none');
-            } else if (paymentMode === 'bank_transfer') {
-                document.getElementById('bankTransferDetails').classList.remove('d-none');
-            } else if (paymentMode === 'credit_card') {
-                document.getElementById('creditCardDetails').classList.remove('d-none');
-            } else if (paymentMode === 'cash') {
-                document.getElementById('cashDetails').classList.remove('d-none');
+                // Show the specific payment detail fields based on payment mode
+                if (paymentMode === 'mobile_money') {
+                    document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+                } else if (paymentMode === 'bank_transfer') {
+                    document.getElementById('bankTransferDetails').classList.remove('d-none');
+                } else if (paymentMode === 'credit_card') {
+                    document.getElementById('creditCardDetails').classList.remove('d-none');
+                } else if (paymentMode === 'cash') {
+                    document.getElementById('cashDetails').classList.remove('d-none');
+                }
+            } else {
+                paymentDetailsContainer.classList.add('d-none');
             }
-        } else {
-            paymentDetailsContainer.classList.add('d-none');
+
+            // Toggle the "already paid" input based on invoice status
+            if (invoiceStatus === 'paid' || invoiceStatus === 'unpaid') {
+                document.getElementById('alreadyPayIInput').classList.add('d-none');
+            } else if (invoiceStatus === 'partially_paid') {
+                document.getElementById('alreadyPayIInput').classList.remove('d-none');
+            }
         }
 
-        // Toggle the "already paid" input based on invoice status
-        if (invoiceStatus === 'paid' || invoiceStatus === 'unpaid') {
-            document.getElementById('alreadyPayIInput').classList.add('d-none');
-        } else if (invoiceStatus === 'partially_paid') {
-            document.getElementById('alreadyPayIInput').classList.remove('d-none');
-        }
-    }
-
-    // Event listeners for invoice status and payment mode changes
-    document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
-    document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
+        // Event listeners for invoice status and payment mode changes
+        document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
+        document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
     </script>
 @endsection
