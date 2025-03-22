@@ -167,7 +167,7 @@
                                         let productName = "Unknown Product";
                                         const originalSelect = document.querySelector(
                                             '#mmodalListeDeProduits select.productSelect'
-                                            );
+                                        );
                                         if (originalSelect && originalSelect
                                             .originalOptions) {
                                             for (let opt of originalSelect
@@ -195,13 +195,13 @@
 
                                     const productSelect = document.querySelector(
                                         `select[name="products[${index}][product_id]"]`
-                                        );
+                                    );
                                     const quantityInput = document.querySelector(
                                         `input[name="products[${index}][quantity]"]`
-                                        );
+                                    );
                                     const discountInput = document.querySelector(
                                         `input[name="products[${index}][discount]"]`
-                                        );
+                                    );
                                     const priceInput = document.querySelector(
                                         `input[name="products[${index}][price]"]`);
 
@@ -220,7 +220,7 @@
                                         let productName = "Unknown Product";
                                         const originalSelect = document.querySelector(
                                             '#mmodalListeDeProduits select.productSelect'
-                                            );
+                                        );
                                         if (originalSelect && originalSelect
                                             .originalOptions) {
                                             for (let opt of originalSelect
@@ -248,7 +248,6 @@
                             updateAllProductDropdowns();
 
                             // Afficher les détails de paiement si nécessaire
-                            togglePaymentDetails();
 
                             // Remplir les champs de détails de paiement si disponibles
                             if (data.payment_details) {
@@ -276,6 +275,55 @@
                                             .commande.cash_reference || '';
                                         break;
                                 }
+                            }
+
+                            // Ensure payment mode is properly formatted
+                            const paymentMode = data.commande.payment_mode;
+                            console.log("Payment mode:", paymentMode);
+
+                            // First hide all payment details
+                            const allPaymentRows = document.querySelectorAll(
+                            '.payment-details');
+                            allPaymentRows.forEach(row => row.classList.add('d-none'));
+
+                            document.getElementById('paymentDetailsContainer').classList.remove(
+                                'd-none');
+
+                            // Détails supplémentaires selon le mode de paiement
+                            if (paymentMode === "mobile_money") {
+                                document.getElementById('mobileMoneyDetails').classList.remove(
+                                    'd-none');
+                                document.getElementById('mobileMoneyRef').classList.remove(
+                                    'd-none');
+                                document.getElementById('mobileNumber').innerText =
+                                data.commande.mobile_number || 'N/A';
+                                document.getElementById('mobileReference').innerText =
+                                data.commande.mobile_reference || 'N/A';
+                            } else if (paymentMode === "credit_card") {
+                                document.getElementById('creditCardDetailsType').classList
+                                    .remove('d-none');
+                                document.getElementById('creditCardDetailsRef').classList
+                                    .remove('d-none');
+                                document.getElementById('cardType').innerText = data.commande
+                                    .card_type || 'N/A';
+                                document.getElementById('cardReference').innerText =
+                                data.commande.card_reference || 'N/A';
+                            } else if (paymentMode === "bank_transfer") {
+                                document.getElementById('bankNameRow').classList.remove(
+                                    'd-none');
+                                document.getElementById('bankReferenceRow').classList.remove(
+                                    'd-none');
+                                document.getElementById('bankName').innerText = data.commande
+                                    .bank_name || 'N/A';
+                                document.getElementById('bankReference').innerText =
+                                data.commande.bank_reference || 'N/A';
+                            } else if (paymentMode === "cash") {
+                                document.getElementById('cashDetailsOrderPay').classList.remove(
+                                    'd-none');
+                                document.getElementById('cashReference').innerText =
+                                data.commande.cash_reference || 'N/A';
+                            } else {
+                                console.log("Unknown payment mode:", paymentMode);
                             }
 
                             // Modifier l'action du formulaire pour la mise à jour
@@ -578,24 +626,9 @@
             });
         }
 
-        // Function to toggle payment details based on payment mode
-        function togglePaymentDetails() {
-            const paymentMode = document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').value;
+       
 
-            // Hide all payment detail sections
-            document.querySelectorAll('.payment-details').forEach(el => {
-                el.style.display = 'none';
-            });
 
-            // Show the relevant payment detail section
-            if (paymentMode !== '') {
-                document.getElementById(`${paymentMode}Details`).style.display = 'block';
-            }
-        }
-
-        // Add event listener for payment mode change
-        document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').addEventListener('change',
-            togglePaymentDetails);
     </script>
     <script>
         // Assuming the modal is triggered by a button with the 'data-client-id' attribute
@@ -633,36 +666,7 @@
                     document.getElementById('amountPaid').innerText = paymentDetails.already_paid || '0.00';
                     document.getElementById('restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
 
-                    // Ensure payment mode is properly formatted
-                    const paymentMode = (paymentDetails.payment_mode || "").trim();
-                    console.log("Payment mode:", paymentMode);
 
-                    // First hide all payment details
-                    const allPaymentRows = document.querySelectorAll('.payment-details-oder_pay');
-                    allPaymentRows.forEach(row => row.classList.add('d-none'));
-
-                    // Détails supplémentaires selon le mode de paiement
-                    if (paymentMode === "mobile_money") {
-                        document.getElementById('mobileMoneyDetails').classList.remove('d-none');
-                        document.getElementById('mobileMoneyRef').classList.remove('d-none');
-                        document.getElementById('mobileNumber').innerText = paymentDetails.mobile_number || 'N/A';
-                        document.getElementById('mobileReference').innerText = paymentDetails.mobile_reference || 'N/A';
-                    } else if (paymentMode === "credit_card") {
-                        document.getElementById('creditCardDetailsType').classList.remove('d-none');
-                        document.getElementById('creditCardDetailsRef').classList.remove('d-none');
-                        document.getElementById('cardType').innerText = paymentDetails.card_type || 'N/A';
-                        document.getElementById('cardReference').innerText = paymentDetails.card_reference || 'N/A';
-                    } else if (paymentMode === "bank_transfer") {
-                        document.getElementById('bankNameRow').classList.remove('d-none');
-                        document.getElementById('bankReferenceRow').classList.remove('d-none');
-                        document.getElementById('bankName').innerText = paymentDetails.bank_name || 'N/A';
-                        document.getElementById('bankReference').innerText = paymentDetails.bank_reference || 'N/A';
-                    } else if (paymentMode === "cash") {
-                        document.getElementById('cashDetailsOrderPay').classList.remove('d-none');
-                        document.getElementById('cashReference').innerText = paymentDetails.cash_reference || 'N/A';
-                    } else {
-                        console.log("Unknown payment mode:", paymentMode);
-                    }
                 })
                 .catch(error => console.error('Error fetching payment details:', error));
         }
@@ -673,7 +677,7 @@
             const paymentId = event.relatedTarget.getAttribute('data-payment-id');
 
             // Load payment details using the paymentId
-            loadPaymentDetails(paymentId);
+            // loadPaymentDetails(paymentId);
         });
 
         function loadClientDetails(clientData) {
@@ -706,5 +710,47 @@
 
             document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
         }
+
+
+        // Function to toggle payment details visibility based on invoice status and payment mode
+    function togglePaymentDetails() {
+        const invoiceStatus = document.getElementById('invoiceStatus').value;
+        const paymentMode = document.getElementById('paymentMode').value;
+        const paymentDetailsContainer = document.getElementById('paymentDetailsContainer');
+
+        // Hide all payment detail fields first
+        document.querySelectorAll('.payment-details').forEach(detail => {
+            detail.classList.add('d-none');
+        });
+
+        // Only show payment details if invoice status is "paid" or "partially_paid"
+        if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
+            paymentDetailsContainer.classList.remove('d-none');
+
+            // Show the specific payment detail fields based on payment mode
+            if (paymentMode === 'mobile_money') {
+                document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+            } else if (paymentMode === 'bank_transfer') {
+                document.getElementById('bankTransferDetails').classList.remove('d-none');
+            } else if (paymentMode === 'credit_card') {
+                document.getElementById('creditCardDetails').classList.remove('d-none');
+            } else if (paymentMode === 'cash') {
+                document.getElementById('cashDetails').classList.remove('d-none');
+            }
+        } else {
+            paymentDetailsContainer.classList.add('d-none');
+        }
+
+        // Toggle the "already paid" input based on invoice status
+        if (invoiceStatus === 'paid' || invoiceStatus === 'unpaid') {
+            document.getElementById('alreadyPayIInput').classList.add('d-none');
+        } else if (invoiceStatus === 'partially_paid') {
+            document.getElementById('alreadyPayIInput').classList.remove('d-none');
+        }
+    }
+
+    // Event listeners for invoice status and payment mode changes
+    document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
+    document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
     </script>
 @endsection

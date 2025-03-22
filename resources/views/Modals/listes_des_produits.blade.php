@@ -105,7 +105,7 @@
                     </div>
 
                     <div id="alreadyPayIInput" class="mb-3 d-none">
-                        <label for="invoiceStatus" class="form-label">Montant payé</label>
+                        <label for="invoiceStatusl" class="form-label">Montant payé</label>
                         <input type="number" name="already_paid" class="form-control">
                     </div>
 
@@ -188,7 +188,6 @@
     </div>
 </div>
 
-
 <script>
     // Function to get all currently selected product IDs
     function getSelectedProductIds() {
@@ -231,6 +230,19 @@
                 }
             });
         });
+    }
+
+    // Function to update price based on selected product
+    function updatePrice(productSelect) {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const rowContainer = productSelect.closest('.productRow');
+        const priceInput = rowContainer.querySelector('input[name*="[price]"]');
+
+        if (selectedOption && selectedOption.getAttribute('data-price')) {
+            priceInput.value = selectedOption.getAttribute('data-price');
+        } else {
+            priceInput.value = '';
+        }
     }
 
     // Function to create a new product row dynamically
@@ -289,14 +301,8 @@
 
         // Then add event listener to the new product select
         const productSelect = productRow.querySelector(`#productSelect${currentIndex}`);
-        const priceInput = productRow.querySelector(`#price${currentIndex}`);
-
         productSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption && selectedOption.getAttribute('data-price')) {
-                priceInput.value = selectedOption.getAttribute('data-price');
-            }
-            // Update available products when selection changes
+            updatePrice(this);
             updateAvailableProducts();
         });
 
@@ -327,26 +333,28 @@
         }
     });
 
-    // Initialize the event listeners for the first row
-    document.addEventListener('DOMContentLoaded', function() {
-        // Store original options for all product selects
-        document.querySelectorAll('.productSelect').forEach(select => {
-            const options = Array.from(select.options);
-            select.originalOptions = options;
-        });
+   
 
-        // Add change event for the first product select
-        const firstProductSelect = document.querySelector('.productSelect');
-        if (firstProductSelect) {
-            firstProductSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption && selectedOption.getAttribute('data-price')) {
-                    const priceInput = document.querySelector('input[name="products[0][price]"]');
-                    priceInput.value = selectedOption.getAttribute('data-price');
-                }
-                // Update available products when selection changes
+    // Initialize event listeners for product selects on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners for the existing product selects
+        document.querySelectorAll('.productSelect').forEach(select => {
+            select.addEventListener('change', function() {
+                updatePrice(this);
                 updateAvailableProducts();
             });
-        }
+        });
+
+        // Initialize price fields based on selected products
+        document.querySelectorAll('.productSelect').forEach(select => {
+            if (select.value) {
+                updatePrice(select);
+            }
+        });
+
+        // Initialize available products
+        updateAvailableProducts();
+
+        
     });
 </script>
