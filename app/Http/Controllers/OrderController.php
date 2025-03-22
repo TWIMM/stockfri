@@ -134,7 +134,7 @@ class OrderController extends Controller
             return (object)$allData;
         };
 
-        return view('users.commandes_not_approved.index', compact('commandeNotApproved','hasPhysique', 
+        return view('users.commandes_approved.index', compact('commandeNotApproved','hasPhysique', 
             'hasPrestation' , 'getClientScoreDataByClientId' , 'getBadge', 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
     }
 
