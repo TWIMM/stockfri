@@ -34,20 +34,7 @@
                                 <td><strong>Adresse</strong></td>
                                 <td id="clientAddress"></td>
                             </tr>
-                            <tr>
-                                <td><strong>Confiance</strong></td>
-                                <td>
-                                    <select class="form-select" name="trust_status">
-                                        <option value="0">Désactiver</option>
-                                        <option value="1">Activer</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Crédit en FCFA</strong></td>
-                                <td><input type="number" class="form-control" name="credit"
-                                        placeholder="Montant du crédit en FCFA" required></td>
-                            </tr>
+                            
                             <!-- Additional client data fields -->
                             <tr>
                                 <td><strong>Score de crédit</strong></td>

@@ -6,7 +6,7 @@
 
     @include('Modals.listes_des_produits')
     @include('Modals.order_clients')
-
+    @include('Modals.risk_high')
     @include('Modals.orderpay')
 
     <div class="row">
@@ -59,9 +59,9 @@
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
-                                            <button type="button" data-id='{{ $eachcommandeNotApproved->id }}'
-                                                id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal"
-                                                data-bs-target="#editStockModal">
+                                            <button type="button"  data-client-id="{{ $client->id }}" data-id='{{ $eachcommandeNotApproved->id }}'
+                                                id='validate-order-btn' class="btn btn-secondary" data-bs-toggle="modal"
+                                                data-bs-target="#riskConfirmationModal">
                                                 <i class="ti ti-check"></i>
                                             </button>
                                             <form action="{{ route('stock.delete', $eachcommandeNotApproved->id) }}"
@@ -740,6 +740,28 @@
             }
 
             document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
+        }
+
+
+        document.getElementById('riskConfirmationModal').addEventListener('show.bs.modal', function(event) {
+            const clientId = event.relatedTarget.getAttribute('data-client-id');
+
+            // Fetch client data from the API
+            fetch(`/clients_data/${clientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const clientData = data.clientData;
+                    loadClientAndCommandDetails(clientData);
+                })
+                .catch(error => {
+                    console.error('Error fetching client data:', error);
+                });
+        });
+
+
+        function loadClientAndCommandDetails(clientData ) {
+            document.getElementById('risk_credit_score').innerText = clientData.credit_score;
+            document.getElementById('risk_level').innerText = clientData.risk_level;
         }
 
 
