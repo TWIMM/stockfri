@@ -132,8 +132,11 @@
                             resetProductsContainer();
 
                             // Remplir avec les produits de la commande
+                            // In the AJAX request success handler where you update form data
+                            // Modify this part of the code in the first script section:
+
                             data.products.forEach((product, index) => {
-                                // Pour le premier produit, utiliser la ligne existante
+                                // For the first product, utilize the existing row
                                 if (index === 0) {
                                     const firstProductSelect = document.querySelector(
                                         'select[name="products[0][product_id]"]');
@@ -145,24 +148,95 @@
                                         'input[name="products[0][price]"]');
 
                                     firstProductSelect.value = product.stock_id;
+
+                                    // Make sure the option is visible in the dropdown
+                                    // Find the option with the matching value and ensure it's available
+                                    let optionExists = false;
+                                    for (let i = 0; i < firstProductSelect.options
+                                        .length; i++) {
+                                        if (firstProductSelect.options[i].value ==
+                                            product.stock_id) {
+                                            optionExists = true;
+                                            break;
+                                        }
+                                    }
+
+                                    // If the option doesn't exist, add it
+                                    if (!optionExists) {
+                                        // Find the product name from the original options
+                                        let productName = "Unknown Product";
+                                        const originalSelect = document.querySelector(
+                                            '#mmodalListeDeProduits select.productSelect'
+                                            );
+                                        if (originalSelect && originalSelect
+                                            .originalOptions) {
+                                            for (let opt of originalSelect
+                                                    .originalOptions) {
+                                                if (opt.value == product.stock_id) {
+                                                    productName = opt.text;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        const newOption = new Option(productName,
+                                            product.stock_id);
+                                        newOption.dataset.price = product.unit_price;
+                                        firstProductSelect.add(newOption);
+                                    }
+
+                                    firstProductSelect.value = product.stock_id;
                                     firstQuantityInput.value = product.quantity;
                                     firstDiscountInput.value = product.discount || 0;
                                     firstPriceInput.value = product.unit_price;
                                 } else {
-                                    // Pour les produits suivants, créer de nouvelles lignes
+                                    // For subsequent products, create new rows
                                     createProductRow();
 
                                     const productSelect = document.querySelector(
                                         `select[name="products[${index}][product_id]"]`
-                                    );
+                                        );
                                     const quantityInput = document.querySelector(
                                         `input[name="products[${index}][quantity]"]`
-                                    );
+                                        );
                                     const discountInput = document.querySelector(
                                         `input[name="products[${index}][discount]"]`
-                                    );
+                                        );
                                     const priceInput = document.querySelector(
                                         `input[name="products[${index}][price]"]`);
+
+                                    // Same fix as above for new rows
+                                    let optionExists = false;
+                                    for (let i = 0; i < productSelect.options
+                                        .length; i++) {
+                                        if (productSelect.options[i].value == product
+                                            .stock_id) {
+                                            optionExists = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!optionExists) {
+                                        let productName = "Unknown Product";
+                                        const originalSelect = document.querySelector(
+                                            '#mmodalListeDeProduits select.productSelect'
+                                            );
+                                        if (originalSelect && originalSelect
+                                            .originalOptions) {
+                                            for (let opt of originalSelect
+                                                    .originalOptions) {
+                                                if (opt.value == product.stock_id) {
+                                                    productName = opt.text;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        const newOption = new Option(productName,
+                                            product.stock_id);
+                                        newOption.dataset.price = product.unit_price;
+                                        productSelect.add(newOption);
+                                    }
 
                                     productSelect.value = product.stock_id;
                                     quantityInput.value = product.quantity;
@@ -170,6 +244,8 @@
                                     priceInput.value = product.unit_price;
                                 }
                             });
+                            // Update all product dropdowns after populating
+                            updateAllProductDropdowns();
 
                             // Afficher les détails de paiement si nécessaire
                             togglePaymentDetails();
@@ -217,6 +293,9 @@
                     xhr.send();
                 });
             });
+
+            // Initialize the product dropdowns
+            updateAllProductDropdowns();
         });
 
         // Fonction pour réinitialiser complètement le conteneur des produits
@@ -233,8 +312,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label for="productSelect0" class="form-label">Produit</label>
-
-                        <select name="products[0][product_id]" class="form-control product-select" required>
+    
+                        <select name="products[0][product_id]" class="form-control productSelect" required>
                             <option value="">-- Sélectionner un produit --</option>
                             @foreach ($stocks as $product)
                             <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
@@ -243,7 +322,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="quantity0" class="form-label">Quantité</label>
-
+    
                         <input type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
                     </div>
                     <div class="col-md-2">
@@ -266,6 +345,18 @@
 
             // Ajouter les event listeners nécessaires pour cette première ligne
             addProductRowEventListeners(template);
+
+            // Add event listener for the remove button on the first row
+            template.querySelector('.remove-product-btn').addEventListener('click', function() {
+                // Don't remove if it's the only row
+                if (productsContainer.children.length > 1) {
+                    productsContainer.removeChild(template);
+                    // Reindex the fields
+                    reindexProductRows();
+                    // Update dropdowns
+                    updateAllProductDropdowns();
+                }
+            });
         }
 
         // Fonction pour créer une nouvelle ligne de produit
@@ -273,23 +364,33 @@
             const productsContainer = document.getElementById('productsContainer');
             const rowCount = productsContainer.children.length;
 
+            // Get all currently selected products
+            const selectedProducts = [];
+            document.querySelectorAll('.productSelect').forEach(select => {
+                if (select.value) {
+                    selectedProducts.push(select.value);
+                }
+            });
+
             const newRow = document.createElement('div');
             newRow.className = 'product-row mb-3';
             newRow.innerHTML = `
                 <div class="row">
                     <div class="col-md-4">
                        <label for="productSelect${rowCount}" class="form-label">Produit</label>
-
-                        <select name="products[${rowCount}][product_id]" class="form-control product-select" required>
+    
+                        <select name="products[${rowCount}][product_id]" class="form-control productSelect" required>
                             <option value="">-- Sélectionner un produit --</option>
                             @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                            <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
+                                {{ $product->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label for="quantity${rowCount}" class="form-label">Quantité</label>
-
+    
                         <input type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
                     </div>
                     <div class="col-md-2">
@@ -298,7 +399,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="price${rowCount}" class="form-label">Prix Unitaire</label>
-
+    
                         <input type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
                     </div>
                     <div class="col-md-1">
@@ -319,6 +420,8 @@
                 productsContainer.removeChild(newRow);
                 // Réindexer les champs
                 reindexProductRows();
+                // Update all dropdowns to reflect the change
+                updateAllProductDropdowns();
             });
 
             return newRow;
@@ -331,23 +434,73 @@
 
             rows.forEach((row, index) => {
                 // Mettre à jour les attributs name avec le nouvel index
-                row.querySelector('.product-select').name = `products[${index}][product_id]`;
+                row.querySelector('.productSelect').name = `products[${index}][product_id]`;
                 row.querySelector('.product-quantity').name = `products[${index}][quantity]`;
                 row.querySelector('.product-discount').name = `products[${index}][discount]`;
                 row.querySelector('.product-price').name = `products[${index}][price]`;
             });
         }
 
+        function getSelectedProductIds() {
+            const selectedIds = [];
+            document.querySelectorAll('.productSelect').forEach(select => {
+                if (select.value) {
+                    selectedIds.push(select.value);
+                }
+            });
+            return selectedIds;
+        }
+
+        // New function to update product selection in all dropdowns
+        function updateAllProductDropdowns() {
+            const selectedIds = getSelectedProductIds();
+
+            // Update each product dropdown
+            document.querySelectorAll('.productSelect').forEach(select => {
+                const currentValue = select.value;
+
+                // Store all options first (clone the original options)
+                if (!select.originalOptions) {
+                    const options = Array.from(select.options);
+                    select.originalOptions = options;
+                }
+
+                // Clear current options except the first one (placeholder)
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+
+                // Add back options that aren't selected elsewhere (except the current selection)
+                select.originalOptions.forEach(option => {
+                    if (option.value === "" || option.value === currentValue || !selectedIds.includes(option
+                            .value)) {
+                        // Skip the first empty option since we kept it
+                        if (option.value !== "" || select.options.length === 0) {
+                            select.add(option.cloneNode(true));
+                        }
+                    }
+                });
+
+                // After updating options, make sure the current value is still selected
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            });
+        }
+
         // Fonction pour ajouter les event listeners aux champs d'une ligne
         function addProductRowEventListeners(row) {
             // Sélectionner les éléments pertinents
-            const productSelect = row.querySelector('.product-select');
+            const productSelect = row.querySelector('.productSelect');
             const quantityInput = row.querySelector('.product-quantity');
             const discountInput = row.querySelector('.product-discount');
             const priceInput = row.querySelector('.product-price');
-
+            updateAllProductDropdowns()
             // Ajouter les event listeners
-            productSelect.addEventListener('change', updatePrice);
+            productSelect.addEventListener('change', function() {
+                updatePrice();
+                updateAllProductDropdowns();
+            });
             quantityInput.addEventListener('input', updatePrice);
             discountInput.addEventListener('input', updatePrice);
 
@@ -358,7 +511,7 @@
                     const quantity = parseFloat(quantityInput.value) || 0;
                     const discount = parseFloat(discountInput.value) || 0;
 
-                    const finalPrice = basePrice * quantity * (1 - discount / 100);
+                    const finalPrice = basePrice;
                     priceInput.value = finalPrice.toFixed(2);
 
                     // Mettre à jour le total
@@ -425,7 +578,6 @@
             });
         }
 
-
         // Function to toggle payment details based on payment mode
         function togglePaymentDetails() {
             const paymentMode = document.querySelector('#mmodalListeDeProduits select[name="payment_mode"]').value;
@@ -464,56 +616,56 @@
 
         // Fonction pour charger les détails du paiement dans le modal
         function loadPaymentDetails(paymentId) {
-    // Make an AJAX request to fetch the payment details
-    fetch(`/commande_data/${paymentId}`)
-        .then(response => response.json())
-        .then(data => {
-            const paymentDetails = data.commande; // Get the payment data from the response
+            // Make an AJAX request to fetch the payment details
+            fetch(`/commande_data/${paymentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const paymentDetails = data.commande; // Get the payment data from the response
 
-            // Remplissage des informations dans le modal
-            document.getElementById('client').innerText = paymentDetails.client || 'N/A';
-            document.getElementById('magasin').innerText = paymentDetails.magasin || 'N/A';
-            document.getElementById('user').innerText = paymentDetails.user || 'N/A';
-            document.getElementById('totalAmount').innerText = paymentDetails.total_price || 'N/A';
-            document.getElementById('tva_ORDER').innerText = paymentDetails.tva || 'N/A';
-            document.getElementById('invoiceStatusoRDER').innerText = paymentDetails.invoice_status || 'N/A';
-            document.getElementById('paymentModeOrderDet').innerText = paymentDetails.payment_mode || 'N/A';
-            document.getElementById('amountPaid').innerText = paymentDetails.already_paid || '0.00';
-            document.getElementById('restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
+                    // Remplissage des informations dans le modal
+                    document.getElementById('client').innerText = paymentDetails.client || 'N/A';
+                    document.getElementById('magasin').innerText = paymentDetails.magasin || 'N/A';
+                    document.getElementById('user').innerText = paymentDetails.user || 'N/A';
+                    document.getElementById('totalAmount').innerText = paymentDetails.total_price || 'N/A';
+                    document.getElementById('tva_ORDER').innerText = paymentDetails.tva || 'N/A';
+                    document.getElementById('invoiceStatusoRDER').innerText = paymentDetails.invoice_status || 'N/A';
+                    document.getElementById('paymentModeOrderDet').innerText = paymentDetails.payment_mode || 'N/A';
+                    document.getElementById('amountPaid').innerText = paymentDetails.already_paid || '0.00';
+                    document.getElementById('restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
 
-            // Ensure payment mode is properly formatted
-            const paymentMode = (paymentDetails.payment_mode || "").trim();
-            console.log("Payment mode:", paymentMode);
+                    // Ensure payment mode is properly formatted
+                    const paymentMode = (paymentDetails.payment_mode || "").trim();
+                    console.log("Payment mode:", paymentMode);
 
-            // First hide all payment details
-            const allPaymentRows = document.querySelectorAll('.payment-details-oder_pay');
-            allPaymentRows.forEach(row => row.classList.add('d-none'));
+                    // First hide all payment details
+                    const allPaymentRows = document.querySelectorAll('.payment-details-oder_pay');
+                    allPaymentRows.forEach(row => row.classList.add('d-none'));
 
-            // Détails supplémentaires selon le mode de paiement
-            if (paymentMode === "mobile_money") {
-                document.getElementById('mobileMoneyDetails').classList.remove('d-none');
-                document.getElementById('mobileMoneyRef').classList.remove('d-none');
-                document.getElementById('mobileNumber').innerText = paymentDetails.mobile_number || 'N/A';
-                document.getElementById('mobileReference').innerText = paymentDetails.mobile_reference || 'N/A';
-            } else if (paymentMode === "credit_card") {
-                document.getElementById('creditCardDetailsType').classList.remove('d-none');
-                document.getElementById('creditCardDetailsRef').classList.remove('d-none');
-                document.getElementById('cardType').innerText = paymentDetails.card_type || 'N/A';
-                document.getElementById('cardReference').innerText = paymentDetails.card_reference || 'N/A';
-            } else if (paymentMode === "bank_transfer") {
-                document.getElementById('bankNameRow').classList.remove('d-none');
-                document.getElementById('bankReferenceRow').classList.remove('d-none');
-                document.getElementById('bankName').innerText = paymentDetails.bank_name || 'N/A';
-                document.getElementById('bankReference').innerText = paymentDetails.bank_reference || 'N/A';
-            } else if (paymentMode === "cash") {
-                document.getElementById('cashDetailsOrderPay').classList.remove('d-none');
-                document.getElementById('cashReference').innerText = paymentDetails.cash_reference || 'N/A';
-            } else {
-                console.log("Unknown payment mode:", paymentMode);
-            }
-        })
-        .catch(error => console.error('Error fetching payment details:', error));
-}
+                    // Détails supplémentaires selon le mode de paiement
+                    if (paymentMode === "mobile_money") {
+                        document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+                        document.getElementById('mobileMoneyRef').classList.remove('d-none');
+                        document.getElementById('mobileNumber').innerText = paymentDetails.mobile_number || 'N/A';
+                        document.getElementById('mobileReference').innerText = paymentDetails.mobile_reference || 'N/A';
+                    } else if (paymentMode === "credit_card") {
+                        document.getElementById('creditCardDetailsType').classList.remove('d-none');
+                        document.getElementById('creditCardDetailsRef').classList.remove('d-none');
+                        document.getElementById('cardType').innerText = paymentDetails.card_type || 'N/A';
+                        document.getElementById('cardReference').innerText = paymentDetails.card_reference || 'N/A';
+                    } else if (paymentMode === "bank_transfer") {
+                        document.getElementById('bankNameRow').classList.remove('d-none');
+                        document.getElementById('bankReferenceRow').classList.remove('d-none');
+                        document.getElementById('bankName').innerText = paymentDetails.bank_name || 'N/A';
+                        document.getElementById('bankReference').innerText = paymentDetails.bank_reference || 'N/A';
+                    } else if (paymentMode === "cash") {
+                        document.getElementById('cashDetailsOrderPay').classList.remove('d-none');
+                        document.getElementById('cashReference').innerText = paymentDetails.cash_reference || 'N/A';
+                    } else {
+                        console.log("Unknown payment mode:", paymentMode);
+                    }
+                })
+                .catch(error => console.error('Error fetching payment details:', error));
+        }
 
         // Initialisation de la fonction lors de l'ouverture du modal
         document.getElementById('paymentDetailsModal').addEventListener('show.bs.modal', function(event) {
@@ -523,7 +675,6 @@
             // Load payment details using the paymentId
             loadPaymentDetails(paymentId);
         });
-
 
         function loadClientDetails(clientData) {
             document.getElementById('clientName').innerText = clientData.name;
@@ -556,5 +707,4 @@
             document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
         }
     </script>
-
 @endsection

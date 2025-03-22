@@ -6,13 +6,13 @@
                 <h5 class="modal-title" id="modalVenteLabel">Nouvelle Vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{route("stock.stock_fri_order_stock")}}" method="POST">
+            <form action="{{ route('stock.stock_fri_order_stock') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <!-- Sélectionner un client -->
                     <div class="mb-3">
                         <label for="clientSelect" class="form-label">Sélectionner un Client</label>
-                        <input type="hidden" value="{{$magasin->id}}" name="magasin_id">
+                        <input type="hidden" value="{{ $magasin->id }}" name="magasin_id">
                         <select class="form-select" id="clientSelect" name="client_id" required>
                             <option value="" disabled selected>Choisir un client</option>
                             @foreach ($clients as $client)
@@ -104,6 +104,11 @@
                         </select>
                     </div>
 
+                    <div id="alreadyPayIInput" class="mb-3 d-none">
+                        <label for="invoiceStatus" class="form-label">Montant payé</label>
+                        <input type="number" name="already_paid" class="form-control">
+                    </div>
+
                     <!-- Champs conditionnels pour les détails de paiement -->
                     <div id="paymentDetailsContainer" class="d-none">
                         <!-- Pour Mobile Money -->
@@ -112,11 +117,13 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="mobileNumber" class="form-label">Numéro Mobile Money</label>
-                                    <input type="text" class="form-control" id="mobileNumber" name="mobile_number">
+                                    <input type="text" class="form-control" id="mobileNumber"
+                                        name="mobile_number">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="mobileReference" class="form-label">Référence de transaction</label>
-                                    <input type="text" class="form-control" id="mobileReference" name="mobile_reference">
+                                    <input type="text" class="form-control" id="mobileReference"
+                                        name="mobile_reference">
                                 </div>
                             </div>
                         </div>
@@ -131,7 +138,8 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="bankReference" class="form-label">Référence du virement</label>
-                                    <input type="text" class="form-control" id="bankReference" name="bank_reference">
+                                    <input type="text" class="form-control" id="bankReference"
+                                        name="bank_reference">
                                 </div>
                             </div>
                         </div>
@@ -151,7 +159,8 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="cardReference" class="form-label">Référence de transaction</label>
-                                    <input type="text" class="form-control" id="cardReference" name="card_reference">
+                                    <input type="text" class="form-control" id="cardReference"
+                                        name="card_reference">
                                 </div>
                             </div>
                         </div>
@@ -162,7 +171,8 @@
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="cashReference" class="form-label">Référence du reçu</label>
-                                    <input type="text" class="form-control" id="cashReference" name="cash_reference">
+                                    <input type="text" class="form-control" id="cashReference"
+                                        name="cash_reference">
                                 </div>
                             </div>
                         </div>
@@ -182,7 +192,7 @@
 <script>
     // Function to create a new product row dynamically
     let productIndex = 1;
-    
+
     // Function to get all currently selected product IDs
     function getSelectedProductIds() {
         const selectedIds = [];
@@ -193,29 +203,30 @@
         });
         return selectedIds;
     }
-    
+
     // Function to update available products in all dropdowns
     function updateAvailableProducts() {
         const selectedIds = getSelectedProductIds();
-        
+
         // Update each product dropdown
         document.querySelectorAll('.productSelect').forEach(select => {
             const currentValue = select.value;
-            
+
             // Store all options first (clone the original options)
             if (!select.originalOptions) {
                 const options = Array.from(select.options);
                 select.originalOptions = options;
             }
-            
+
             // Clear current options except the first one (placeholder)
             while (select.options.length > 1) {
                 select.remove(1);
             }
-            
+
             // Add back options that aren't selected elsewhere (except the current selection)
             select.originalOptions.forEach(option => {
-                if (option.value === "" || option.value === currentValue || !selectedIds.includes(option.value)) {
+                if (option.value === "" || option.value === currentValue || !selectedIds.includes(option
+                        .value)) {
                     // Skip the first empty option since we kept it
                     if (option.value !== "" || select.options.length === 0) {
                         select.add(option.cloneNode(true));
@@ -224,16 +235,32 @@
             });
         });
     }
-    
+
+    // Function to update price based on selected product
+    function updatePrice(productSelect) {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const rowContainer = productSelect.closest('.productRow');
+        const priceInput = rowContainer.querySelector('input[name*="[price]"]');
+        const productNameInput = rowContainer.querySelector('input[name*="[product_name]"]');
+
+        if (selectedOption && selectedOption.getAttribute('data-price')) {
+            priceInput.value = selectedOption.getAttribute('data-price');
+            productNameInput.value = selectedOption.innerText; // Set the product name as well
+        } else {
+            priceInput.value = '';
+            productNameInput.value = '';
+        }
+    }
+
+    // Function to create a product row and attach event listeners
     function createProductRow() {
         const productRow = document.createElement('div');
         productRow.classList.add('productRow', 'mb-3');
-        
+
         const currentIndex = productIndex;
-        
+
         productRow.innerHTML = `
         <div class="d-flex">
-            <!-- Produit -->
             <div class="flex-fill">
                 <label for="productSelect${currentIndex}" class="form-label">Produit</label>
                 <select class="form-select productSelect" id="productSelect${currentIndex}" name="products[${currentIndex}][product_id]" required>
@@ -245,26 +272,24 @@
                     @endforeach
                 </select>
             </div>
-
-            <!-- Quantité -->
+    
             <div class="flex-fill ms-2">
                 <label for="quantity${currentIndex}" class="form-label">Quantité</label>
                 <input type="number" class="form-control" id="quantity${currentIndex}" name="products[${currentIndex}][quantity]" min="1" required>
             </div>
-
-            <!-- Remise -->
+    
             <div class="flex-fill ms-2">
                 <label for="discount${currentIndex}" class="form-label">Remise (%)</label>
                 <input type="number" class="form-control" id="discount${currentIndex}" name="products[${currentIndex}][discount]" min="0" max="100">
             </div>
-
-            <!-- Prix Unitaire -->
+    
             <div class="flex-fill ms-2">
                 <label for="price${currentIndex}" class="form-label">Prix Unitaire</label>
                 <input type="number" class="form-control" id="price${currentIndex}" name="products[${currentIndex}][price]" required readonly>
             </div>
-
-            <!-- Supprimer Produit -->
+    
+           
+    
             <div class="flex-fill ms-2">
                 <button type="button" class="btn btn-danger removeProduct" aria-label="Supprimer produit">
                     <i class="ti ti-trash"></i>
@@ -273,59 +298,54 @@
         </div>
         `;
 
-        // Add to DOM first
+        // Add the new row to the container
         document.getElementById('productsContainer').appendChild(productRow);
 
-        // Then add event listener to the new product select
+        // Add event listener to the new product select
         const productSelect = productRow.querySelector(`#productSelect${currentIndex}`);
-        const priceInput = productRow.querySelector(`#price${currentIndex}`);
-        
         productSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption && selectedOption.getAttribute('data-price')) {
-                priceInput.value = selectedOption.getAttribute('data-price');
-            }
-            // Update available products when selection changes
+            updatePrice(this);
             updateAvailableProducts();
         });
-        
-        // Update available products in this new dropdown
+
+        // Update available products
         updateAvailableProducts();
 
+        // Increment productIndex for the next row
         productIndex++;
     }
 
-    // Function to update the price for the first row
-    function updateFirstRowPrice() {
-        const firstProductSelect = document.querySelector('.productSelect');
-        if (firstProductSelect) {
-            firstProductSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption && selectedOption.getAttribute('data-price')) {
-                    const priceInput = document.querySelector('input[name="products[0][price]"]');
-                    priceInput.value = selectedOption.getAttribute('data-price');
-                }
-                // Update available products when selection changes
-                updateAvailableProducts();
-            });
-        }
-    }
+    // Handle Add Product Button Click
+    document.getElementById('addProductButton').addEventListener('click', function() {
+        createProductRow();
+    });
 
-    // Function to toggle payment details based on invoice status and payment mode
+    // Handle Remove Product Button Click
+    document.addEventListener('click', function(e) {
+        if (e.target && (e.target.classList.contains('removeProduct') || e.target.closest('.removeProduct'))) {
+            const productRow = e.target.closest('.productRow');
+            if (productRow) {
+                productRow.remove();
+                updateAvailableProducts();
+            }
+        }
+    });
+
+    // Function to toggle payment details visibility based on invoice status and payment mode
     function togglePaymentDetails() {
         const invoiceStatus = document.getElementById('invoiceStatus').value;
         const paymentMode = document.getElementById('paymentMode').value;
         const paymentDetailsContainer = document.getElementById('paymentDetailsContainer');
-        
+
         // Hide all payment detail fields first
         document.querySelectorAll('.payment-details').forEach(detail => {
             detail.classList.add('d-none');
         });
-        
+
         // Only show payment details if invoice status is "paid" or "partially_paid"
         if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
             paymentDetailsContainer.classList.remove('d-none');
-            
+
             // Show the specific payment detail fields based on payment mode
             if (paymentMode === 'mobile_money') {
                 document.getElementById('mobileMoneyDetails').classList.remove('d-none');
@@ -339,49 +359,33 @@
         } else {
             paymentDetailsContainer.classList.add('d-none');
         }
-    }
 
-    // Event listener to add a new product row
-    document.getElementById('addProductButton').addEventListener('click', function() {
-        createProductRow();
-    });
-
-    // Event listener to remove a product row
-    document.addEventListener('click', function(e) {
-        if (e.target && (e.target.classList.contains('removeProduct') || e.target.closest('.removeProduct'))) {
-            const productRow = e.target.closest('.productRow');
-            if (productRow) {
-                productRow.remove();
-                // Update available products after removal
-                updateAvailableProducts();
-            }
+        // Toggle the "already paid" input based on invoice status
+        if (invoiceStatus === 'paid' || invoiceStatus === 'unpaid') {
+            document.getElementById('alreadyPayIInput').classList.add('d-none');
+        } else if (invoiceStatus === 'partially_paid') {
+            document.getElementById('alreadyPayIInput').classList.remove('d-none');
         }
-    });
+    }
 
     // Event listeners for invoice status and payment mode changes
     document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
     document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
 
-    // Initialize the event listeners for the first row
+    // Initialize event listeners for product selects on page load
     document.addEventListener('DOMContentLoaded', function() {
-        updateFirstRowPrice();
-        
-        // Store original options for all product selects
+        // Initial setup for available products
+        updateAvailableProducts();
+
+        // Add event listeners for the existing product selects
         document.querySelectorAll('.productSelect').forEach(select => {
-            const options = Array.from(select.options);
-            select.originalOptions = options;
+            select.addEventListener('change', function() {
+                updatePrice(this);
+                updateAvailableProducts();
+            });
         });
-        
-        // Also initialize the price field for the first row if a product is preselected
-        const firstProductSelect = document.querySelector('.productSelect');
-        if (firstProductSelect && firstProductSelect.selectedIndex > 0) {
-            const selectedOption = firstProductSelect.options[firstProductSelect.selectedIndex];
-            if (selectedOption && selectedOption.getAttribute('data-price')) {
-                const priceInput = document.querySelector('input[name="products[0][price]"]');
-                priceInput.value = selectedOption.getAttribute('data-price');
-            }
-            // Initialize product filtering
-            updateAvailableProducts();
-        }
+
+        // Initialize togglePaymentDetails on page load
+        togglePaymentDetails();
     });
 </script>

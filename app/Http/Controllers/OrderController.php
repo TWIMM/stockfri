@@ -303,6 +303,7 @@ class OrderController extends Controller
             'products.*.price' => 'required|numeric|min:0',
             'products.*.discount' => 'nullable|numeric|min:0|max:100',
             'tva' => 'required|numeric|min:0',
+            //'already_paid' => 'required|string',
             'payment_mode' => 'required|string',
             'invoice_status' => 'required|string|in:paid,partially_paid,unpaid',
             
@@ -380,7 +381,39 @@ class OrderController extends Controller
         
         try {
             DB::beginTransaction();
+            $totalOrderPrices = 0;
+
+            foreach ($request->products as $productData) {
+                $stock = Stock::findOrFail($productData['product_id']);
+                
+                // Calculate item total price with discount
+                $unitPrice = $productData['price'];
+                $quantity = $productData['quantity'];
+                $discount = isset($productData['discount']) ? $productData['discount'] : 0;
+                $itemTotal = $unitPrice * $quantity;
+
+                if ($discount > 99) {
+                    return back()->with('error', 'Une erreur est survenue: Vous offrez des reduction avoisinant 99,99%');
+                }
+                
+                if ($discount > 0) {
+                    $itemTotal = $itemTotal - ($itemTotal * ($discount / 100));
+                }
+                
+                $totalOrderPrices += $itemTotal;
+            }
             
+            // Apply TVA to total price
+            $tvaAmount = $totalOrderPrices * ($request->tva / 100);
+            $totalWithTva = $totalOrderPrices + $tvaAmount;
+            
+            if($request->already_paid)
+            {
+                if($request->already_paid > $totalWithTva){
+                    return back()->with('error', 'Une erreur est survenue: ' . 'Le montant payé ne peut depasser le total de la facture');
+
+                }
+            }            
             // Create the order
             $commande = Commandes::create([
                 'client_id' => $request->client_id,
@@ -456,7 +489,25 @@ class OrderController extends Controller
             
             // Update the order with the calculated total price
             $commande->total_price = $totalWithTva;
+            if($request->invoice_status === 'unpaid'){
+                $already_paid = 0.00; 
+                $rest_to_pay = $commande->total_price; 
+                $statutValidation = 'not_approved';
+            } else if ($request->invoice_status  === 'partially_paid') {
+                $already_paid = floatval($request->already_paid ?? 0); 
+                $rest_to_pay = $commande->total_price - $already_paid; 
+                $statutValidation = 'approved';
+            }
+            else if ($request->invoice_status  === 'paid') {
+                $already_paid = $commande->total_price; 
+                $statutValidation = 'approved';
+                $rest_to_pay = 0.00; 
+            }
+            $commande->already_paid = $already_paid;
+            $commande->rest_to_pay = $rest_to_pay;
+            $commande->validation_status = $statutValidation;
             $commande->save();
+
             
             // Generate the invoice for this order
             $invoice = $this->generateInvoiceFromOrder($commande);
