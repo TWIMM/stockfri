@@ -16,7 +16,6 @@
 
     <title>Dashboard - StockFri</title>
 
-    <script src="assets/js/theme-script.js" type="d49464235a86cf7c053a2086-text/javascript"></script>
 
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/img/apple-touch-icon.png') }}">
 
