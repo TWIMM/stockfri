@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
+use App\Services\EmailService;
+use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -17,6 +19,12 @@ class RegisterController extends Controller
      *
      * @return \Illuminate\View\View
      */
+    protected $emailService;
+
+    public function __construct(EmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
     public function showRegistrationForm()
     {
         return view('auth/register');
@@ -46,7 +54,22 @@ class RegisterController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
-
+        $success = $this->emailService->sendEmailWithTemplate($user->email, 'emails.user_confirm' , [
+            'name' => $user->name,      
+            'appLink' => env("APP_URL").env('VALIDATE_MAIL')."/".$user->id,   
+        ]);
         return redirect()->route('pricing.page');
+    }
+
+    public function ValidateMail($id){
+        $user = User::find($id);
+        if($user->email_verified_at){
+
+            return redirect()->route('login');
+        }
+        $user->email_verified_at = Carbon::now(); 
+        $user->save();
+        return redirect()->route('login');
+
     }
 }

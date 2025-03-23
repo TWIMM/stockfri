@@ -47,7 +47,7 @@
                                     <tr>
                                         <td>{{ $stock->name }}</td>
                                         <td>{{ $stock->description }}</td>
-                                        <td>{{ $stock->quantity }}</td>
+                                        <td><span class="badge badge-pill badge-status bg-blue">{{ $stock->quantity }} </span> </td>
 
                                         <td>{{ $stock->price }} FCFA</td>
                                         <td>

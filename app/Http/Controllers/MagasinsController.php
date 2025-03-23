@@ -8,7 +8,7 @@ use App\Models\Magasins;
 use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
 use App\Models\MouvementDeStocks;
-use App\Models\clients;
+use App\Models\Clients;
 
 class MagasinsController extends Controller
 {

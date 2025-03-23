@@ -30,6 +30,7 @@ Route::post('/pricing/select', [PricingController::class, 'selectPricing'])->nam
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::get('/team-member-signin/{id}' , [TeamMemberController::class, 'returnConfirmTeamMemberPwd'])->name('signin.team_member');
+Route::get('/user-signin/{id}' , [RegisterController::class, 'ValidateMail'])->name('signin.user_confirm');
 
 //protected
 

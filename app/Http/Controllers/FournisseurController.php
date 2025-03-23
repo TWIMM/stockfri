@@ -64,7 +64,7 @@ class FournisseurController extends Controller
     }
 
     // Mettre à jour un fournisseur
-    public function update($id)
+    public function update($id , Request $request)
     {
         
 
