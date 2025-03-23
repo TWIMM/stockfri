@@ -59,7 +59,7 @@
                                             </button></td>
 
                                         <td>
-                                            <select class="form-control" name="status_livraison" id="status_livraison">
+                                            <select class="form-control" name="status_livraison{{!$eachcommandeNotApproved->id}}" id="status_livraison{{!$eachcommandeNotApproved->id}}">
                                                 <option value="none"
                                                     {{ !$eachcommandeNotApproved->livraison ? 'selected' : '' }}>
                                                     Aucun
@@ -85,16 +85,17 @@
 
                                         <script>
                                             var commandeIdLoaded = @json($eachcommandeNotApproved->id);
-                                            console.log(commandeId); 
+                                            console.log(commandeIdLoaded); 
                                             fetch(`/livraison_data/${commandeIdLoaded}`)
                                                     .then(response => response.json())
                                                     .then(data => {
                                                         // You can handle the response here
                                                         console.log(data);
 
-                                                        if (data.exists) {
+                                                        if (data.exists === true) {
                                                             // Example: You could use the livraison data to populate hidden fields or modals
                                                             const livraison = data.livraison;
+                                                            document.getElementById(`status_livraison${commandeIdLoaded}`).value = livraison.delivery_status;
                                                             // Populate the page with the livraison data, e.g., in a hidden modal or div.
                                                         } else {
                                                             // Handle case where livraison doesn't exist
