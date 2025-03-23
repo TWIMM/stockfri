@@ -28,6 +28,11 @@ class Commandes extends Model
         'card_reference',
         'cash_reference'
     ];
+
+    public function livraison()
+    {
+        return $this->hasOne(Livraisons::class, 'commande_id');
+    }
     
     public function client()
     {
