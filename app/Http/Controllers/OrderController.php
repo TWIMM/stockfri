@@ -14,7 +14,8 @@ use App\Services\InvoiceService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Magasins;
-
+use App\Models\Livraisons;
+use App\Models\TeamMember;
 
 class OrderController extends Controller
 {
@@ -66,6 +67,119 @@ class OrderController extends Controller
 
         return redirect()->back()->with('success', 'Success');
     }
+
+    public function checkExists($commandeId)
+    {
+        $exists = Livraisons::where('commande_id', $commandeId)->exists();
+        
+        return response()->json([
+            'exists' => $exists
+        ]);
+    }
+
+
+    public function getDeliveryPersonnel()
+    {
+        // Assuming delivery personnel have a role or a flag in the users table
+        // Adjust query according to your database structure
+        $personnel = TeamMember::where('user_id', auth()->user()->id)
+                        ->get(['id', 'name']);
+        
+        return response()->json([
+            'personnel' => $personnel
+        ]);
+    }
+    
+    /**
+     * Create a new livraison record with all details
+     */
+    public function createLivraison(Request $request)
+    {
+        $request->validate([
+            'commande_id' => 'required|exists:commandes,id',
+            'delivery_status' => 'required|string',
+            'delivery_address' => 'required|string',
+            'delivered_by' => 'required|exists:users,id',
+            'shipping_method' => 'required|string',
+            'delivery_date' => 'required|date',
+            'is_shipping_paid' => 'required|boolean',
+            'shipping_cost' => 'required_if:is_shipping_paid,1|nullable|numeric|min:0',
+            'delivery_notes' => 'nullable|string'
+        ]);
+        
+        // Check if livraison already exists
+        $livraison = Livraisons::where('commande_id', $request->commande_id)->first();
+        
+        if ($livraison) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une livraison existe déjà pour cette commande'
+            ], 400);
+        }
+        
+        // Create new livraison
+        $livraison = new Livraisons();
+        $livraison->commande_id = $request->commande_id;
+        $livraison->delivery_status = $request->delivery_status;
+        $livraison->delivery_address = $request->delivery_address;
+        $livraison->delivered_by = $request->delivered_by;
+        $livraison->shipping_method = $request->shipping_method;
+        $livraison->delivery_date = $request->delivery_date;
+        $livraison->delivery_notes = $request->delivery_notes;
+        
+        // Set shipping cost if paid
+        if ($request->is_shipping_paid) {
+            $livraison->shipping_cost = $request->shipping_cost;
+        } else {
+            $livraison->shipping_cost = 0;
+        }
+        
+        // Generate tracking number
+        $livraison->tracking_number = 'LIV-' . $request->commande_id . '-' . now()->format('YmdHis');
+        
+        $livraison->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Livraison créée avec succès',
+            'livraison' => $livraison
+        ]);
+    }
+    
+    /**
+     * Update an existing livraison status
+     */
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'commande_id' => 'required|exists:commandes,id',
+            'delivery_status' => 'required|string'
+        ]);
+        
+        $commandeId = $request->commande_id;
+        $status = $request->delivery_status;
+        
+        // Find existing livraison
+        $livraison = Livraisons::where('commande_id', $commandeId)->first();
+        
+        if (!$livraison) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Livraison non trouvée'
+            ], 404);
+        }
+        
+        // Update existing livraison
+        $livraison->delivery_status = $status;
+        $livraison->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Statut de livraison mis à jour avec succès',
+            'livraison' => $livraison
+        ]);
+    }
+    
 
 
     public function approveClientOrder(Request $request){

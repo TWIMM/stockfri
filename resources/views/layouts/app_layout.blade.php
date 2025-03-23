@@ -13,7 +13,7 @@
         content="Advanced CRM template, customer relationship management, business CRM, sales optimization, customer support software, CRM integration, customizable CRM, business tools, enterprise CRM solutions">
     <meta name="author" content="Dreams Technologies">
     <meta name="robots" content="index, follow">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard - StockFri</title>
 
 
@@ -359,7 +359,19 @@
             <div class="page-wrapper">
                 <div class="content">
                     <div class="row">
+                        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                              <div class="toast-header">
+                                <strong class="me-auto">Notification</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                              </div>
+                              <div class="toast-body">
+                                <!-- Toast message will go here -->
+                              </div>
+                            </div>
+                          </div>
                         @yield('content')
+
                     </div>
                 </div>
             </div>

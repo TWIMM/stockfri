@@ -57,27 +57,29 @@
                                                 data-bs-target="#paymentDetailsModal">
                                                 <i style="color: white" class="ti ti-receipt"></i>
                                             </button></td>
-                                        <td>
-                                            <select class="form-control" name="status_livraison" id="">
 
-                                                <option value="none">
-                                                     Aucun
+                                        <td>
+                                            <select class="form-control" name="status_livraison" id="status_livraison">
+                                                <option value="none"
+                                                    {{ !$eachcommandeNotApproved->livraison ? 'selected' : '' }}>
+                                                    Aucun
                                                 </option>
-                                                                                                
-                                                <option value="en_cours">
+                                                <option value="pending"
+                                                    {{ $eachcommandeNotApproved->livraison && $eachcommandeNotApproved->livraison->delivery_status == 'pending' ? 'selected' : '' }}>
                                                     En attente
                                                 </option>
-                                                                                               
-                                                <option value="en_cours">
+                                                <option value="delivered"
+                                                    {{ $eachcommandeNotApproved->livraison && $eachcommandeNotApproved->livraison->delivery_status == 'delivered' ? 'selected' : '' }}>
                                                     Livré
                                                 </option>
-                                                <option value="en_cours">
+                                                <option value="in_progress"
+                                                    {{ $eachcommandeNotApproved->livraison && $eachcommandeNotApproved->livraison->delivery_status == 'in_progress' ? 'selected' : '' }}>
                                                     En cours
                                                 </option>
-                                                <option value="canceled">
+                                                <option value="cancelled"
+                                                    {{ $eachcommandeNotApproved->livraison && $eachcommandeNotApproved->livraison->delivery_status == 'cancelled' ? 'selected' : '' }}>
                                                     Annulé
                                                 </option>
-
                                             </select>
                                         </td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
@@ -119,6 +121,331 @@
             const validatesbUTTONS = document.querySelectorAll('#validate-order-btn');
 
             const invoice_viewer_buttons = document.querySelectorAll('#invoice_viewer-btn');
+
+            // Find all select elements with name="status_livraison"
+            const statusSelects = document.querySelectorAll('select[name="status_livraison"]');
+
+            // Add onchange event listener to each select
+            statusSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // Get the selected value
+                    const status = this.value;
+                    console.log(status)
+
+                    // Get the commande ID from the closest row
+                    const row = this.closest('tr');
+                    const commandeId = row.querySelector('#precommande-btn')
+                        .getAttribute('data-id');
+
+                    // Store the original HTML and the select element for later use
+                    const originalHtml = this.closest('td').innerHTML;
+                    const selectElement = this;
+
+                    // Check if a livraison already exists
+                    checkLivraisonExists(commandeId).then(exists => {
+                        console.log('checking')
+                        if (exists) {
+                            // Just update the status
+                            showLoadingIndicator(selectElement.closest('td'));
+                            updateLivraisonStatus(commandeId, status,
+                                selectElement.closest('td'), originalHtml);
+                        } else {
+                            // Show the modal to get additional information
+                            showLivraisonModal(commandeId, status, selectElement
+                                .closest('td'), originalHtml);
+                        }
+                    });
+                });
+            });
+
+            // Function to check if a livraison exists
+            function checkLivraisonExists(commandeId) {
+                return fetch(`/check-livraison-exists/${commandeId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        return data.exists;
+                    })
+                    .catch(error => {
+                        console.error('Error checking livraison:', error);
+                        return false;
+                    });
+            }
+
+            // Function to show loading indicator
+            function showLoadingIndicator(element) {
+                element.innerHTML =
+                    '<div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            }
+
+            // Function to show the livraison modal
+            function showLivraisonModal(commandeId, status, tdElement, originalHtml) {
+                // First, fetch delivery personnel list to populate the select
+                fetch('/get-delivery-personnel', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Create options for delivery personnel select
+                        let personnelOptions = '<option value="">Sélectionner un livreur</option>';
+                        data.personnel.forEach(person => {
+                            personnelOptions +=
+                                `<option value="${person.id}">${person.name}</option>`;
+                        });
+
+                        // Create modal HTML
+                        const modalHtml = `
+            <div class="modal fade" id="livraisonModal" tabindex="-1" aria-labelledby="livraisonModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="livraisonModalLabel">Détails de livraison</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="livraisonForm">
+                                <input type="hidden" name="commande_id" value="${commandeId}">
+                                <input type="hidden" name="delivery_status" value="${status}">
+                                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+                                
+                                <div class="mb-3">
+                                    <label for="delivery_address" class="form-label">Adresse de livraison</label>
+                                    <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" required></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="delivered_by" class="form-label">Livreur</label>
+                                    <select class="form-select" id="delivered_by" name="delivered_by" required>
+                                        ${personnelOptions}
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="shipping_method" class="form-label">Méthode d'expédition</label>
+                                    <select class="form-select" id="shipping_method" name="shipping_method" required>
+                                        <option value="Standard">Standard</option>
+                                        <option value="Express">Express</option>
+                                        <option value="Premium">Premium</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="delivery_date" class="form-label">Date de livraison prévue</label>
+                                    <input type="date" class="form-control" id="delivery_date" name="delivery_date" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Frais de livraison payés?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="is_shipping_paid" id="shipping_paid_yes" value="1">
+                                        <label class="form-check-label" for="shipping_paid_yes">
+                                            Oui
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="is_shipping_paid" id="shipping_paid_no" value="0" checked>
+                                        <label class="form-check-label" for="shipping_paid_no">
+                                            Non
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div id="shipping_cost_container" class="mb-3" style="display: none;">
+                                    <label for="shipping_cost" class="form-label">Montant des frais de livraison</label>
+                                    <input type="number" class="form-control" id="shipping_cost" name="shipping_cost" step="0.01" min="0">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="delivery_notes" class="form-label">Notes de livraison</label>
+                                    <textarea class="form-control" id="delivery_notes" name="delivery_notes" rows="2"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button" class="btn btn-primary" id="saveLivraisonBtn">Enregistrer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+
+                        // Add modal to the document
+                        const modalContainer = document.createElement('div');
+                        modalContainer.innerHTML = modalHtml;
+                        document.body.appendChild(modalContainer);
+
+                        // Initialize the modal
+                        const livraisonModal = new bootstrap.Modal(document.getElementById(
+                            'livraisonModal'));
+
+                        // Set default delivery date to 3 days from now
+                        const deliveryDateInput = document.getElementById('delivery_date');
+                        const threeBusinessDays = new Date();
+                        threeBusinessDays.setDate(threeBusinessDays.getDate() + 3);
+                        deliveryDateInput.valueAsDate = threeBusinessDays;
+
+                        // Show/hide shipping cost field based on payment selection
+                        const shippingPaidRadios = document.querySelectorAll(
+                            'input[name="is_shipping_paid"]');
+                        shippingPaidRadios.forEach(radio => {
+                            radio.addEventListener('change', function() {
+                                const shippingCostContainer = document
+                                    .getElementById('shipping_cost_container');
+                                if (this.value === '1') {
+                                    shippingCostContainer.style.display = 'block';
+                                    document.getElementById('shipping_cost')
+                                        .setAttribute('required', 'required');
+                                } else {
+                                    shippingCostContainer.style.display = 'none';
+                                    document.getElementById('shipping_cost')
+                                        .removeAttribute('required');
+                                }
+                            });
+                        });
+
+                        // Handle save button click
+                        document.getElementById('saveLivraisonBtn').addEventListener('click',
+                            function() {
+                                const form = document.getElementById('livraisonForm');
+
+                                // Check form validity
+                                if (form.checkValidity()) {
+                                    // Get form data
+                                    const formData = new FormData(form);
+
+                                    // Hide modal
+                                    livraisonModal.hide();
+
+                                    // Show loading indicator
+                                    showLoadingIndicator(tdElement);
+
+                                    // Send form data
+                                    createLivraison(formData, tdElement, originalHtml);
+                                } else {
+                                    // Trigger form validation
+                                    form.reportValidity();
+                                }
+                            });
+
+                        // Show the modal
+                        livraisonModal.show();
+
+                        // Clean up when the modal is hidden
+                        document.getElementById('livraisonModal').addEventListener(
+                            'hidden.bs.modal',
+                            function() {
+                                // Restore original select
+                                tdElement.innerHTML = originalHtml;
+                                // Remove the modal from the DOM
+                                this.remove();
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching delivery personnel:', error);
+                        // Restore original select
+                        tdElement.innerHTML = originalHtml;
+
+                        // Show error message
+                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                        document.querySelector('#liveToast .toast-body').textContent =
+                            'Error fetching delivery personnel';
+                        toast.show();
+                    });
+            }
+
+            // Function to create a new livraison
+            function createLivraison(formData, tdElement, originalHtml) {
+                fetch('/create-livraison', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Restore select with updated value
+                        tdElement.innerHTML = originalHtml;
+
+                        // Set the correct option as selected
+                        const select = tdElement.querySelector('select');
+                        select.value = formData.get('delivery_status');
+
+                        // Show success message
+                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                        document.querySelector('#liveToast .toast-body').textContent = data
+                            .message || 'Livraison créée avec succès';
+                        toast.show();
+                    })
+                    .catch(error => {
+                        // Restore original select on error
+                        tdElement.innerHTML = originalHtml;
+
+                        // Show error message
+                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                        document.querySelector('#liveToast .toast-body').textContent =
+                            'Error creating livraison';
+                        toast.show();
+
+                        console.error('Error:', error);
+                    });
+            }
+
+            // Function to update an existing livraison status
+            function updateLivraisonStatus(commandeId, status, tdElement, originalHtml) {
+                // Create form data
+                const formData = new FormData();
+                formData.append('commande_id', commandeId);
+                formData.append('delivery_status', status);
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]')
+                    .getAttribute('content'));
+
+                // Send POST request
+                fetch('/update-livraison-status', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Restore select with updated value
+                        tdElement.innerHTML = originalHtml;
+
+                        // Set the correct option as selected
+                        const select = tdElement.querySelector('select');
+                        select.value = status;
+
+                        // Show success message
+                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                        document.querySelector('#liveToast .toast-body').textContent = data
+                            .message || 'Status updated successfully';
+                        toast.show();
+                    })
+                    .catch(error => {
+                        // Restore original select on error
+                        tdElement.innerHTML = originalHtml;
+
+                        // Show error message
+                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                        document.querySelector('#liveToast .toast-body').textContent =
+                            'Error updating status';
+                        toast.show();
+
+                        console.error('Error:', error);
+                    });
+            }
 
             // Function to load PDF from the input URL
             function loadPdfFromUrl() {

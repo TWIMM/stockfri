@@ -106,6 +106,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stock/add_up_quantity', [StockController::class, 'add_up_quantity'])->name('stock.add_up_quantity');
 
 
+    Route::get('/check-livraison-exists/{commandeId}', [OrderController::class, 'checkExists'])->name('livraison.check-exists');
+    Route::get('/get-delivery-personnel', [OrderController::class, 'getDeliveryPersonnel'])->name('livraison.get-personnel');
+    Route::post('/create-livraison', [OrderController::class, 'createLivraison'])->name('livraison.create');
+    Route::post('/update-livraison-status', [OrderController::class, 'updateStatus'])->name('livraison.update-status');
+
     //mnagasins
     Route::get('/magasins_list', [MagasinsController::class, 'index'])->name('magasins.listes');
     Route::post('/magasins_store', [MagasinsController::class, 'store'])->name('magasins.store');
