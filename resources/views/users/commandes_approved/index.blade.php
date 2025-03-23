@@ -347,22 +347,22 @@
 
                         // Clean up when the modal is hidden
                         document.getElementById('livraisonModal').addEventListener('hidden.bs.modal',
-                    function() {
-                            // Restore original select
-                            tdElement.innerHTML = originalHtml;
+                            function() {
+                                // Restore original select
+                                tdElement.innerHTML = originalHtml;
 
-                            // Ensure the select has the correct value
-                            const select = tdElement.querySelector('select');
-                            if (select) {
-                                select.value = status;
-                            }
+                                // Ensure the select has the correct value
+                                const select = tdElement.querySelector('select');
+                                if (select) {
+                                    select.value = status;
+                                }
 
-                            // Reinitialize the event listeners
-                            initializeStatusSelects();
+                                // Reinitialize the event listeners
+                                initializeStatusSelects();
 
-                            // Remove the modal from the DOM
-                            this.remove();
-                        });
+                                // Remove the modal from the DOM
+                                this.remove();
+                            });
                     })
                     .catch(error => {
                         console.error('Error fetching delivery personnel:', error);
@@ -384,6 +384,9 @@
             function createLivraison(formData, tdElement, originalHtml) {
                 fetch('/create-livraison', {
                         method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
                         body: formData
                     })
                     .then(response => {
@@ -404,10 +407,10 @@
                         initializeStatusSelects();
 
                         // Show success message
-                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
-                        document.querySelector('#liveToast .toast-body').textContent = data.message ||
-                            'Livraison créée avec succès';
-                        toast.show();
+                        Notiflix.Notify.success("Creation de la livraison reussie", {
+                            timeout: 100000, // Timeout in milliseconds (optional)
+                            zindex: 10000, // Adjust the z-index if needed
+                        });
                     })
                     .catch(error => {
                         // Restore original select on error
@@ -417,14 +420,13 @@
                         initializeStatusSelects();
 
                         // Show error message
-                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
-                        document.querySelector('#liveToast .toast-body').textContent =
-                            'Error creating livraison';
-                        toast.show();
-
-                        console.error('Error:', error);
+                        Notiflix.Notify.failure("Erreur lors de la creation de la livraison", {
+                            timeout: 100000, // Timeout in milliseconds (optional)
+                            zindex: 10000, // Adjust the z-index if needed
+                        });
                     });
             }
+
 
             // Function to update an existing livraison status
             function updateLivraisonStatus(commandeId, status, tdElement, originalHtml) {
@@ -433,7 +435,7 @@
                 formData.append('commande_id', commandeId);
                 formData.append('delivery_status', status);
                 formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute(
-                'content'));
+                    'content'));
 
                 // Send POST request
                 fetch('/update-livraison-status', {

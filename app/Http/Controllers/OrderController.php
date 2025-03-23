@@ -99,7 +99,7 @@ class OrderController extends Controller
             'commande_id' => 'required|exists:commandes,id',
             'delivery_status' => 'required|string',
             'delivery_address' => 'required|string',
-            'delivered_by' => 'required|exists:users,id',
+            'delivered_by' => 'required|exists:team_members,id',
             'shipping_method' => 'required|string',
             'delivery_date' => 'required|date',
             'is_shipping_paid' => 'required|boolean',
@@ -240,6 +240,16 @@ class OrderController extends Controller
         }
 
 
+    }
+
+    public function getLivDetail($commande_id){
+        $exists = Livraisons::where('commande_id', $commandeId)->exists();
+        $livraison = Livraisons::where('commande_id', $commandeId)->first();
+
+        return response()->json([
+            'exists' => $exists, 
+            'livraison' => $livraison, 
+        ]);
     }
 
     public function index(){
