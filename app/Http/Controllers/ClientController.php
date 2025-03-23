@@ -38,7 +38,7 @@ class ClientController extends Controller
         //->where('limit_credit_for_this_user' , '<=' , 0)
         ->paginate(10);
 
-        return view('users.creence_clients.index', compact('clients','hasPhysique', 
+        return view('users.finances.creence_clients', compact('clients','hasPhysique', 
         'hasPrestation', "businesses",  'user'));
     }
 
