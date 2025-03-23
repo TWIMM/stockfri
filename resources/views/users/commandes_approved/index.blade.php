@@ -26,6 +26,7 @@
                                     <th>Produit</th>
                                     <th>Client</th>
                                     <th>Details de Paiement </th>
+                                    <th>Statut livraison </th>
                                     <th>Prix total </th>
                                     <th>Montant restant</th>
                                     <th>Nombre de produit(s)</th>
@@ -56,6 +57,21 @@
                                                 data-bs-target="#paymentDetailsModal">
                                                 <i style="color: white" class="ti ti-receipt"></i>
                                             </button></td>
+                                        <td>
+                                            <select class="form-control" name="status_livraison" id="">
+
+                                                <option value="none">
+                                                     Aucun
+                                                </option>
+                                                <option value="en_cours">
+                                                    En cours
+                                                </option>
+                                                <option value="canceled">
+                                                    Annulé
+                                                </option>
+
+                                            </select>
+                                        </td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
                                         <td>{{ $eachcommandeNotApproved->rest_to_pay }} FCFA</td>
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
