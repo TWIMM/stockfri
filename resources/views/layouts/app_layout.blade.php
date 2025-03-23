@@ -227,43 +227,88 @@
                                         </ul>
                                     </li>
 
+                                    @if ($hasPhysique  || $$hasPrestation)
+                                        <li class="submenu">
+                                            <a class="{{ request()->routeIs('finances.*')  ? 'subdrop active' : '' }}"
+                                                href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                                <span>Finances</span>
+                                                <span class="menu-arrow"></span>
+                                            </a>
+                                            <ul>
+                                                <li><a href="{{ route('finances.dettes') }}"
+                                                        class="{{ request()->routeIs('finances.dettes') ? 'active' : '' }}">Gestion
+                                                        des dettes</a></li>
+                                                <li><a href="{{ route('finances.paiement') }}"
+                                                        class="{{ request()->routeIs('finances.paiement') ? 'active' : '' }}">Gestion
+                                                        des paiements</a></li>
+                                            
+
+                                            </ul>
+                                        </li>
+                                    @endif
+
+                                    
+
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);" class="{{ request()->routeIs('stock.*') || request()->routeIs('cat_prod.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('stock.*') || request()->routeIs('cat_prod.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i>
                                                 <span>Stock</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="{{ route('cat_prod.listes') }}" class="{{ request()->routeIs('cat_prod.listes') ? 'active' : ''  }}">Categorie de produits</a></li>
+                                                <li><a href="{{ route('cat_prod.listes') }}"
+                                                        class="{{ request()->routeIs('cat_prod.listes') ? 'active' : '' }}">Categorie
+                                                        de produits</a></li>
 
-                                                <li><a href="{{ route('stock.listes') }}" class="{{ request()->routeIs('stock.listes') ? 'active' : ''  }}">Gerer stock</a></li>
+                                                <li><a href="{{ route('stock.listes') }}"
+                                                        class="{{ request()->routeIs('stock.listes') ? 'active' : '' }}">Gerer
+                                                        stock</a></li>
                                             </ul>
                                         </li>
 
                                         <li class="submenu">
-                                            <a href="javascript:void(0);" class="{{ request()->routeIs('fournisseurs.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('fournisseurs.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i>
                                                 <span>Fournisseurs</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="{{ route('fournisseurs.listes') }}" class="{{ request()->routeIs('fournisseurs.listes') ? 'active' : ''  }}">Gerer Fournisseurs</a></li>
+                                                <li><a href="{{ route('fournisseurs.listes') }}"
+                                                        class="{{ request()->routeIs('fournisseurs.listes') ? 'active' : '' }}">Gerer
+                                                        Fournisseurs</a></li>
 
                                             </ul>
                                         </li>
 
                                         <li class="submenu">
-                                            <a class="{{ request()->routeIs('magasins.*') ||  request()->routeIs('clients.*') ||  request()->routeIs('livraisons.*') ||  request()->routeIs('pre_commandes.*') ||  request()->routeIs('commandes.*')  ? 'subdrop active' : '' }}" href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a class="{{ request()->routeIs('magasins.*') || request()->routeIs('clients.*') || request()->routeIs('livraisons.*') || request()->routeIs('pre_commandes.*') || request()->routeIs('commandes.*') ? 'subdrop active' : '' }}"
+                                                href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
                                                 <span>Magasins</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a  href="{{ route('magasins.listes') }}" class="{{ request()->routeIs('magasins.listes') ? 'active' : ''  }}">Gestion des magasins</a></li>
-                                                <li><a  href="{{ route('clients.listes') }}" class="{{ request()->routeIs('clients.listes') ? 'active' : ''  }}">Gestion des clients</a></li>
-                                                <li><a  href="{{ route('pre_commandes.listes') }}" class="{{ request()->routeIs('pre_commandes.listes') ? 'active' : ''  }}">Approuver des commandes</a></li>
-                                                <li><a  href="{{ route('commandes.listes') }}" class="{{ request()->routeIs('commandes.listes') ? 'active' : ''  }}"> Commandes actives</a></li>
-                                                <li><a  href="{{ route('livraisons.listes') }}" class="{{ request()->routeIs('livraisons.listes') ? 'active' : ''  }}">Gestion des Livraisons</a></li>
-                                                <li><a  href="{{ route('factures.listes') }}" class="{{ request()->routeIs('factures.listes') ? 'active' : ''  }}">Gestion des Factures</a></li>
+                                                <li><a href="{{ route('magasins.listes') }}"
+                                                        class="{{ request()->routeIs('magasins.listes') ? 'active' : '' }}">Gestion
+                                                        des magasins</a></li>
+                                                <li><a href="{{ route('clients.listes') }}"
+                                                        class="{{ request()->routeIs('clients.listes') ? 'active' : '' }}">Gestion
+                                                        des clients</a></li>
+                                                <li><a href="{{ route('pre_commandes.listes') }}"
+                                                        class="{{ request()->routeIs('pre_commandes.listes') ? 'active' : '' }}">Approuver
+                                                        des commandes</a></li>
+                                                <li><a href="{{ route('commandes.listes') }}"
+                                                        class="{{ request()->routeIs('commandes.listes') ? 'active' : '' }}">
+                                                        Commandes actives</a></li>
+                                                <li><a href="{{ route('livraisons.listes') }}"
+                                                        class="{{ request()->routeIs('livraisons.listes') ? 'active' : '' }}">Gestion
+                                                        des Livraisons</a></li>
+                                                <li><a href="{{ route('factures.listes') }}"
+                                                        class="{{ request()->routeIs('factures.listes') ? 'active' : '' }}">Gestion
+                                                        des Factures</a></li>
 
                                             </ul>
                                         </li>
@@ -271,12 +316,15 @@
 
                                     @if ($hasPrestation)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);" class="{{ request()->routeIs('services.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('services.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i>
                                                 <span>Services Offert</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a class="{{ request()->routeIs('services.listes') ? 'active' : '' }}" href="{{ route('services.listes') }}">Gerer services</a></li>
+                                                <li><a class="{{ request()->routeIs('services.listes') ? 'active' : '' }}"
+                                                        href="{{ route('services.listes') }}">Gerer services</a></li>
                                             </ul>
                                         </li>
                                     @endif
@@ -360,16 +408,18 @@
                 <div class="content">
                     <div class="row">
                         <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                              <div class="toast-header">
-                                <strong class="me-auto">Notification</strong>
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                              </div>
-                              <div class="toast-body">
-                                <!-- Toast message will go here -->
-                              </div>
+                            <div id="liveToast" class="toast" role="alert" aria-live="assertive"
+                                aria-atomic="true">
+                                <div class="toast-header">
+                                    <strong class="me-auto">Notification</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="toast-body">
+                                    <!-- Toast message will go here -->
+                                </div>
                             </div>
-                          </div>
+                        </div>
                         @yield('content')
 
                     </div>
