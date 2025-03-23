@@ -1,7 +1,7 @@
 <!-- Modal pour éditer un stock -->
 <div class="modal fade" id="editStockModal" tabindex="-1" aria-labelledby="editStockModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="editStockForm" method="POST" action="{{ route('stock.update', 'id') }}">
+        <form id="editStockForm" method="POST" >
             @csrf
             @method('POST')
             <div class="modal-content">

@@ -117,17 +117,17 @@ class StockController extends Controller
           $request->validate([
               'name' => 'required|max:255',
               'description' => 'nullable|max:1000',
-              'quantity' => 'required|integer|min:0',
+              //'quantity' => 'required|integer|min:0',
               'price' => 'required|numeric|min:0',
               'category_id' => 'required|exists:categorie_produits,id',
-              'business_id' => 'required|exists:businesses,id',
+              'business_id' => 'required|exists:business,id',
           ]);
   
           $stock->update([
               'name' => $request->name,
               'description' => $request->description,
               'category_id'=> $request->category_id,
-              'quantity' => $request->quantity,
+              //'quantity' => $request->quantity,
               'price' => $request->price,
               'business_id' => $request->business_id,
           ]);

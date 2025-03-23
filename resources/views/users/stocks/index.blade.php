@@ -102,8 +102,8 @@
                             document.getElementById('business_id_edit').value = data.stock.business_id;
                             document.getElementById('category_id_edit').value = data.stock.category_id;
                             // Set the form action for updating the service
-                            let editServiceForm = document.getElementById('editServiceForm');
-                            editServiceForm.action = `/services/${data.service.id}/update`;
+                            let editServiceForm = document.getElementById('editStockForm');
+                            editServiceForm.action = `/stock/${data.stock.id}/update`;
                             editServiceForm.method = 'POST';
                         } else {
                             console.log(xhr.responseText)
