@@ -22,6 +22,26 @@ class ClientController extends Controller
         'hasPrestation', "businesses",  'user'));
     }
 
+
+    public function getDette()
+    {
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+        $user = auth()->user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+
+        $clients = Clients::where('user_id' ,$user->id)
+        ->where('current_debt' , '>' , 0)
+        //->where('limit_credit_for_this_user' , '<=' , 0)
+        ->paginate(10);
+
+        return view('users.creence_clients.index', compact('clients','hasPhysique', 
+        'hasPrestation', "businesses",  'user'));
+    }
+
     public function create()
     {
         return view('clients.create');
