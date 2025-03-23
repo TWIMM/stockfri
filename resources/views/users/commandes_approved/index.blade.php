@@ -82,6 +82,30 @@
                                                 </option>
                                             </select>
                                         </td>
+
+                                        <script>
+                                            var commandeIdLoaded = @json($eachcommandeNotApproved->id);
+                                            console.log(commandeId); 
+                                            fetch(`/livraison_data/${commandeIdLoaded}`)
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        // You can handle the response here
+                                                        console.log(data);
+
+                                                        if (data.exists) {
+                                                            // Example: You could use the livraison data to populate hidden fields or modals
+                                                            const livraison = data.livraison;
+                                                            // Populate the page with the livraison data, e.g., in a hidden modal or div.
+                                                        } else {
+                                                            // Handle case where livraison doesn't exist
+                                                            console.log(`Livraison not found for commande ${commandeId}`);
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error fetching livraison details for commande ' + commandeId,
+                                                            error);
+                                                    });
+                                        </script>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
                                         <td>{{ $eachcommandeNotApproved->rest_to_pay }} FCFA</td>
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>

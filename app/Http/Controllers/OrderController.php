@@ -242,15 +242,16 @@ class OrderController extends Controller
 
     }
 
-    public function getLivDetail($commande_id){
-        $exists = Livraisons::where('commande_id', $commandeId)->exists();
-        $livraison = Livraisons::where('commande_id', $commandeId)->first();
-
+    public function getLivDetail($commande_id) { 
+        $exists = Livraisons::where('commande_id', $commande_id)->exists();
+        $livraison = Livraisons::where('commande_id', $commande_id)->first();
+    
         return response()->json([
             'exists' => $exists, 
             'livraison' => $livraison, 
         ]);
     }
+    
 
     public function index(){
         if(auth()->user()->type === 'team_member'){
