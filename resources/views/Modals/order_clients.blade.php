@@ -48,6 +48,10 @@
                                 <td><strong>Crédit disponible</strong></td>
                                 <td id="clientAvailableCredit"></td>
                             </tr>
+                            <tr>
+                                <td><strong>Dette actuelle</strong></td>
+                                <td id="clientDebtActual"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

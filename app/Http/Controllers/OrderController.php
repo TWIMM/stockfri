@@ -68,7 +68,7 @@ class OrderController extends Controller
     }
 
 
-    public function approveClientOrder(Request $requestt){
+    public function approveClientOrder(Request $request){
         $request->validate([
             'commande_id' => 'required|exists:commandes,id',
             //'client_id' => 'required|exists:clients,id',
@@ -76,10 +76,54 @@ class OrderController extends Controller
         
         //$client = Client::find($request->client_id);
         $commandeNotApproved = Commandes::find($request->commande_id);
-        $commandeNotApproved->validation_status = 'approved';
-        $commandeNotApproved->save();
+        $client = Clients::find($commandeNotApproved->client_id);
 
-        return redirect()->back()->with('success', 'Success');
+        //is client trusted ? 
+
+        if($client->trusted === 1){
+            
+            $commandeNotApproved->validation_status = 'approved';
+            $commandeStatus = $commandeNotApproved->invoice_status;
+            if($client->limit_credit_for_this_user <= 0 ){
+                return redirect()->back()->with('error', 'La limite de credit de ce client est de zero');
+            }
+            if($commandeStatus === 'unpaid'){
+                if($client->limit_credit_for_this_user < $commandeNotApproved->total_price){
+                    return redirect()->back()->with('error', 'La limite de credit de ce client est insuffisante');
+
+                }
+
+                $client->limit_credit_for_this_user = $client->limit_credit_for_this_user - $commandeNotApproved->total_price;
+                $client->current_debt = $commandeNotApproved->total_price;
+                $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
+                $commandeNotApproved->rest_to_pay = 0;
+
+            } else if ($commandeStatus === 'partially_paid') {
+
+                $remainingAmount = $commandeNotApproved->rest_to_pay;
+                if($client->limit_credit_for_this_user < $remainingAmount){
+                    return redirect()->back()->with('error', 'La limite de credit de ce client est insuffisante');
+                }
+                $client->limit_credit_for_this_user = $client->limit_credit_for_this_user - $remainingAmount;
+                $client->current_debt += $remainingAmount;
+                $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
+                $commandeNotApproved->rest_to_pay = 0;
+                
+            }
+
+            
+
+            $client->save();
+            $commandeNotApproved->save();
+            
+            return redirect()->back()->with('success', 'Success');
+
+        } else if($client->trusted === 0) {
+            
+            return redirect()->back()->with('error', 'Veuillez activer le mode trusted');
+        }
+
+
     }
 
     public function index(){

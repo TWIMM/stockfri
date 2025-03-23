@@ -777,7 +777,9 @@
                 riskLevelBadge.innerText = 'Élevé';
             }
 
-            document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
+            document.getElementById('clientAvailableCredit').innerText = clientData.limit_credit_for_this_user;
+            document.getElementById('clientDebtActual').innerText = clientData.current_debt;
+
         }
 
 

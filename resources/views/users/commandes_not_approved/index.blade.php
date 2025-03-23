@@ -60,7 +60,7 @@
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
-                                            <button type="button" data-client-id="{{ $client->id }}"
+                                            <button type="button" data-command-id="{{$eachcommandeNotApproved->id}}" data-client-id="{{ $client->id }}"
                                                 data-id='{{ $eachcommandeNotApproved->id }}' id='validate-order-btn'
                                                 class="btn btn-secondary">
                                                 <i class="ti ti-check"></i>
@@ -99,6 +99,8 @@
                 button.addEventListener('click', function() {
                     const clientId = button.getAttribute(
                         'data-client-id');
+                    const commandId = button.getAttribute(
+                            'data-command-id');
 
                     // Fetch client data from the API
                     fetch(`/clients_data/${clientId}`)
@@ -118,6 +120,7 @@
                                         .getElementById('riskConfirmationModal'));
                                     riskModal.show();
                                 } else {
+                                    document.getElementById('commande_id_risk_low').value = commandId;
                                     const riskModal = new bootstrap.Modal(document
                                         .getElementById('excellentCreditModal'));
                                     riskModal.show();
@@ -125,6 +128,8 @@
                             } else if(clientData.trusted == 1){
                                 document.getElementById('available_credit_limit').value = clientData
                                 .limit_credit_for_this_user;
+                                document.getElementById('commande_id_risk_low').value = commandId;
+                                document.getElementById('current_debt').value = data.clientData.current_debt;
                                 const riskModal = new bootstrap.Modal(document
                                         .getElementById('excellentCreditModal'));
                                     riskModal.show();
@@ -784,7 +789,8 @@
                 riskLevelBadge.innerText = 'Élevé';
             }
 
-            document.getElementById('clientAvailableCredit').innerText = clientData.available_credit;
+            document.getElementById('clientAvailableCredit').innerText = clientData.limit_credit_for_this_user;
+            document.getElementById('clientDebtActual').innerText = clientData.current_debt;
         }
 
 

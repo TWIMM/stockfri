@@ -111,12 +111,12 @@ in precommande :
 user dont paid anything ?
 I user score enough to trust him ? Yes go and apply for a order 
 No ? go to step 3
-is user trusted ? Yes Apply the order in credit , remove amount from credit addup debt 
+is user trusted ? Yes Apply the order in credit , remove amount from credit addup debt , generate invoice 
 No ? trust user , give him credit , and go do step two again
 
 
 user pay_partial ? check if system score is good , ask if user want to trust user and give him credit
-if Yes , do and make the rest payement in the credit  remove amount from credit addup debt 
+if Yes , do and make the rest payement in the credit  remove amount from credit addup debt  , generate invoice 
 
 
 User can not make payement in the system without paying all the money , if they want to 
