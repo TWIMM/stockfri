@@ -108,13 +108,15 @@ class OrderController extends Controller
                 $client->current_debt += $remainingAmount;
                 $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
                 $commandeNotApproved->rest_to_pay = 0;
-                
+
             }
 
             
 
             $client->save();
             $commandeNotApproved->save();
+
+            $invoice = $this->generateInvoiceFromOrder($commandeNotApproved);
             
             return redirect()->back()->with('success', 'Success');
 

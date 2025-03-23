@@ -9,6 +9,7 @@
     @include('Modals.risk_high')
     @include('Modals.orderpay')
     @include('Modals.risk_low')
+    @include('Modals.pdf_viewer')
 
     <div class="row">
         <div class="col-sm-12">
@@ -65,7 +66,11 @@
                                                 class="btn btn-secondary">
                                                 <i class="ti ti-send"></i>
                                             </button>
-                                            
+                                            <button type="button" data-payment-id='{{ $eachcommandeNotApproved->id }}'
+                                                data-id='{{ $eachcommandeNotApproved->id }}' id='invoice_viewer-btn'
+                                                class="btn bg-blue" {{-- data-bs-target="#pdfViewerModal" --}}>
+                                                <i style="color: white" class="ti ti-folder"></i>
+                                            </button>
 
                                         </td>
                                     </tr>
@@ -88,6 +93,58 @@
             const precommandesee = document.querySelectorAll('#precommande-btn');
 
             const validatesbUTTONS = document.querySelectorAll('#validate-order-btn');
+
+            const invoice_viewer_buttons = document.querySelectorAll('#invoice_viewer-btn');
+
+            // Function to load PDF from the input URL
+            function loadPdfFromUrl() {
+                const pdfUrl = document.getElementById('invoices_url').value;
+
+                if (pdfUrl) {
+                    // Show loading state
+                    document.getElementById('pdfLoading').classList.remove('d-none');
+                    document.getElementById('pdfContainer').classList.add('d-none');
+                    document.getElementById('pdfError').classList.add('d-none');
+
+                    // Load the PDF
+                    currentPdfUrl = pdfUrl;
+                    const viewer = document.getElementById('pdfViewerFrame');
+                    viewer.src = pdfUrl;
+
+                    // Hide loading, show PDF viewer
+                    document.getElementById('pdfLoading').classList.add('d-none');
+                    document.getElementById('pdfContainer').classList.remove('d-none');
+
+                    // Simulate page count update
+                    simulatePageCount();
+                } else {
+                    showError('URL du document introuvable');
+                }
+            }
+
+            invoice_viewer_buttons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const commandeId = button.getAttribute(
+                        'data-id');
+
+                    // Fetch client data from the API
+                    fetch(`/invoices/${commandeId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const invoicesurl = data.invoicesurl;
+                            document.getElementById('invoices_url').value = invoicesurl;
+                            console.log(invoicesurl)
+                            const pdfViewer = new bootstrap.Modal(document
+                                .getElementById('pdfViewerModal'));
+                            pdfViewer.show();
+
+                            loadPdfFromUrl();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching client invoice:', error);
+                        });
+                });
+            });
 
             validatesbUTTONS.forEach(function(button) {
                 button.addEventListener('click', function() {
@@ -115,12 +172,13 @@
                                         .getElementById('excellentCreditModal'));
                                     riskModal.show();
                                 }
-                            } else if(clientData.trusted == 1){
-                                document.getElementById('available_credit_limit').value = clientData
-                                .limit_credit_for_this_user;
+                            } else if (clientData.trusted == 1) {
+                                document.getElementById('available_credit_limit').value =
+                                    clientData
+                                    .limit_credit_for_this_user;
                                 const riskModal = new bootstrap.Modal(document
-                                        .getElementById('excellentCreditModal'));
-                                    riskModal.show();
+                                    .getElementById('excellentCreditModal'));
+                                riskModal.show();
                             }
 
                         })

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\InvoiceService;
+use App\Models\Invoice;
 
 class InvoiceController extends Controller
 {
@@ -52,5 +53,14 @@ class InvoiceController extends Controller
 
         dd($this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes));
         return $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes);
+    }
+
+    public function retrieveUrl($id){
+        $invoice = Invoice::where('commande_id',  $id)->first();
+
+
+        return response()->json([
+            'invoicesurl' => $invoice->invoice_link,
+        ]);
     }
 }

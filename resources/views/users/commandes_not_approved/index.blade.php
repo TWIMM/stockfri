@@ -56,7 +56,7 @@
                                                 <i style="color: white" class="ti ti-receipt"></i>
                                             </button></td>
                                         <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
-                                        <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
+                                        <td>{{ $eachcommandeNotApproved->rest_to_pay }} FCFA</td>
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
