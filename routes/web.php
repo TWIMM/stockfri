@@ -110,6 +110,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-delivery-personnel', [OrderController::class, 'getDeliveryPersonnel'])->name('livraison.get-personnel');
     Route::post('/create-livraison', [OrderController::class, 'createLivraison'])->name('livraison.create');
     Route::post('/update-livraison-status', [OrderController::class, 'updateStatus'])->name('livraison.update-status');
+    
+    Route::get('/livraison_data/{commande_id}', [OrderController::class, 'getLivDetail'])->name('livraison.getLivDetailexists');
 
     //mnagasins
     Route::get('/magasins_list', [MagasinsController::class, 'index'])->name('magasins.listes');
