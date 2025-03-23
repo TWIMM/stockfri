@@ -51,15 +51,17 @@
                                                 data-bs-target="#clientDetailsModal">
                                                 <i style="color: white" class="ti ti-user"></i>
                                             </button></td>
-                                        <td><button type="button" data-payment-id='{{ $eachcommandeNotApproved->id }}'
+                                        <td>
+                                            <button type="button" data-payment-id='{{ $eachcommandeNotApproved->id }}'
                                                 data-id='{{ $eachcommandeNotApproved->id }}' id='precommande-btn'
                                                 class="btn bg-green" data-bs-toggle="modal"
                                                 data-bs-target="#paymentDetailsModal">
                                                 <i style="color: white" class="ti ti-receipt"></i>
-                                            </button></td>
+                                            </button>
+                                        </td>
 
                                         <td>
-                                            <select class="form-control" name="status_livraison{{!$eachcommandeNotApproved->id}}" id="status_livraison{{!$eachcommandeNotApproved->id}}">
+                                            <select class="form-control" name="status_livraison" id="status_livraison{{$eachcommandeNotApproved->id}}">
                                                 <option value="none"
                                                     {{ !$eachcommandeNotApproved->livraison ? 'selected' : '' }}>
                                                     Aucun
@@ -99,11 +101,11 @@
                                                             // Populate the page with the livraison data, e.g., in a hidden modal or div.
                                                         } else {
                                                             // Handle case where livraison doesn't exist
-                                                            console.log(`Livraison not found for commande ${commandeId}`);
+                                                            console.log(`Livraison not found for commande ${commandeIdLoaded}`);
                                                         }
                                                     })
                                                     .catch(error => {
-                                                        console.error('Error fetching livraison details for commande ' + commandeId,
+                                                        console.error('Error fetching livraison details for commande ' + commandeIdLoaded,
                                                             error);
                                                     });
                                         </script>
