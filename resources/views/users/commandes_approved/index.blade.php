@@ -63,6 +63,14 @@
                                                 <option value="none">
                                                      Aucun
                                                 </option>
+                                                                                                
+                                                <option value="en_cours">
+                                                    En attente
+                                                </option>
+                                                                                               
+                                                <option value="en_cours">
+                                                    Livré
+                                                </option>
                                                 <option value="en_cours">
                                                     En cours
                                                 </option>
