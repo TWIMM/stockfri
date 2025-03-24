@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Magasins;
 use App\Models\Livraisons;
 use App\Models\TeamMember;
+use App\Models\ClientDebt;
 
 class OrderController extends Controller
 {
@@ -212,6 +213,16 @@ class OrderController extends Controller
                 $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
                 $commandeNotApproved->rest_to_pay = 0;
 
+
+                ClientDebt::create([
+                    'client_id' => $client->id, 
+                    'commande_id' => $commandeNotApproved->id, 
+                    'amount' => $commandeNotApproved->total_price, 
+                    //'payment_method' => 'credit_card', 
+                    'due_date' => $client->user->due_date_delay, 
+                ]);
+
+
             } else if ($commandeStatus === 'partially_paid') {
 
                 $remainingAmount = $commandeNotApproved->rest_to_pay;
@@ -222,6 +233,15 @@ class OrderController extends Controller
                 $client->current_debt += $remainingAmount;
                 $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
                 $commandeNotApproved->rest_to_pay = 0;
+
+
+                ClientDebt::create([
+                    'client_id' => $client->id, 
+                    'commande_id' => $commandeNotApproved->id, 
+                    'amount' => $remainingAmount, 
+                    //'payment_method' => 'credit_card', 
+                    'due_date' => $client->user->due_date_delay, 
+                ]);
 
             }
 

@@ -161,6 +161,7 @@ class BusinessController extends Controller
             'number' => 'required|string|max:255',
             'business_email' => 'required|email',
         ]);
+        $user_id = 0;
 
         if( !$request->team_member){
             $user_id = Auth::id();
@@ -172,9 +173,18 @@ class BusinessController extends Controller
             $team = $realTeamMember->team()->first();  
             //$intBus = Business::find(optional($team->pivot)->business_id);
             $user = User::findOrFail($realTeamMember->user_id);
-           // $teamBusiness = $team->business()->first();  // ✅ Correct way
-           // $teamBusinessOwner = $teamBusiness->user;  // ✅ Correct way
+           // $teamBusiness = $team->business()->first(); 
+           // $teamBusinessOwner = $teamBusiness->user; 
             $user_id = $user->id;
+        }
+
+
+        $exist = Business::where('user_id', $user_id)
+        ->where('name', $request->name)
+        ->exists();
+
+        if($exist){
+            return back()->with('error', 'Le nom est deja associe a un de vos business');
         }
 
         // Create the business

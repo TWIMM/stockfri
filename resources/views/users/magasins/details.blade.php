@@ -42,11 +42,11 @@
                                     <tr>
                                         <td>{{ $stock->name }}</td>
                                         <td><span class="badge badge-pill badge-status bg-green">
-                                            {{ $stock->quantity }} 
+                                            {{number_format( $stock->quantity )}}
                                             </span></td>
 
                                         <td><span class="badge badge-pill badge-status bg-blue">
-                                            {{ $stock->price }} FCFA
+                                            {{number_format( $stock->price )}} FCFA
                                             </span></td>
                                         <td>
                                             

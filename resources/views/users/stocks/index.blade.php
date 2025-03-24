@@ -47,9 +47,9 @@
                                     <tr>
                                         <td>{{ $stock->name }}</td>
                                         <td>{{ $stock->description }}</td>
-                                        <td><span class="badge badge-pill badge-status bg-blue">{{ $stock->quantity }} </span> </td>
+                                        <td><span class="badge badge-pill badge-status bg-blue">{{number_format( $stock->quantity )}} </span> </td>
 
-                                        <td>{{ $stock->price }} FCFA</td>
+                                        <td>{{number_format( $stock->price )}} FCFA</td>
                                         <td>
                                             <button type="button" data-id='{{$stock->id}}' id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editStockModal">
                                                 <i class="ti ti-pencil"></i>

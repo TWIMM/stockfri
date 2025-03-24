@@ -227,7 +227,7 @@
                                         </ul>
                                     </li>
 
-                                    @if ($hasPhysique  || $$hasPrestation)
+                                    @if ($hasPhysique  || $hasPrestation)
                                         <li class="submenu">
                                             <a class="{{ request()->routeIs('finances.*')  ? 'subdrop active' : '' }}"
                                                 href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>

@@ -32,7 +32,7 @@ class RolePermSeeder extends Seeder
             'envoyer facture',
 
             // Paramètres de l'application
-            'gérer paramètres_application', 'modifier paramètres_application', 'voir paramètres_application',
+            'gérer paramètres application', 'modifier paramètres application', 'voir paramètres application',
 
             // Autres permissions
             'vendre produit', 'vendre service',
@@ -82,7 +82,7 @@ class RolePermSeeder extends Seeder
                 'gérer magasins', 'créer magasins', 'modifier magasins', 'supprimer magasins', 'voir magasins',
             ],
             'gestionnaire_paramètres' => [
-                'gérer paramètres_application', 'modifier paramètres_application', 'voir paramètres_application',
+                'gérer paramètres application', 'modifier paramètres application', 'voir paramètres application',
             ]
         ];
 
