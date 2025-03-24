@@ -22,6 +22,36 @@ class ClientController extends Controller
         'hasPrestation', "businesses",  'user'));
     }
 
+    public function handleDebt($id , Request $request){
+        $request->validate([
+            'amount' => 'required|numeric|min:0',
+            //'file' => 'mimes:pdf,jpeg,jpg,png|max:2048', 
+            'factures_achat' => 'required|array', 
+            'factures_achat.*' => 'mimes:pdf,jpeg,jpg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('factures_achat')) {
+            foreach ($request->file('factures_achat') as $file) {
+                // Store each file in the 'factures_add_up_quantity' directory inside 'public' disk
+                $filePath = $file->store('factures_remboursements', 'public');
+                $filePaths[] = $filePath; // Save the file path in the array for later use
+            }
+        }
+
+
+        $client = Clients::find($id);
+
+        if($request->amount > $client->current_debt){
+            $client->current_debt = 0; 
+        } else {
+            $client->current_debt = $client->current_debt - $request->amount; 
+
+        }
+        $client->save();
+        
+        return response()->json($client);
+    }
+
 
     public function getDette()
     {

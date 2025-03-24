@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="modalVenteLabel">Remboursements de crédit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('stock.stock_fri_order_stock') }}" method="POST">
+            <form action="{{ route('finances.handle_dette') }}" method="POST">
                 @csrf
                 <div class="modal-body">
 
@@ -101,7 +101,7 @@
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <input type="file" class="form-control" id="factureId"
-                                        name="factureName">
+                                        name="factures_remboursement" multiple>
                                 </div>
                             </div>
                         </div>
