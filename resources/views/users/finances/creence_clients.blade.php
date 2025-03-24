@@ -11,9 +11,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClientModal">
-                        Ajouter un client
-                    </button>
+                  <h5>Créentié(e)s</h5>  
                 </div>
 
                 <div class="card-body">
@@ -31,21 +29,16 @@
                                 @forelse($clients as $coequipier)
                                     <tr>
                                         <td>{{ $coequipier->name }}</td>
-                                        <td>{{ $coequipier->current_debt }}</td>
-                                        <td>{{ $coequipier->limit_credit_for_this_user }}</td>
+                                        <td>{{ number_format($coequipier->current_debt) }} FCFA</td>
+                                        <td>{{ number_format($coequipier->limit_credit_for_this_user) }} FCFA</td>
                                         <td>
                                             <button type="button" class="btn btn-secondary edit-btn"
                                                 data-id="{{ $coequipier->id }}" data-name="{{ $coequipier->name }}"
                                                 data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
                                                 data-bs-toggle="modal" data-bs-target="#editClientModal">
-                                                <i class="ti ti-pencil"></i>
+                                                <i class="ti ti-receipt"></i>
                                             </button>
-                                            <form action="{{ route('clients.destroy', $coequipier->id) }}"
-                                                method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger"> <i class="ti ti-trash"></i></button>
-                                            </form>
+                                           
                                         </td>
                                     </tr>
                                 @empty

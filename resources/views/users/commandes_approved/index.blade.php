@@ -109,8 +109,8 @@
                                                             error);
                                                     });
                                         </script>
-                                        <td>{{ $eachcommandeNotApproved->total_price }} FCFA</td>
-                                        <td>{{ $eachcommandeNotApproved->rest_to_pay }} FCFA</td>
+                                        <td>{{ number_format($eachcommandeNotApproved->total_price) }} FCFA</td>
+                                        <td>{{ number_format($eachcommandeNotApproved->rest_to_pay) }} FCFA</td>
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
@@ -1169,13 +1169,19 @@
                     document.getElementById('payment_client').innerText = paymentDetails.client || 'N/A';
                     document.getElementById('payment_magasin').innerText = paymentDetails.magasin || 'N/A';
                     document.getElementById('payment_user').innerText = paymentDetails.user || 'N/A';
-                    document.getElementById('payment_totalAmount').innerText = paymentDetails.total_price || 'N/A';
+                    //document.getElementById('payment_totalAmount').innerText = paymentDetails.total_price || 'N/A';
                     document.getElementById('payment_tva').innerText = paymentDetails.tva || 'N/A';
                     document.getElementById('payment_invoiceStatus').innerText = paymentDetails.invoice_status || 'N/A';
                     document.getElementById('payment_paymentMode').innerText = paymentDetails.payment_mode || 'N/A';
-                    document.getElementById('payment_amountPaid').innerText = paymentDetails.already_paid || '0.00';
-                    document.getElementById('payment_restToPay').innerText = paymentDetails.rest_to_pay || '0.00';
+                   // Format the amount paid and the rest to pay with comma separators
+                    const amountPaidFormatted = new Intl.NumberFormat().format(paymentDetails.already_paid || 0.00);
+                    const restToPayFormatted = new Intl.NumberFormat().format(paymentDetails.rest_to_pay || 0.00);
+                    const payment_totalAmount = new Intl.NumberFormat().format(paymentDetails.total_price || 0.00);
 
+                    // Set the formatted values
+                    document.getElementById('payment_amountPaid').innerText = amountPaidFormatted;
+                    document.getElementById('payment_restToPay').innerText = restToPayFormatted;
+                    document.getElementById('payment_totalAmount').innerText = payment_totalAmount;
                     // Ensure payment mode is properly formatted
                     const paymentMode = (paymentDetails.payment_mode || "").trim();
                     console.log("Payment mode:", paymentMode);
@@ -1252,8 +1258,14 @@
                 riskLevelBadge.innerText = 'Élevé';
             }
 
-            document.getElementById('clientAvailableCredit').innerText = clientData.limit_credit_for_this_user;
-            document.getElementById('clientDebtActual').innerText = clientData.current_debt;
+            // Format the credit limit and debt with comma separators
+            const creditFormatted = new Intl.NumberFormat().format(clientData.limit_credit_for_this_user);
+            const debtFormatted = new Intl.NumberFormat().format(clientData.current_debt);
+
+            // Set the formatted values
+            document.getElementById('clientAvailableCredit').innerText = creditFormatted;
+            document.getElementById('clientDebtActual').innerText = debtFormatted;
+
 
         }
 
