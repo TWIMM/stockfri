@@ -27,12 +27,12 @@ class ClientController extends Controller
             'id' => 'required|exists:clients,id',
             'amount' => 'required|numeric|min:0',
             //'file' => 'mimes:pdf,jpeg,jpg,png|max:2048', 
-            'factures_achat' => 'required|array', 
-            'factures_achat.*' => 'mimes:pdf,jpeg,jpg,png|max:2048',
+            'factures_remboursement' => 'required|array', 
+            'factures_remboursement.*' => 'mimes:pdf,jpeg,jpg,png|max:2048',
         ]);
 
-        if ($request->hasFile('factures_achat')) {
-            foreach ($request->file('factures_achat') as $file) {
+        if ($request->hasFile('factures_remboursement')) {
+            foreach ($request->file('factures_remboursement') as $file) {
                 // Store each file in the 'factures_add_up_quantity' directory inside 'public' disk
                 $filePath = $file->store('factures_remboursements', 'public');
                 $filePaths[] = $filePath; // Save the file path in the array for later use

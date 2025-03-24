@@ -29,6 +29,7 @@
                     <div id="alreadyPayIInput" class="mb-3 d-none">
                         <label for="invoiceStatusl" class="form-label">Montant payé</label>
                         <input type="number" name="amount" class="form-control">
+                        <input type="hidden" id='put_id_in_there' value='' name='id'>
                     </div>
 
                     <!-- Champs conditionnels pour les détails de paiement -->
@@ -56,7 +57,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="bankName" class="form-label">Nom de la banque</label>
                                     <input type="text" class="form-control" id="bankName" name="bank_name">
-                                    <input type="hidden" id='put_id_in_there' value=''>
+                                   
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="bankReference" class="form-label">Référence du virement</label>
