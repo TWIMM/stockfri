@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('due_date_delay')->nullable(); 
+            $table->integer('due_date_delay')->default(10)->nullable(); 
         });
     }
 
