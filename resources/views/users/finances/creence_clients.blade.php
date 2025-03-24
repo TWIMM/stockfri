@@ -64,6 +64,7 @@
             button.addEventListener('click', function () {
                 // Get the data-id from the clicked button
                 const clientId = this.getAttribute('data-id');
+                document.getElementById('put_id_in_there').value = clientId;
                 
                 // Use AJAX to get the client data based on the ID
                 fetch(`/clients/${clientId}`)

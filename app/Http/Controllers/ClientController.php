@@ -22,8 +22,9 @@ class ClientController extends Controller
         'hasPrestation', "businesses",  'user'));
     }
 
-    public function handleDebt($id , Request $request){
+    public function handleDebt( Request $request){
         $request->validate([
+            'id' => 'required|exists:clients,id',
             'amount' => 'required|numeric|min:0',
             //'file' => 'mimes:pdf,jpeg,jpg,png|max:2048', 
             'factures_achat' => 'required|array', 
@@ -39,7 +40,7 @@ class ClientController extends Controller
         }
 
 
-        $client = Clients::find($id);
+        $client = Clients::find($request->id);
 
         if($request->amount > $client->current_debt){
             $client->current_debt = 0; 

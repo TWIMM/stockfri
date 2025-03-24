@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="modalVenteLabel">Remboursements de crédit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('finances.handle_dette') }}" method="POST">
+            <form action="{{ route('finances.handle_dette') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
 
@@ -28,7 +28,7 @@
 
                     <div id="alreadyPayIInput" class="mb-3 d-none">
                         <label for="invoiceStatusl" class="form-label">Montant payé</label>
-                        <input type="number" name="already_paid" class="form-control">
+                        <input type="number" name="amount" class="form-control">
                     </div>
 
                     <!-- Champs conditionnels pour les détails de paiement -->
@@ -56,6 +56,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="bankName" class="form-label">Nom de la banque</label>
                                     <input type="text" class="form-control" id="bankName" name="bank_name">
+                                    <input type="hidden" id='put_id_in_there' value=''>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="bankReference" class="form-label">Référence du virement</label>
