@@ -160,7 +160,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('trust_client', [OrderController::class, 'trustClient'])->name('commandes.trustClient'); // Show individual supplier
     Route::post('approve_client_order', [OrderController::class, 'approveClientOrder'])->name('commandes.approveClientOrder'); // Show individual supplier
     Route::get('/invoices/{id}', [InvoiceController::class, 'retrieveUrl'])->name('invoices.retrieveUrl'); // Show individual supplier
+    Route::get('/clients/{client}/debts', [OrderController::class, 'getClientDebts'])->name('clients.debts');
 
+    // Mark a debt as paid
+    Route::post('/client-debts/{clientDebt}/pay', [OrderController::class, 'markAsPaid'])->name('clients.debts.pay');
+    
+    // Create a new debt from a command
+    Route::post('/client-debts/create',  [OrderController::class, 'createDebtFromCommande'])->name('clients.debts.create');
 });
 
 Route::middleware(['auth']) -> group(function(){

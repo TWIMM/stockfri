@@ -17,6 +17,7 @@ use App\Models\Magasins;
 use App\Models\Livraisons;
 use App\Models\TeamMember;
 use App\Models\ClientDebt;
+use App\Models\User;
 
 class OrderController extends Controller
 {
@@ -25,6 +26,50 @@ class OrderController extends Controller
     public function __construct(InvoiceService $invoiceService)
     {
         $this->invoiceService = $invoiceService;
+    }
+
+    /**
+     * Get all unpaid debts for a client
+     *
+     * @param Clients $client
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getClientDebts(Clients $client)
+    {
+        // Get unpaid debts for the client
+        $debts = ClientDebt::where('client_id', $client->id)
+                        //->where('is_paid', false)
+                        ->orderBy('due_date')
+                        ->get();
+        
+        return response()->json($debts);
+    }
+    
+    /**
+     * Mark a debt as paid
+     *
+     * @param ClientDebt $clientDebt
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markAsPaid(ClientDebt $clientDebt)
+    {
+        try {
+            $clientId = $clientDebt->client_id;
+            
+            // Mark the debt as paid
+            $clientDebt->markAsPaid();
+            
+            return response()->json([
+                'success' => true,
+                'client_id' => $clientId,
+                'message' => 'Dette marquée comme payée avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -192,6 +237,7 @@ class OrderController extends Controller
         //$client = Client::find($request->client_id);
         $commandeNotApproved = Commandes::find($request->commande_id);
         $client = Clients::find($commandeNotApproved->client_id);
+        $user = User::find($client->user_id);
 
         //is client trusted ? 
 
@@ -219,7 +265,7 @@ class OrderController extends Controller
                     'commande_id' => $commandeNotApproved->id, 
                     'amount' => $commandeNotApproved->total_price, 
                     //'payment_method' => 'credit_card', 
-                    'due_date' => $client->user->due_date_delay, 
+                    'due_date' => Carbon::now()->addDays($user->due_date_delay), 
                 ]);
 
 
@@ -240,7 +286,7 @@ class OrderController extends Controller
                     'commande_id' => $commandeNotApproved->id, 
                     'amount' => $remainingAmount, 
                     //'payment_method' => 'credit_card', 
-                    'due_date' => $client->user->due_date_delay, 
+                    'due_date' => Carbon::now()->addDays($user->due_date_delay),  
                 ]);
 
             }
