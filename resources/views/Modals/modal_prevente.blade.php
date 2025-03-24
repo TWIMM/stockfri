@@ -109,6 +109,16 @@
                         <input type="number" name="already_paid" class="form-control">
                     </div>
 
+                    <div id="facture" class=" mb-3">
+                        <h6 class="mb-3">Facture</h6>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <input type="file" class="form-control" id="factureId"
+                                    name="factureName">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Champs conditionnels pour les détails de paiement -->
                     <div id="paymentDetailsContainer" class="d-none">
                         <!-- Pour Mobile Money -->

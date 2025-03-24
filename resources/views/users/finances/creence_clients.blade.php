@@ -4,8 +4,7 @@
 
 @section('content')
 
-    @include('Modals.add_client')
-    @include('Modals.edit_client')
+    @include('Modals.remboursement')
 
     <div class="row">
         <div class="col-sm-12">
@@ -35,7 +34,7 @@
                                             <button type="button" class="btn btn-secondary edit-btn"
                                                 data-id="{{ $coequipier->id }}" data-name="{{ $coequipier->name }}"
                                                 data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
-                                                data-bs-toggle="modal" data-bs-target="#editClientModal">
+                                                data-bs-toggle="modal" data-bs-target="#remboursementModal">
                                                 <i class="ti ti-receipt"></i>
                                             </button>
                                            
