@@ -238,10 +238,7 @@
                                                 <li><a href="{{ route('finances.dettes') }}"
                                                         class="{{ request()->routeIs('finances.dettes') ? 'active' : '' }}">Gestion
                                                         des dettes</a></li>
-                                                <li><a href="{{ route('finances.paiement') }}"
-                                                        class="{{ request()->routeIs('finances.paiement') ? 'active' : '' }}">Gestion
-                                                        des paiements</a></li>
-                                            
+                                                
 
                                             </ul>
                                         </li>
