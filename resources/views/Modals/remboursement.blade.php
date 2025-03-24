@@ -103,7 +103,7 @@
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <input type="file" class="form-control" id="factureId"
-                                        name="factures_remboursement" multiple>
+                                        name="factures_remboursement[]" multiple>
                                 </div>
                             </div>
                         </div>

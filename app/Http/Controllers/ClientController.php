@@ -41,6 +41,7 @@ class ClientController extends Controller
 
 
         $client = Clients::find($request->id);
+        $limitCredit =  $client->current_debt + $client->limit_credit_for_this_user; 
 
         if($request->amount > $client->current_debt){
             $client->current_debt = 0; 
@@ -48,9 +49,10 @@ class ClientController extends Controller
             $client->current_debt = $client->current_debt - $request->amount; 
 
         }
+        $client->limit_credit_for_this_user = $limitCredit;
         $client->save();
         
-        return response()->json($client);
+        return redirect()->back()->with('success' , 'Credit rembourse avec succes');
     }
 
 
