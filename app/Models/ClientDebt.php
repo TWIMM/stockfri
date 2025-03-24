@@ -5,19 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Paiement extends Model
+class ClientDebt extends Model
 {
     use HasFactory;
-    protected $table = 'paiements';
-
 
     protected $fillable = [
         'client_id',
         'commande_id',
-        'client_debt_id',
         'amount',
-        'payment_method',
-        'is_late',
+        //'payment_method',
+        //'is_late',
         'due_date',
     ];
 
@@ -26,13 +23,13 @@ class Paiement extends Model
         return $this->belongsTo(Clients::class, 'client_id');
     }
 
+    public function paiements()
+    {
+        return $this->hasMany(Paiement::class);
+    }
+
     public function commande()
     {
         return $this->belongsTo(Commande::class);
-    }
-
-    public function ClientDebt()
-    {
-        return $this->belongsTo(ClientDebt::class);
     }
 }
