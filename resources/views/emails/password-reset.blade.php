@@ -63,12 +63,10 @@
     <body>
         <div class="email-container">
             <div class="email-header">
-                <h4>Bienvenue chez Stockfri !</h4>
+                <h4>Cliquez sur ce lien afin de mofifier votre mot de passe !</h4>
             </div>
             <div class="email-body">
-                <p>Bonjour <strong>{{ $name }}</strong>,</p>
-                <p>Nous sommes heureux de vous accueillir sur notre plateforme ! Vous pouvez compléter la configuration de votre pass membre en cliquant sur le lien ci-dessous :</p>
-                <a href="{{ $appLink }}" class="button">Terminer la configuration</a>
+               <a href="{{ $appLink }}" class="button">Modifier mot de passe</a>
             </div>
             <div class="footer">
                 <p>Si vous avez des questions, n'hésitez pas à <a href="mailto:support@stockfri.com">nous contacter</a>.</p>

@@ -17,6 +17,8 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LivraisonController;
+use App\Http\Controllers\PasswordResetController;
+
 
 Route::get('/invoice', [InvoiceController::class, 'generateInvoice'])->name('invoice');
 
@@ -173,6 +175,15 @@ Route::middleware(['auth']) -> group(function(){
     Route::get('/dashboard_team_member', [DashboardController::class, 'team_member'])->name('dashboard_team_member');
 
 });
+
+
+Route::get('/password/reset/request', [PasswordResetController::class, 'showResetForm'])->name('password.reset.request');
+
+Route::post('/send/request/notification', [PasswordResetController::class, 'sendResetLinkEmail'])->name('send.request.notification');
+
+Route::get('/password/reset', [PasswordResetController::class, 'resetPassword'])->name('password.reset');
+
+Route::get('/password/reset/confirmation/{token}', [PasswordResetController::class, 'showResetConfirmForm'])->name('password.reset.request');
 
 /* 
 Route::get('/verify_2fa', function () {

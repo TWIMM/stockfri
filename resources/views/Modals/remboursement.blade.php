@@ -32,6 +32,40 @@
                         <input type="hidden" id='put_id_in_there' value='' name='id'>
                     </div>
 
+
+
+
+                    <!-- Pour Espèces (Cash) -->
+                    <div id="commandeTopay" class="payment-details d-none mb-3">
+                        <h6 class="mb-3">Commande a rembourser</h6>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <select name="" id="">
+                                    <option value="">
+
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Commande ID</th>
+                                    <th>Montant</th>
+                                    <th>Date d'échéance</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Debt data will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
                     <!-- Champs conditionnels pour les détails de paiement -->
                     <div id="paymentDetailsContainer" class="d-none">
                         <!-- Pour Mobile Money -->

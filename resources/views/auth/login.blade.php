@@ -78,7 +78,7 @@
                                     </label>
                                 </div>
                                 <div class="text-end">
-                                    <a href="forgot-password.html" class="text-primary fw-medium link-hover">Mot de passe oublie?</a>
+                                    <a href="/password/reset/request" class="text-primary fw-medium link-hover">Mot de passe oublie?</a>
                                 </div>
                             </div>
                             <div class="mb-3">

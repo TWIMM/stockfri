@@ -32,16 +32,11 @@
                                         <td>{{ number_format($coequipier->current_debt) }} FCFA</td>
                                         <td>{{ number_format($coequipier->limit_credit_for_this_user) }} FCFA</td>
                                         <td>
-                                            <button type="button" class="btn btn-secondary edit-btn"
-                                                data-id="{{ $coequipier->id }}" data-name="{{ $coequipier->name }}"
-                                                data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
-                                                data-bs-toggle="modal" data-bs-target="#remboursementModal">
-                                                <i class="ti ti-receipt"></i>
-                                            </button>
-                                            <button type="button" class="btn bg-blue edit-btn"
-                                                data-id="{{ $coequipier->id }}" data-name="{{ $coequipier->name }}"
-                                                data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
-                                                data-bs-toggle="modal" data-bs-target="#CommandeImpayes">
+
+                                            <button type="button" class="btn bg-blue edit-btn" data-id="{{ $coequipier->id }}"
+                                                data-name="{{ $coequipier->name }}" data-email="{{ $coequipier->email }}"
+                                                data-tel="{{ $coequipier->tel }}" data-bs-toggle="modal"
+                                                data-bs-target="#CommandeImpayes">
                                                 <i class="ti ti-eye"></i>
                                             </button>
                                         </td>
@@ -123,6 +118,13 @@
                                         : '<span class="badge bg-success">À temps</span>'}
                                 </td>
                                 <td>
+
+                                    <button  type="button" class="btn btn-sm btn-secondary edit-btn"
+                                                data-id="{{ $coequipier->id }}" data-name="{{ $coequipier->name }}"
+                                                data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
+                                                data-bs-toggle="modal" data-bs-target="#remboursementModal">
+                                                <i class="ti ti-receipt"></i>
+                                            </button>
                                     <a href="/commandes/${debt.commande_id}" class="btn btn-info btn-sm">
                                         <i class="ti ti-eye"></i>
                                     </a>
@@ -187,7 +189,7 @@
                                 .then(response => response.json())
                                 .then(debts => {
                                     const tableBody = document.querySelector(
-                                    '#CommandeImpayes table tbody');
+                                        '#CommandeImpayes table tbody');
                                     tableBody.innerHTML = '';
 
                                     if (debts.length === 0) {

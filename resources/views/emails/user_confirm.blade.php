@@ -63,7 +63,7 @@
     <body>
         <div class="email-container">
             <div class="email-header">
-                <h1>Bienvenue chez Stockfri !</h1>
+                <h4>Bienvenue chez Stockfri !</h4>
             </div>
             <div class="email-body">
                 <p>Bonjour <strong>{{ $name }}</strong>,</p>
