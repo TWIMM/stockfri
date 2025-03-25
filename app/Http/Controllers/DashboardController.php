@@ -10,6 +10,8 @@ use App\Models\Team;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Clients;
+use App\Models\Commandes;
 
 class DashboardController extends Controller
 {
@@ -34,8 +36,25 @@ class DashboardController extends Controller
 
             $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
 
+            $countClients = count(Clients::where('user_id' ,$user->id)->get());
+            $countTeams = count(Team::where('user_id' ,$user->id)->get());
+            $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
+            $countBusiness = count(Business::where('user_id' ,$user->id)->get());
+            $commandeNotApproved = Commandes::where('user_id' , auth()->id())
+            ->where('validation_status' , 'not_approved')
+            ->get(); 
+            $countOrderNotApproved = count($commandeNotApproved);
+            $commandeApproved = Commandes::where('user_id' , auth()->id())
+            ->where('validation_status' , 'approved')
+            ->get(); 
+            $countOrderApproved = count($commandeApproved);
+            $commandeApproved = ClientDebt::where('user_id' , auth()->id())
+            ->where('validation_status' , 'approved')
+            ->get();
 
-            return view('welcome', compact('businesses', 'hasPhysique', 'hasPrestation' , 'user'));
+
+
+            return view('welcome', compact('businesses', 'hasPhysique', 'countOrderApproved',  'countOrderNotApproved' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
         } else if(auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }

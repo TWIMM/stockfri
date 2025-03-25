@@ -123,3 +123,7 @@ User can not make payement in the system without paying all the money , if they 
 they need to be trusted and to have credit , 
 User who have credit can buy in this credit , you cannot sell to a user more than credit allow him
 
+
+
+Move index and htaccess in root , 
+Move assets from public in root too

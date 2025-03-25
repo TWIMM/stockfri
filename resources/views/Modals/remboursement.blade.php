@@ -49,22 +49,7 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Commande ID</th>
-                                    <th>Montant</th>
-                                    <th>Date d'échéance</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Debt data will be loaded here dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
+                    
 
                     <!-- Champs conditionnels pour les détails de paiement -->
                     <div id="paymentDetailsContainer" class="d-none">

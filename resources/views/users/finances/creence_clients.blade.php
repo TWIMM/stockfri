@@ -128,9 +128,7 @@
                                     <a href="/commandes/${debt.commande_id}" class="btn btn-info btn-sm">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <button type="button" class="btn btn-success btn-sm mark-paid-btn" data-debt-id="${debt.id}">
-                                        <i class="ti ti-check"></i>
-                                    </button>
+                                   
                                 </td>
                             `;
                                     tableBody.appendChild(row);
