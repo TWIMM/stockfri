@@ -119,8 +119,8 @@
                                 </td>
                                 <td>
 
-                                    <button  type="button" class="btn btn-sm btn-secondary edit-btn"
-                                                data-id="{{ $coequipier->id }}" data-name="{{ $coequipier->name }}"
+                                    <button  type="button" class="btn reveal-modal-btn btn-sm btn-secondary edit-btn"
+                                                data-id="${debt.commande_id}" data-name="{{ $coequipier->name }}"
                                                 data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
                                                 data-bs-toggle="modal" data-bs-target="#remboursementModal">
                                                 <i class="ti ti-receipt"></i>
@@ -135,7 +135,7 @@
                                 });
 
                                 // Add event listeners to mark-paid buttons
-                                addMarkPaidEventListeners();
+                                setCommandId();
                             })
                             .catch(error => {
                                 console.error('Error:', error);
@@ -147,13 +147,11 @@
             });
 
             // Function to add event listeners to mark-paid buttons
-            function addMarkPaidEventListeners() {
-                document.querySelectorAll('.mark-paid-btn').forEach(button => {
+            function setCommandId() {
+                document.querySelectorAll('.reveal-modal-btn').forEach(button => {
                     button.addEventListener('click', function() {
-                        const debtId = this.getAttribute('data-debt-id');
-                        if (confirm('Êtes-vous sûr de vouloir marquer cette dette comme payée?')) {
-                            markDebtAsPaid(debtId);
-                        }
+                        const commandId = this.getAttribute('data-id');
+                        document.getElementById('setcommandid').value = commandId;
                     });
                 });
             }

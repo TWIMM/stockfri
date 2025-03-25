@@ -7,6 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('finances.handle_dette') }}" method="POST" enctype="multipart/form-data">
+
                 @csrf
                 <div class="modal-body">
 
@@ -37,16 +38,7 @@
 
                     <!-- Pour Espèces (Cash) -->
                     <div id="commandeTopay" class="payment-details d-none mb-3">
-                        <h6 class="mb-3">Commande a rembourser</h6>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <select name="" id="">
-                                    <option value="">
-
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
+                        <input type="hidden" id='setcommandid' name="commandId">
                     </div>
 
                     

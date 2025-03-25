@@ -18,6 +18,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LivraisonController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PayController;
 
 
 Route::get('/invoice', [InvoiceController::class, 'generateInvoice'])->name('invoice');
@@ -116,7 +117,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/livraison_data/{commande_id}', [OrderController::class, 'getLivDetail'])->name('livraison.getLivDetailexists');
     Route::get('/get_dettes', [ClientController::class, 'getDette'])->name('finances.dettes');
     Route::get('/get_pays', [OrderController::class, 'getPays'])->name('finances.paiement');
-    Route::post('/handle_dette', [ClientController::class, 'handleDebt'])->name('finances.handle_dette');
 
 
     //mnagasins
@@ -163,7 +163,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('approve_client_order', [OrderController::class, 'approveClientOrder'])->name('commandes.approveClientOrder'); // Show individual supplier
     Route::get('/invoices/{id}', [InvoiceController::class, 'retrieveUrl'])->name('invoices.retrieveUrl'); // Show individual supplier
     Route::get('/clients/{client}/debts', [OrderController::class, 'getClientDebts'])->name('clients.debts');
-
+    
+    Route::prefix('pays')->group(function () {
+        Route::post('/', [PayController::class, 'pay'])->name('finances.handle_dette');
+        Route::get('{commandId}', [PayController::class, 'show']);
+        Route::get('user/{userId}', [PayController::class, 'getUserPayments']);
+    });
     // Mark a debt as paid
     Route::post('/client-debts/{clientDebt}/pay', [OrderController::class, 'markAsPaid'])->name('clients.debts.pay');
     
