@@ -26,6 +26,27 @@
                 </div>
 
                 <div class="card-body">
+                    <form method="GET" action="{{ route('magasins.listes') }}" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <label for="name">Nom</label>
+                                <input type="text" name="name" id="name" class="form-control" value="{{ request('name') }}" placeholder="Filtrer par nom">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="quantity">Quantité</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control" value="{{ request('quantity') }}" placeholder="Filtrer par quantité">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="price">Prix</label>
+                                <input type="number" name="price" id="price" class="form-control" value="{{ request('price') }}" placeholder="Filtrer par prix">
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                                <a href="{{ route('magasins.listes') }}" class="btn btn-secondary">Réinitialiser</a>
+                            </div>
+                        </div>
+                    </form>
+                    
                     <div class="table-responsive">
                         <table class="table table-view">
                             <thead>

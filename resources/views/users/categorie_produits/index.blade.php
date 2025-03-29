@@ -17,6 +17,19 @@
                 </div>
 
                 <div class="card-body">
+                    <form method="GET" action="{{ route('cat_prod.listes') }}" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="search">Nom de la catégorie</label>
+                                <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Rechercher par nom de catégorie">
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                                <a href="{{ route('cat_prod.listes') }}" class="btn btn-secondary">Réinitialiser</a>
+                            </div>
+                        </div>
+                    </form>
+                    
                     <div class="table-responsive">
                         <table class="table table-view">
                             <thead>

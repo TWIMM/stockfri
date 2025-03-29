@@ -17,6 +17,31 @@
                 </div>
 
                 <div class="card-body">
+                    <form method="GET" action="{{ route('fournisseurs.listes') }}" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <label for="search">Nom</label>
+                                <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Rechercher un fournisseur...">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="email">Email</label>
+                                <input type="text" name="email" id="email" class="form-control" value="{{ request('email') }}" placeholder="Filtrer par email">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="phone">Téléphone</label>
+                                <input type="text" name="phone" id="phone" class="form-control" value="{{ request('phone') }}" placeholder="Filtrer par téléphone">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="address">Adresse</label>
+                                <input type="text" name="address" id="address" class="form-control" value="{{ request('address') }}" placeholder="Filtrer par adresse">
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                                <a href="{{ route('fournisseurs.listes') }}" class="btn btn-secondary">Réinitialiser</a>
+                            </div>
+                        </div>
+                    </form>
+                    
                     <div class="table-responsive">
                         <table class="table table-view">
                             <thead>
