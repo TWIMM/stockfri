@@ -6,7 +6,6 @@
 
     @include('Modals.remboursement')
     @include('Modals.commande_owned')
-    @include('Modals.listes_des_produits_no_update')
 
 
     <div class="row">
@@ -21,24 +20,35 @@
                         <table class="table table-view">
                             <thead>
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Dette actuelle</th>
-                                    <th>Limite de crédit</th>
-                                    <th>Actions</th>
+                                    <th>ID Transaction</th>
+                                    <th>Commande</th>
+                                    <th>Montant</th>
+                                    <th>Date</th>
+                                    <th>Methode de payement</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($clients as $coequipier)
+                                @forelse($paiements as $pay)
                                     <tr>
-                                        <td>{{ $coequipier->name }}</td>
-                                        <td>{{ number_format($coequipier->current_debt) }} FCFA</td>
-                                        <td>{{ number_format($coequipier->limit_credit_for_this_user) }} FCFA</td>
+                                        <td>{{ $pay->transaction_id }}</td>
+                                        <td>{{ $pay->commande_id }} <span><button type="button"
+                                                    class="btn btn-success btn-sm mark-paid-btn" data-debt-id="${debt.id}">
+                                                    <i class="ti ti-eye"></i>
+                                                </button></span></td>
+                                        <td> {{ number_format($pay->amount) }} FCFA</td>
+                                        <td> {{ $pay->created_at }}</td>
+                                        <td> {{ $pay->payment_method }} </td>
                                         <td>
-                                            <button type="button" class="btn bg-blue edit-btn" data-id="{{ $coequipier->id }}"
-                                                data-name="{{ $coequipier->name }}" data-email="{{ $coequipier->email }}"
-                                                data-tel="{{ $coequipier->tel }}" data-bs-toggle="modal"
-                                                data-bs-target="#CommandeImpayes">
-                                                <i class="ti ti-eye"></i>
+                                            <button type="button" data-client-id="{{ $client->id }}"
+                                                data-id='{{ $pay->id }}' id='validate-order-btn'
+                                                class="btn btn-secondary">
+                                                <i class="ti ti-send"></i>
+                                            </button>
+                                            <button type="button" data-payment-id='{{ $pay->id }}'
+                                                data-id='{{ $pay->id }}' id='invoice_viewer-btn'
+                                                class="btn bg-blue" {{-- data-bs-target="#pdfViewerModal" --}}>
+                                                <i style="color: white" class="ti ti-folder"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -54,7 +64,7 @@
 
                 <div class="card-footer">
                     <div class="d-flex justify-content-center">
-                        {{ $clients->links() }}
+                        {{ $paiements->links() }}
                     </div>
                 </div>
             </div>
@@ -396,7 +406,7 @@
                             // Si vous avez un champ pour afficher le total
                             if (document.getElementById('totalPrice')) {
                                 document.getElementById('totalPrice').textContent = total.toFixed(
-                                2);
+                                    2);
                             }
                         }
 
@@ -441,7 +451,7 @@
                                         const firstProductSelect = document
                                             .querySelector(
                                                 'select[name="products[0][product_id]"]'
-                                                );
+                                            );
                                         const firstQuantityInput = document
                                             .querySelector(
                                                 'input[name="products[0][quantity]"]');
@@ -487,14 +497,14 @@
                                             const newOption = new Option(productName,
                                                 product.stock_id);
                                             newOption.dataset.price = product
-                                            .unit_price;
+                                                .unit_price;
                                             firstProductSelect.add(newOption);
                                         }
 
                                         firstProductSelect.value = product.stock_id;
                                         firstQuantityInput.value = product.quantity;
                                         firstDiscountInput.value = product.discount ||
-                                        0;
+                                            0;
                                         firstPriceInput.value = product.unit_price;
                                     } else {
                                         // For subsequent products, create new rows
@@ -511,7 +521,7 @@
                                         );
                                         const priceInput = document.querySelector(
                                             `input[name="products[${index}][price]"]`
-                                            );
+                                        );
 
                                         // Same fix as above for new rows
                                         let optionExists = false;
@@ -545,7 +555,7 @@
                                             const newOption = new Option(productName,
                                                 product.stock_id);
                                             newOption.dataset.price = product
-                                            .unit_price;
+                                                .unit_price;
                                             productSelect.add(newOption);
                                         }
 
