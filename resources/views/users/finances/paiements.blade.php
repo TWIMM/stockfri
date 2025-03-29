@@ -40,7 +40,7 @@
                                         <td> {{ $pay->created_at }}</td>
                                         <td> {{ $pay->payment_method }} </td>
                                         <td>
-                                            <button type="button" data-client-id="{{ $client->id }}"
+                                            <button type="button" data-client-id="{{ $pay->id }}"
                                                 data-id='{{ $pay->id }}' id='validate-order-btn'
                                                 class="btn btn-secondary">
                                                 <i class="ti ti-send"></i>
