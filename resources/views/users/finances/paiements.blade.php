@@ -38,7 +38,7 @@
                                                     data-bs-toggle="modal" data-bs-target="#mmodalListeDeProduits">
                                                     <i class="ti ti-eye"></i>
                                                 </button></span></td>
-                                        <td> {{ number_format($pay->amount) }} FCFA</td>
+                                        <td> <span class="badge badge-pill badge-status bg-blue">{{ number_format($pay->amount) }} FCFA</span> </td>
                                         <td> {{ $pay->created_at }}</td>
                                         <td> {{ $pay->payment_method }} </td>
                                         <td>

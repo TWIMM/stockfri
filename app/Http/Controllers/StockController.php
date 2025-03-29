@@ -50,9 +50,9 @@ class StockController extends Controller
         $stocks = Stock::where('user_id' ,$user->id)->get(); 
 
         $moves = MouvementDeStocks::where('user_id' ,$user->id)->paginate(10); 
-        
+
         return view('users.stocks.moves', compact('stocks','hasPhysique', 
-            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
+            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs" , 'moves'));
     }
 
     public function add_up_quantity(Request $request)
