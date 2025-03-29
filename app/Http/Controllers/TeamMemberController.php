@@ -71,10 +71,11 @@ class TeamMemberController extends Controller
 
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
+        // Redirect if the user is a team member
         if ($user->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }
@@ -87,15 +88,25 @@ class TeamMemberController extends Controller
             $query->whereIn('business_team.business_id', $businessIds);
         })->paginate(10);
 
-        // Retrieve only team members belonging to the authenticated user
-        $teamMembers = TeamMember::with('team')->where('user_id', $user->id)->paginate(10);
-        view()->share('teamMembers', $teamMembers);
+        // Query to retrieve team members, applying the search filter if available
+        $teamMembersQuery = TeamMember::with('team')->where('user_id', $user->id);
 
+        // Apply search filter if 'search' query parameter is set
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $teamMembersQuery->where('name', 'like', '%' . $search . '%');
+        }
+
+        // Paginate the results
+        $teamMembers = $teamMembersQuery->paginate(10);
+
+        // Get business types for view
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $roles = Role::with('permissions')->get();
         $permissions = Permission::all();
 
+        // Return the view with the filtered results
         return view('users.team_member.index', compact(
             'teamMembers', 
             'roles', 
@@ -106,6 +117,7 @@ class TeamMemberController extends Controller
             'user'
         ));
     }
+
 
 
 

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class TeamController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
 
         if(auth()->user()->type === 'team_member'){
@@ -27,10 +27,17 @@ class TeamController extends Controller
         // Get the business IDs of the user
         $businessIds = $user->business()->withTrashed()->pluck('id');
 
-        // Retrieve teams that are associated with these businesses through the pivot table
-        $teams = Team::whereHas('business', function ($query) use ($businessIds) {
+        $teamsQuery = Team::whereHas('business', function ($query) use ($businessIds) {
             $query->whereIn('business.id', $businessIds);
-        })->paginate(10);
+        });
+    
+        // Apply the filter if the search parameter is provided
+        if ($request->has('search') && !empty($request->search)) {
+            $teamsQuery->where('name', 'like', '%' . $request->search . '%'); // Example filter by team name
+        }
+    
+        // Paginate the results
+        $teams = $teamsQuery->paginate(10);
 
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
 
