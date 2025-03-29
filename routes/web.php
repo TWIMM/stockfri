@@ -117,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/livraison_data/{commande_id}', [OrderController::class, 'getLivDetail'])->name('livraison.getLivDetailexists');
     Route::get('/get_dettes', [ClientController::class, 'getDette'])->name('finances.dettes');
     Route::get('/get_pays', [ClientController::class, 'getPays'])->name('finances.paiement');
+    Route::get('/mouvement_de_stock', [StockController::class, 'getMoveOfStocks'])->name('stock.moves');
 
 
     //mnagasins

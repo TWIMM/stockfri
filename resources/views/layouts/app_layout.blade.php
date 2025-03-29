@@ -265,6 +265,10 @@
                                                 <li><a href="{{ route('stock.listes') }}"
                                                         class="{{ request()->routeIs('stock.listes') ? 'active' : '' }}">Gerer
                                                         stock</a></li>
+                                                
+                                                <li><a href="{{ route('stock.moves') }}"
+                                                            class="{{ request()->routeIs('stock.moves') ? 'active' : '' }}">Mouvements
+                                                            stock</a></li>
                                             </ul>
                                         </li>
 
