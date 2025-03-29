@@ -34,6 +34,27 @@ class StockController extends Controller
             'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
     }
 
+
+    public function getMoveOfStocks()
+    {
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+        $user = Auth::user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+        $categories = $user->categorieProduits; 
+        $fournisseurs = $user->fournisseurs; 
+
+        $stocks = Stock::where('user_id' ,$user->id)->get(); 
+
+        $moves = MouvementDeStocks::where('user_id' ,$user->id)->paginate(10); 
+        
+        return view('users.stocks.moves', compact('stocks','hasPhysique', 
+            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
+    }
+
     public function add_up_quantity(Request $request)
     {
         
