@@ -6,6 +6,8 @@
 
     @include('Modals.remboursement')
     @include('Modals.commande_owned')
+    @include('Modals.listes_des_produits_no_update')
+
 
     <div class="row">
         <div class="col-sm-12">
@@ -32,7 +34,6 @@
                                         <td>{{ number_format($coequipier->current_debt) }} FCFA</td>
                                         <td>{{ number_format($coequipier->limit_credit_for_this_user) }} FCFA</td>
                                         <td>
-
                                             <button type="button" class="btn bg-blue edit-btn" data-id="{{ $coequipier->id }}"
                                                 data-name="{{ $coequipier->name }}" data-email="{{ $coequipier->email }}"
                                                 data-tel="{{ $coequipier->tel }}" data-bs-toggle="modal"
@@ -109,33 +110,34 @@
 
                                     const row = document.createElement('tr');
                                     row.innerHTML = `
-                                <td>${debt.commande_id}</td>
-                                <td>${Number(debt.amount).toLocaleString()} FCFA</td>
-                                <td>${formatDate(debt.due_date)}</td>
-                                <td>
-                                    ${isLate 
-                                        ? '<span class="badge bg-danger">En retard</span>' 
-                                        : '<span class="badge bg-success">À temps</span>'}
-                                </td>
-                                <td>
-
-                                    <button  type="button" class="btn reveal-modal-btn btn-sm btn-secondary edit-btn"
+                                        <td>${debt.commande_id}</td>
+                                        <td>${Number(debt.amount).toLocaleString()} FCFA</td>
+                                        <td>${formatDate(debt.due_date)}</td>
+                                        <td>
+                                            ${isLate 
+                                                ? '<span class="badge bg-danger">En retard</span>' 
+                                                : '<span class="badge bg-success">À temps</span>'}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn reveal-modal-btn btn-sm btn-secondary edit-btn"
                                                 data-id="${debt.commande_id}" 
-                                                
                                                 data-bs-toggle="modal" data-bs-target="#remboursementModal">
                                                 <i class="ti ti-receipt"></i>
                                             </button>
-                                    <a href="/commandes/${debt.commande_id}" class="btn btn-info btn-sm">
-                                        <i class="ti ti-eye"></i>
-                                    </a>
-                                   
-                                </td>
-                            `;
+                                            <button type="button" class="btn reveal-modal-btn btn-sm btn-info precommande-btn"
+                                                data-id="${debt.commande_id}" 
+                                                data-bs-toggle="modal" data-bs-target="#mmodalListeDeProduits">
+                                                <i class="ti ti-eye"></i>
+                                            </button>
+                                        </td>
+                                    `;
                                     tableBody.appendChild(row);
                                 });
 
-                                // Add event listeners to mark-paid buttons
-                                setCommandId();
+                                // Add event listeners to remboursement buttons
+                                setupRemboursementButtons();
+                                // Add event listeners to precommande buttons
+                                setupPrecommandeButtons();
                             })
                             .catch(error => {
                                 console.error('Error:', error);
@@ -146,13 +148,261 @@
                 });
             });
 
-            // Function to add event listeners to mark-paid buttons
-            function setCommandId() {
-                document.querySelectorAll('.reveal-modal-btn').forEach(button => {
+            // Function to set up the precommande buttons
+            function setupPrecommandeButtons() {
+                document.querySelectorAll('.precommande-btn').forEach(function(button) {
                     button.addEventListener('click', function() {
-                        const commandId = this.getAttribute('data-id');
-                        document.getElementById('setcommandid').value = commandId;
+                        const serviceId = this.getAttribute('data-id');
+                        
+                        // Make the AJAX request to get the service details
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('GET', '/precommande/' + serviceId, true);
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                        xhr.onload = function() {
+                            if (xhr.status === 200) {
+                                const data = JSON.parse(xhr.responseText);
+
+                                // Mettre le modal en mode édition
+                                const modal = document.getElementById('mmodalListeDeProduits');
+                                modal.setAttribute('data-mode', 'edit');
+
+                                // Mettre à jour le titre du modal
+                                document.getElementById('modalVenteLabel').textContent =
+                                    'Détails de la Commande';
+
+                                // Remplir le formulaire avec les données
+                                document.querySelector(
+                                        '#mmodalListeDeProduits select[name="client_id"]')
+                                    .value = data.commande.client_id;
+                                document.querySelector('#mmodalListeDeProduits input[name="tva"]')
+                                    .value = data
+                                    .commande.tva || 0;
+                                document.querySelector(
+                                        '#mmodalListeDeProduits select[name="payment_mode"]')
+                                    .value = data.commande.payment_mode;
+                                document.querySelector(
+                                        '#mmodalListeDeProduits select[name="invoice_status"]')
+                                    .value = data.commande.invoice_status;
+
+                                // Vider complètement le conteneur de produits
+                                resetProductsContainer();
+
+                                // Remplir avec les produits de la commande
+                                data.products.forEach((product, index) => {
+                                    // For the first product, utilize the existing row
+                                    if (index === 0) {
+                                        const firstProductSelect = document.querySelector(
+                                            'select[name="products[0][product_id]"]');
+                                        const firstQuantityInput = document.querySelector(
+                                            'input[name="products[0][quantity]"]');
+                                        const firstDiscountInput = document.querySelector(
+                                            'input[name="products[0][discount]"]');
+                                        const firstPriceInput = document.querySelector(
+                                            'input[name="products[0][price]"]');
+
+                                        firstProductSelect.value = product.stock_id;
+
+                                        // Make sure the option is visible in the dropdown
+                                        // Find the option with the matching value and ensure it's available
+                                        let optionExists = false;
+                                        for (let i = 0; i < firstProductSelect.options
+                                            .length; i++) {
+                                            if (firstProductSelect.options[i].value ==
+                                                product.stock_id) {
+                                                optionExists = true;
+                                                break;
+                                            }
+                                        }
+
+                                        // If the option doesn't exist, add it
+                                        if (!optionExists) {
+                                            // Find the product name from the original options
+                                            let productName = "Unknown Product";
+                                            const originalSelect = document.querySelector(
+                                                '#mmodalListeDeProduits select.productSelect'
+                                            );
+                                            if (originalSelect && originalSelect
+                                                .originalOptions) {
+                                                for (let opt of originalSelect
+                                                        .originalOptions) {
+                                                    if (opt.value == product.stock_id) {
+                                                        productName = opt.text;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                            const newOption = new Option(productName,
+                                                product.stock_id);
+                                            newOption.dataset.price = product.unit_price;
+                                            firstProductSelect.add(newOption);
+                                        }
+
+                                        firstProductSelect.value = product.stock_id;
+                                        firstQuantityInput.value = product.quantity;
+                                        firstDiscountInput.value = product.discount || 0;
+                                        firstPriceInput.value = product.unit_price;
+                                    } else {
+                                        // For subsequent products, create new rows
+                                        createProductRow();
+
+                                        const productSelect = document.querySelector(
+                                            `select[name="products[${index}][product_id]"]`
+                                        );
+                                        const quantityInput = document.querySelector(
+                                            `input[name="products[${index}][quantity]"]`
+                                        );
+                                        const discountInput = document.querySelector(
+                                            `input[name="products[${index}][discount]"]`
+                                        );
+                                        const priceInput = document.querySelector(
+                                            `input[name="products[${index}][price]"]`);
+
+                                        // Same fix as above for new rows
+                                        let optionExists = false;
+                                        for (let i = 0; i < productSelect.options
+                                            .length; i++) {
+                                            if (productSelect.options[i].value == product
+                                                .stock_id) {
+                                                optionExists = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!optionExists) {
+                                            let productName = "Unknown Product";
+                                            const originalSelect = document.querySelector(
+                                                '#mmodalListeDeProduits select.productSelect'
+                                            );
+                                            if (originalSelect && originalSelect
+                                                .originalOptions) {
+                                                for (let opt of originalSelect
+                                                        .originalOptions) {
+                                                    if (opt.value == product.stock_id) {
+                                                        productName = opt.text;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                            const newOption = new Option(productName,
+                                                product.stock_id);
+                                            newOption.dataset.price = product.unit_price;
+                                            productSelect.add(newOption);
+                                        }
+
+                                        productSelect.value = product.stock_id;
+                                        quantityInput.value = product.quantity;
+                                        discountInput.value = product.discount || 0;
+                                        priceInput.value = product.unit_price;
+                                    }
+                                });
+                                // Update all product dropdowns after populating
+                                updateAllProductDropdowns();
+
+                                // Afficher les détails de paiement si nécessaire
+
+                                // Remplir les champs de détails de paiement si disponibles
+                                if (data.payment_details) {
+                                    switch (data.commande.payment_mode) {
+                                        case 'mobile_money':
+                                            document.getElementById('mobileNumber').value = data
+                                                .commande.mobile_number || '';
+                                            document.getElementById('mobileReference').value = data
+                                                .commande.mobile_reference || '';
+                                            break;
+                                        case 'bank_transfer':
+                                            document.getElementById('bankName').value = data
+                                                .commande.bank_name || '';
+                                            document.getElementById('bankReference').value = data
+                                                .commande.bank_reference || '';
+                                            break;
+                                        case 'credit_card':
+                                            document.getElementById('cardType').value = data
+                                                .commande.card_type || '';
+                                            document.getElementById('cardReference').value = data
+                                                .commande.card_reference || '';
+                                            break;
+                                        case 'cash':
+                                            document.getElementById('cashReference').value = data
+                                                .commande.cash_reference || '';
+                                            break;
+                                    }
+                                }
+
+                                // Ensure payment mode is properly formatted
+                                const paymentMode = data.commande.payment_mode;
+                                console.log("Payment mode:", paymentMode);
+
+                                // First hide all payment details
+                                const allPaymentRows = document.querySelectorAll(
+                                    '.payment-details');
+                                allPaymentRows.forEach(row => row.classList.add('d-none'));
+
+                                document.getElementById('paymentDetailsContainer').classList.remove(
+                                    'd-none');
+
+                                // Détails supplémentaires selon le mode de paiement
+                                if (paymentMode === "mobile_money") {
+                                    document.getElementById('mobileMoneyDetails').classList.remove(
+                                        'd-none');
+                                    document.getElementById('mobileNumber').innerText =
+                                        data.commande.mobile_number || 'N/A';
+                                    document.getElementById('mobileReference').innerText =
+                                        data.commande.mobile_reference || 'N/A';
+                                } else if (paymentMode === "credit_card") {
+                                    document.getElementById('creditCardDetailsType').classList
+                                        .remove('d-none');
+                                    document.getElementById('creditCardDetailsRef').classList
+                                        .remove('d-none');
+                                    document.getElementById('cardType').innerText = data.commande
+                                        .card_type || 'N/A';
+                                    document.getElementById('cardReference').innerText =
+                                        data.commande.card_reference || 'N/A';
+                                } else if (paymentMode === "bank_transfer") {
+                                    document.getElementById('bankNameRow').classList.remove(
+                                        'd-none');
+                                    document.getElementById('bankReferenceRow').classList.remove(
+                                        'd-none');
+                                    document.getElementById('bankName').innerText = data.commande
+                                        .bank_name || 'N/A';
+                                    document.getElementById('bankReference').innerText =
+                                        data.commande.bank_reference || 'N/A';
+                                } else if (paymentMode === "cash") {
+                                    document.getElementById('cashDetailsOrderPay').classList.remove(
+                                        'd-none');
+                                    document.getElementById('cashReference').innerText =
+                                        data.commande.cash_reference || 'N/A';
+                                } else {
+                                    console.log("Unknown payment mode:", paymentMode);
+                                }
+
+                                // Modifier l'action du formulaire pour la mise à jour
+                                const form = document.querySelector('#mmodalListeDeProduits form');
+                                form.action = `/commandes/${serviceId}/update`;
+
+                                // Changer le texte du bouton de soumission
+                                const submitButton = document.querySelector(
+                                    '#mmodalListeDeProduits button[type="submit"]');
+                                submitButton.textContent = 'Mettre à jour la commande';
+                            } else {
+                                alert('Impossible de récupérer les détails de la commande.');
+                            }
+                        };
+                        xhr.send();
                     });
+                });
+            }
+
+            // Function to set up the remboursement buttons
+            function setupRemboursementButtons() {
+                document.querySelectorAll('.reveal-modal-btn').forEach(button => {
+                    if (button.getAttribute('data-bs-target') === '#remboursementModal') {
+                        button.addEventListener('click', function() {
+                            const commandId = this.getAttribute('data-id');
+                            document.getElementById('setcommandid').value = commandId;
+                        });
+                    }
                 });
             }
 
@@ -202,32 +452,33 @@
 
                                         const row = document.createElement('tr');
                                         row.innerHTML = `
-                                <td>${debt.commande_id}</td>
-                                <td>${Number(debt.amount).toLocaleString()} FCFA</td>
-                                <td>${debt.payment_method}</td>
-                                <td>${formatDate(debt.due_date)}</td>
-                                <td>
-                                    ${isLate 
-                                        ? '<span class="badge bg-danger">En retard</span>' 
-                                        : '<span class="badge bg-success">À temps</span>'}
-                                </td>
-                                <td>
-                                    <a href="/commandes/${debt.commande_id}" class="btn btn-info btn-sm">
-                                        <i class="ti ti-eye"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-success btn-sm mark-paid-btn" data-debt-id="${debt.id}">
-                                        <i class="ti ti-check"></i>
-                                    </button>
-                                </td>
-                            `;
+                                            <td>${debt.commande_id}</td>
+                                            <td>${Number(debt.amount).toLocaleString()} FCFA</td>
+                                            <td>${debt.payment_method}</td>
+                                            <td>${formatDate(debt.due_date)}</td>
+                                            <td>
+                                                ${isLate 
+                                                    ? '<span class="badge bg-danger">En retard</span>' 
+                                                    : '<span class="badge bg-success">À temps</span>'}
+                                            </td>
+                                            <td>
+                                                <a href="/commandes/${debt.commande_id}" class="btn btn-info btn-sm">
+                                                    <i class="ti ti-eye"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-success btn-sm mark-paid-btn" data-debt-id="${debt.id}">
+                                                    <i class="ti ti-check"></i>
+                                                </button>
+                                            </td>
+                                        `;
                                         tableBody.appendChild(row);
                                     });
 
                                     // Re-add event listeners
-                                    addMarkPaidEventListeners();
+                                    setupRemboursementButtons();
+                                    setupPrecommandeButtons();
                                 });
 
-                            // Show success message (customize based on your notification system)
+                            // Show success message
                             showNotification('Succès', 'Dette marquée comme payée avec succès', 'success');
                         } else {
                             showNotification('Erreur', data.message || 'Une erreur est survenue', 'danger');
@@ -251,7 +502,7 @@
                 return `${day} ${month} ${year}`;
             }
 
-            // Function to show notifications (adapt to your notification system)
+            // Function to show notifications
             function showNotification(title, message, type) {
                 // Check if you have a notification library like Toastify or SweetAlert
                 if (typeof Swal !== 'undefined') {
@@ -272,28 +523,33 @@
                 }
             }
         });
-        // Listen for click events on "Edit" buttons
-        document.querySelectorAll('.edit-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                // Get the data-id from the clicked button
-                const clientId = this.getAttribute('data-id');
-                document.getElementById('put_id_in_there').value = clientId;
 
-                // Use AJAX to get the client data based on the ID
-                fetch(`/clients/${clientId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Populate the modal fields with the retrieved data
-                        document.getElementById('edit-client-id').value = data.id;
-                        document.getElementById('edit-name').value = data.name;
-                        document.getElementById('edit-email').value = data.email;
-                        document.getElementById('edit-tel').value = data.tel;
-                        document.getElementById('edit-address').value = data.address;
+        // Listen for click events on "Edit" buttons for client editing
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                if (button.hasAttribute('data-email')) { // Check if this is a client edit button
+                    button.addEventListener('click', function() {
+                        // Get the data-id from the clicked button
+                        const clientId = this.getAttribute('data-id');
+                        document.getElementById('put_id_in_there').value = clientId;
 
-                        // Set the form action to the correct route for the update
-                        document.getElementById('editForm').action = `/clients/update/${data.id}`;
-                    })
-                    .catch(error => console.error('Error fetching client data:', error));
+                        // Use AJAX to get the client data based on the ID
+                        fetch(`/clients/${clientId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Populate the modal fields with the retrieved data
+                                document.getElementById('edit-client-id').value = data.id;
+                                document.getElementById('edit-name').value = data.name;
+                                document.getElementById('edit-email').value = data.email;
+                                document.getElementById('edit-tel').value = data.tel;
+                                document.getElementById('edit-address').value = data.address;
+
+                                // Set the form action to the correct route for the update
+                                document.getElementById('editForm').action = `/clients/update/${data.id}`;
+                            })
+                            .catch(error => console.error('Error fetching client data:', error));
+                    });
+                }
             });
         });
     </script>
