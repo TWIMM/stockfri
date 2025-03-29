@@ -17,6 +17,26 @@
                 </div>
 
                 <div class="card-body">
+                    <form method="GET" action="{{ route('clients.listes') }}" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <label for="search">Recherche par nom</label>
+                                <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Rechercher un client...">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="email">Email</label>
+                                <input type="text" name="email" id="email" class="form-control" value="{{ request('email') }}" placeholder="Filtrer par email">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="tel">Téléphone</label>
+                                <input type="text" name="tel" id="tel" class="form-control" value="{{ request('tel') }}" placeholder="Filtrer par téléphone">
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                                <a href="{{ route('clients.listes') }}" class="btn btn-secondary">Réinitialiser</a>
+                            </div>
+                        </div>
+                    </form>
                     <div class="table-responsive">
                         <table class="table table-view">
                             <thead>
