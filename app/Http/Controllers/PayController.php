@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pay;
 use App\Models\Commandes;
 use App\Models\ClientDebt;
-
+use App\Models\Clients;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,8 +49,8 @@ class PayController extends Controller
 
         $clientDebt->amount -= $request->amount;
         
-        $client = Client::where('client_id', $command->client_id)->first();
-        $client->current_debt  -= $request->amount;
+        $client = Clients::where('id', $command->client_id)->first();
+        $client->current_debt  = $client->current_debt - $request->amount;
         
 
         if ($request->hasFile('factures_remboursement')) {

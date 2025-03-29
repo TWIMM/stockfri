@@ -18,6 +18,7 @@ use App\Models\Livraisons;
 use App\Models\TeamMember;
 use App\Models\ClientDebt;
 use App\Models\User;
+use App\Models\Pay;
 
 class OrderController extends Controller
 {
@@ -271,6 +272,21 @@ class OrderController extends Controller
 
             } else if ($commandeStatus === 'partially_paid') {
 
+
+                //handle partiall payement
+
+                $payment = new Pay();
+                $payment->user_id = $commandeNotApproved->user_id;
+                $payment->amount = $commandeNotApproved->already_paid;
+                $payment->payment_method = $commandeNotApproved->payment_mode;
+                $payment->transaction_id = $this->generateTransactionId(); 
+                $payment->commande_id = $commandeNotApproved->id;
+                $paymentCreated = $payment->save();
+                
+                if(!$paymentCreated){
+                    return redirect()->back()->with('error', 'Paiement non valide !!');
+                }
+
                 $remainingAmount = $commandeNotApproved->rest_to_pay;
                 if($client->limit_credit_for_this_user < $remainingAmount){
                     return redirect()->back()->with('error', 'La limite de credit de ce client est insuffisante');
@@ -279,7 +295,6 @@ class OrderController extends Controller
                 $client->current_debt = $client->current_debt + $remainingAmount;
                 $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
                 $commandeNotApproved->rest_to_pay = 0;
-
 
                 ClientDebt::create([
                     'client_id' => $client->id, 
@@ -306,6 +321,12 @@ class OrderController extends Controller
         }
 
 
+    }
+
+    // Generate a unique transaction ID
+    private function generateTransactionId()
+    {
+        return 'TXN-' . strtoupper(uniqid());
     }
 
     public function getLivDetail($commande_id) { 
