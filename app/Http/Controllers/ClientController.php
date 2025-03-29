@@ -58,25 +58,50 @@ class ClientController extends Controller
     }
 
 
-    public function getDette()
+    public function getDette(Request $request)
     {
+        // Check user type, if 'team_member' redirect to the team member dashboard
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+
+        // Get the authenticated user
         $user = auth()->user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
-        $businesses = $user->business; 
+        $businesses = $user->business;
 
-        $clients = Clients::where('user_id' ,$user->id)
-        ->where('current_debt' , '>' , 0)
-        //->where('limit_credit_for_this_user' , '<=' , 0)
-        ->paginate(10);
-        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
+        // Start building the query for clients
+        $clientsQuery = Clients::where('user_id', $user->id)
+            ->where('current_debt', '>', 0); // Always filter for clients with debt
 
-        return view('users.finances.creence_clients', compact('clients' , 'stocks','hasPhysique', 
-        'hasPrestation', "businesses",  'user'));
+        // Apply search filter if a 'search' query is provided
+        if ($request->has('search') && !empty($request->search)) {
+            $clientsQuery->where('name', 'like', '%' . $request->search . '%');  // Searching by client name
+        }
+
+        // Apply limit filter if a 'limite' query is provided
+        if ($request->has('limite') && !empty($request->limite)) {
+            $clientsQuery->where('limit_credit_for_this_user', '<=', $request->limite);  // Filter by credit limit
+        }
+
+        // Apply current debt filter if a 'dette_actuelle' query is provided
+        if ($request->has('dette_actuelle') && !empty($request->dette_actuelle)) {
+            $clientsQuery->where('current_debt', '<=', $request->dette_actuelle);  // Filter by current debt
+        }
+
+        // Paginate the filtered clients
+        $clients = $clientsQuery->paginate(10);
+
+        // Fetch stock data (if needed)
+        $stocks = Stock::where('user_id', $user->id)->paginate(10);
+
+        // Return the view with the filtered results
+        return view('users.finances.creence_clients', compact(
+            'clients', 'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'user'
+        ));
     }
+
     
     
     public function getPays()

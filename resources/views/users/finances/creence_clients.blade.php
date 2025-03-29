@@ -17,26 +17,27 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="GET" action="{{ route('clients.listes') }}" class="mb-4">
+                    <form method="GET" action="{{ route('finances.dettes') }}" class="mb-4">
                         <div class="row">
                             <div class="col-md-4 mb-2">
                                 <label for="search">Recherche par nom</label>
                                 <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Rechercher un client...">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label for="liimite">Limite</label>
-                                <input type="number" name="limite" id="dette_actuelle" class="form-control" value="{{ request('email') }}" placeholder="Filtrer par limite">
+                                <label for="limite">Limite</label>
+                                <input type="number" name="limite" id="limite" class="form-control" value="{{ request('limite') }}" placeholder="Filtrer par limite">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label for="tel">Dette actuelle</label>
-                                <input type="number" name="dette_actuelle" id="dette_actuelle" class="form-control" value="{{ request('tel') }}" placeholder="Filtrer par dette">
+                                <label for="dette_actuelle">Dette actuelle</label>
+                                <input type="number" name="dette_actuelle" id="dette_actuelle" class="form-control" value="{{ request('dette_actuelle') }}" placeholder="Filtrer par dette">
                             </div>
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
-                                <a href="{{ route('clients.listes') }}" class="btn btn-secondary">Réinitialiser</a>
+                                <a href="{{ route('finances.dettes') }}" class="btn btn-secondary">Réinitialiser</a>
                             </div>
                         </div>
                     </form>
+                    
                     <div class="table-responsive">
                         <table class="table table-view">
                             <thead>
