@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Clients;
 use Illuminate\Http\Request;
+use App\Models\Stock;
+use App\Models\Pays;
 
 class ClientController extends Controller
 {
@@ -73,6 +75,27 @@ class ClientController extends Controller
         $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
 
         return view('users.finances.creence_clients', compact('clients' , 'stocks','hasPhysique', 
+        'hasPrestation', "businesses",  'user'));
+    }
+    
+    
+    public function getPays()
+    {
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+        $user = auth()->user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+
+        $paiements = Pays::where('user_id' ,$user->id)
+        //->where('current_debt' , '>' , 0)
+        //->where('limit_credit_for_this_user' , '<=' , 0)
+        ->paginate(10);
+        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
+
+        return view('users.finances.paiements', compact('paiements' , 'stocks','hasPhysique', 
         'hasPrestation', "businesses",  'user'));
     }
 
