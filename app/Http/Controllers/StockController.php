@@ -17,11 +17,12 @@ class StockController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-        if(auth()->user()->type === 'team_member'){
+        if (auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }
+
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
@@ -29,17 +30,41 @@ class StockController extends Controller
         $categories = $user->categorieProduits; 
         $fournisseurs = $user->fournisseurs; 
 
-        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
-        return view('users.stocks.index', compact('stocks','hasPhysique', 
-            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs"));
+        // Build the query for the stocks, starting with the basic query for the logged-in user
+        $stocksQuery = Stock::where('user_id', $user->id);
+
+        // Apply filter by 'name' if provided
+        if ($request->has('name') && !empty($request->name)) {
+            $stocksQuery->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        // Apply filter by 'quantity' if provided
+        if ($request->has('quantity') && !empty($request->quantity)) {
+            $stocksQuery->where('quantity', '<=' ,  $request->quantity);
+        }
+
+        // Apply filter by 'price' if provided
+        if ($request->has('price') && !empty($request->price)) {
+            $stocksQuery->where('price' , '<=' , $request->price);
+        }
+
+        // Paginate the filtered stocks
+        $stocks = $stocksQuery->paginate(10);
+
+        // Return the view with the filtered stocks and other necessary data
+        return view('users.stocks.index', compact(
+            'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'user', 'categories', 'fournisseurs'
+        ));
     }
 
 
-    public function getMoveOfStocks()
+
+    public function getMoveOfStocks(Request $request)
     {
-        if(auth()->user()->type === 'team_member'){
+        if (auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }
+
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
@@ -47,13 +72,42 @@ class StockController extends Controller
         $categories = $user->categorieProduits; 
         $fournisseurs = $user->fournisseurs; 
 
-        $stocks = Stock::where('user_id' ,$user->id)->get(); 
+        // Retrieve all stocks associated with the user
+        $stocks = Stock::where('user_id', $user->id)->get(); 
 
-        $moves = MouvementDeStocks::where('user_id' ,$user->id)->paginate(10); 
+        // Start with the base query for stock movements
+        $movesQuery = MouvementDeStocks::where('user_id', $user->id);
 
-        return view('users.stocks.moves', compact('stocks','hasPhysique', 
-            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs" , 'moves'));
+        // Apply filter by product if provided
+        if ($request->has('product') && !empty($request->product)) {
+            $movesQuery->where('stock_id', $request->product);
+        }
+
+        // Apply filter by type of movement if provided
+        if ($request->has('type') && !empty($request->type)) {
+            $movesQuery->where('type_de_mouvement', $request->type);
+        }
+
+        // Apply filter by start date if provided
+        if ($request->has('date_start') && !empty($request->date_start)) {
+            $movesQuery->where('created_at', '>=', $request->date_start);
+        }
+
+        // Apply filter by end date if provided
+        if ($request->has('date_end') && !empty($request->date_end)) {
+            $movesQuery->where('created_at', '<=', $request->date_end);
+        }
+
+        // Paginate the filtered stock movements
+        $moves = $movesQuery->paginate(10);
+
+        // Return the view with the filtered stock movements and necessary data
+        return view('users.stocks.moves', compact(
+            'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'user', 
+            'categories', 'fournisseurs', 'moves'
+        ));
     }
+
 
     public function add_up_quantity(Request $request)
     {

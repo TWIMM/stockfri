@@ -32,11 +32,14 @@
                                 <label for="type">Type de mouvement</label>
                                 <select name="type" id="type" class="form-control">
                                     <option value="">Tous les types</option>
-                                    <option value="entrée" {{ request('type') == 'entrée' ? 'selected' : '' }}>Entrée</option>
-                                    <option value="sortie" {{ request('type') == 'sortie' ? 'selected' : '' }}>Sortie</option>
-                                    <option value="ajustement" {{ request('type') == 'ajustement' ? 'selected' : '' }}>Ajustement</option>
+                                    <option value="achat_de_stock_chez_fournisseur" {{ request('type') == 'achat_de_stock_chez_fournisseur' ? 'selected' : '' }}>Achat de stock chez fournisseur</option>
+                                    <option value="envoi_de_stock_en_magasin" {{ request('type') == 'envoi_de_stock_en_magasin' ? 'selected' : '' }}>Envoi de stock en magasin</option>
+                                    <option value="achat_client" {{ request('type') == 'achat_client' ? 'selected' : '' }}>Achat client</option>
                                     <option value="bonus" {{ request('type') == 'bonus' ? 'selected' : '' }}>Bonus</option>
+                                    <option value="retour_client" {{ request('type') == 'retour_client' ? 'selected' : '' }}>Retour client</option>
+                                    <option value="retour_au_depot" {{ request('type') == 'retour_au_depot' ? 'selected' : '' }}>Retour au dépôt</option>
                                 </select>
+                                
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_start">Date début</label>
