@@ -8,20 +8,42 @@ use Illuminate\Support\Facades\Auth;
 
 class CategorieProduitController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Check if the user is a 'team_member' and redirect them if necessary
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+
+        // Get the authenticated user
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
 
-        $categories = CategorieProduits::where('user_id' ,$user->id)->paginate(10);
-        return view('users.categorie_produits.index', compact('categories','hasPhysique', 
-            'hasPrestation', "businesses",  'user'));
+        // Start building the query for categories
+        $categoriesQuery = CategorieProduits::where('user_id', $user->id);
+
+        // Apply the search filter if a 'search' parameter is provided
+        if ($request->has('search') && !empty($request->search)) {
+            $categoriesQuery->where('name', 'like', '%' . $request->search . '%');  // Searching by category name
+        }
+
+        // You can add more filters if needed, such as filtering by type, etc.
+        // Example:
+        if ($request->has('type') && !empty($request->type)) {
+            $categoriesQuery->where('type', $request->type);  // Filter by category type (or any other field)
+        }
+
+        // Paginate the categories with the applied filters
+        $categories = $categoriesQuery->paginate(10);
+
+        // Return the view with the filtered categories
+        return view('users.categorie_produits.index', compact(
+            'categories', 'hasPhysique', 'hasPrestation', 'businesses', 'user'
+        ));
     }
+
 
     // Afficher le formulaire de création
     public function create()
