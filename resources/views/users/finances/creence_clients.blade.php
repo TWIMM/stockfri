@@ -24,12 +24,12 @@
                                 <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Rechercher un client...">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label for="email">Email</label>
-                                <input type="text" name="email" id="email" class="form-control" value="{{ request('email') }}" placeholder="Filtrer par email">
+                                <label for="liimite">Limite</label>
+                                <input type="number" name="limite" id="dette_actuelle" class="form-control" value="{{ request('email') }}" placeholder="Filtrer par limite">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label for="tel">Téléphone</label>
-                                <input type="text" name="tel" id="tel" class="form-control" value="{{ request('tel') }}" placeholder="Filtrer par téléphone">
+                                <label for="tel">Dette actuelle</label>
+                                <input type="number" name="dette_actuelle" id="dette_actuelle" class="form-control" value="{{ request('tel') }}" placeholder="Filtrer par dette">
                             </div>
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
