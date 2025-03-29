@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Clients;
 use App\Models\Commandes;
+use App\Models\ClientDebt;
 
 class DashboardController extends Controller
 {
@@ -48,9 +49,7 @@ class DashboardController extends Controller
             ->where('validation_status' , 'approved')
             ->get(); 
             $countOrderApproved = count($commandeApproved);
-            $commandeApproved = ClientDebt::where('user_id' , auth()->id())
-            ->where('validation_status' , 'approved')
-            ->get();
+           
 
 
 

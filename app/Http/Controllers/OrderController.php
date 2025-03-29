@@ -255,7 +255,7 @@ class OrderController extends Controller
                 }
 
                 $client->limit_credit_for_this_user = $client->limit_credit_for_this_user - $commandeNotApproved->total_price;
-                $client->current_debt = $commandeNotApproved->total_price;
+                $client->current_debt = $client->current_debt + $commandeNotApproved->total_price;
                 $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
                 $commandeNotApproved->rest_to_pay = 0;
 
@@ -276,7 +276,7 @@ class OrderController extends Controller
                     return redirect()->back()->with('error', 'La limite de credit de ce client est insuffisante');
                 }
                 $client->limit_credit_for_this_user = $client->limit_credit_for_this_user - $remainingAmount;
-                $client->current_debt += $remainingAmount;
+                $client->current_debt = $client->current_debt + $remainingAmount;
                 $commandeNotApproved->already_paid = $commandeNotApproved->total_price;
                 $commandeNotApproved->rest_to_pay = 0;
 

@@ -43,7 +43,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center">Aucun coéquipier trouvé.</td>
+                                        <td colspan="4" class="text-center">Aucune créence trouvée.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -120,8 +120,8 @@
                                 <td>
 
                                     <button  type="button" class="btn reveal-modal-btn btn-sm btn-secondary edit-btn"
-                                                data-id="${debt.commande_id}" data-name="{{ $coequipier->name }}"
-                                                data-email="{{ $coequipier->email }}" data-tel="{{ $coequipier->tel }}"
+                                                data-id="${debt.commande_id}" 
+                                                
                                                 data-bs-toggle="modal" data-bs-target="#remboursementModal">
                                                 <i class="ti ti-receipt"></i>
                                             </button>

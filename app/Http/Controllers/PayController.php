@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pay;
-use App\Models\Command;
+use App\Models\Commandes;
+use App\Models\ClientDebt;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,29 +29,42 @@ class PayController extends Controller
             'factures_remboursement.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        // Create a new payment record
+        $command = Commandes::find($request->commandId); 
+
+
+        $clientDebt = ClientDebt::where('client_id', $command->client_id)
+        ->where('commande_id' , $request->commandId)
+        ->first();
+
+        if( $request->amount > $clientDebt->amount ){
+            return back()->with('error' , 'La dette du client est inferieur au montant ');
+        }
+
         $payment = new Pay();
         $payment->user_id = auth()->user()->id;
         $payment->amount = $request->amount;
         $payment->payment_method = $request->payment_mode;
-        $payment->transaction_id = $this->generateTransactionId(); // Generate a transaction ID, you can customize this method
-        $payment->commande_id = $request->commandId; // Assuming the command ID is passed in the request
+        $payment->transaction_id = $this->generateTransactionId(); 
+        $payment->commande_id = $request->commandId;
 
+        $clientDebt->amount -= $request->amount;
+        
+        $client = Client::where('client_id', $command->client_id)->first();
+        $client->current_debt  -= $request->amount;
         
 
-        // Handle the uploaded invoices (factures)
         if ($request->hasFile('factures_remboursement')) {
             $files = $request->file('factures_remboursement');
             foreach ($files as $file) {
-                $path = $file->store('factures_remboursements'); // Store the file in a directory called 'factures'
-                // Here, you can save the file path in the database or associate it with the payment record
+                $path = $file->store('factures_remboursements'); 
             }
         }
 
-        // Save the payment record
+        $clientDebt->save();
+        $client->save();
+
         $payment->save();
 
-        // Return a success response or redirect
         return redirect()->back()->with('success', 'Remboursement enregistré avec succès!');
     }
 
