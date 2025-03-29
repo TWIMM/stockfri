@@ -164,37 +164,37 @@
                             const template = document.createElement('div');
                             template.className = 'product-row mb-3';
                             template.innerHTML = `
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="productSelect0" class="form-label">Produit</label>
-    
-                        <select readonly disabled name="products[0][product_id]" class="form-control productSelect" required>
-                            <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="quantity0" class="form-label">Quantité</label>
-    
-                        <input readonly disabled type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="discount${0}" class="form-label">Remise (%)</label>
-                        <input readonly disabled type="number" name="products[0][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="price${0}" class="form-label">Prix Unitaire</label>
-                        <input readonly disabled type="number" name="products[0][price]" class="form-control product-price" placeholder="Prix" readonly>
-                    </div>
-                    <div class="col-md-1">
-                        <button disabled type="button" class="btn btn-danger remove-product-btn">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="productSelect0" class="form-label">Produit</label>
+                
+                                    <select readonly disabled name="products[0][product_id]" class="form-control productSelect" required>
+                                        <option value="">-- Sélectionner un produit --</option>
+                                        @foreach ($stocks as $product)
+                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="quantity0" class="form-label">Quantité</label>
+                
+                                    <input readonly disabled type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="discount${0}" class="form-label">Remise (%)</label>
+                                    <input readonly disabled type="number" name="products[0][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="price${0}" class="form-label">Prix Unitaire</label>
+                                    <input readonly disabled type="number" name="products[0][price]" class="form-control product-price" placeholder="Prix" readonly>
+                                </div>
+                                <div class="col-md-1">
+                                    <button disabled type="button" class="btn btn-danger remove-product-btn">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
 
                             productsContainer.appendChild(template);
 
@@ -231,40 +231,40 @@
                             const newRow = document.createElement('div');
                             newRow.className = 'product-row mb-3';
                             newRow.innerHTML = `
-                <div class="row">
-                    <div class="col-md-4">
-                       <label for="productSelect${rowCount}" class="form-label">Produit</label>
-    
-                        <select readonly disabled name="products[${rowCount}][product_id]" class="form-control productSelect" required>
-                            <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
-                                {{ $product->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="quantity${rowCount}" class="form-label">Quantité</label>
-    
-                        <input readonly disabled type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="discount${rowCount}" class="form-label">Remise (%)</label>
-                        <input readonly disabled type="number" name="products[${rowCount}][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="price${rowCount}" class="form-label">Prix Unitaire</label>
-    
-                        <input readonly disabled type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
-                    </div>
-                    <div class="col-md-1">
-                        <button  disabled type="button" class="btn btn-danger remove-product-btn">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
+                            <div class="row">
+                                <div class="col-md-4">
+                                <label for="productSelect${rowCount}" class="form-label">Produit</label>
+                
+                                    <select readonly disabled name="products[${rowCount}][product_id]" class="form-control productSelect" required>
+                                        <option value="">-- Sélectionner un produit --</option>
+                                        @foreach ($stocks as $product)
+                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
+                                            {{ $product->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="quantity${rowCount}" class="form-label">Quantité</label>
+                
+                                    <input readonly disabled type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="discount${rowCount}" class="form-label">Remise (%)</label>
+                                    <input readonly disabled type="number" name="products[${rowCount}][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="price${rowCount}" class="form-label">Prix Unitaire</label>
+                
+                                    <input readonly disabled type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
+                                </div>
+                                <div class="col-md-1">
+                                    <button  disabled type="button" class="btn btn-danger remove-product-btn">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
 
                             productsContainer.appendChild(newRow);
 

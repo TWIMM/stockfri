@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Clients;
 use Illuminate\Http\Request;
 use App\Models\Stock;
-use App\Models\Pays;
+use App\Models\Pay;
 
 class ClientController extends Controller
 {
@@ -88,14 +88,15 @@ class ClientController extends Controller
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
+        $clients = Clients::where('user_id' ,$user->id)->get();
 
-        $paiements = Pays::where('user_id' ,$user->id)
+        $paiements = Pay::where('user_id' ,$user->id)
         //->where('current_debt' , '>' , 0)
         //->where('limit_credit_for_this_user' , '<=' , 0)
         ->paginate(10);
         $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
 
-        return view('users.finances.paiements', compact('paiements' , 'stocks','hasPhysique', 
+        return view('users.finances.paiements', compact('paiements' , 'clients' , 'stocks','hasPhysique', 
         'hasPrestation', "businesses",  'user'));
     }
 

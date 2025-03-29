@@ -6,6 +6,7 @@
 
     @include('Modals.remboursement')
     @include('Modals.commande_owned')
+    @include('Modals.listes_des_produits_no_update')
 
 
     <div class="row">
@@ -33,7 +34,8 @@
                                     <tr>
                                         <td>{{ $pay->transaction_id }}</td>
                                         <td>{{ $pay->commande_id }} <span><button type="button"
-                                                    class="btn btn-success btn-sm mark-paid-btn" data-debt-id="${debt.id}">
+                                                    class="btn btn-success btn-sm mark-paid-btn precommande-btn"  data-id='{{$pay->commande_id}}' data-debt-id="${debt.id}"
+                                                    data-bs-toggle="modal" data-bs-target="#mmodalListeDeProduits">
                                                     <i class="ti ti-eye"></i>
                                                 </button></span></td>
                                         <td> {{ number_format($pay->amount) }} FCFA</td>
@@ -46,8 +48,8 @@
                                                 <i class="ti ti-send"></i>
                                             </button>
                                             <button type="button" data-payment-id='{{ $pay->id }}'
-                                                data-id='{{ $pay->id }}' id='invoice_viewer-btn'
-                                                class="btn bg-blue" {{-- data-bs-target="#pdfViewerModal" --}}>
+                                                data-id='{{ $pay->id }}' id='invoice_viewer-btn' class="btn bg-blue"
+                                                {{-- data-bs-target="#pdfViewerModal" --}}>
                                                 <i style="color: white" class="ti ti-folder"></i>
                                             </button>
                                         </td>
@@ -74,93 +76,8 @@
         // JavaScript to handle the client debts modal
         document.addEventListener('DOMContentLoaded', function() {
             // Event listener for the CommandeImpayes modal buttons
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Check if this button is for the CommandeImpayes modal
-                    if (this.getAttribute('data-bs-target') === '#CommandeImpayes') {
-                        const clientId = this.getAttribute('data-id');
-                        const clientName = this.getAttribute('data-name');
 
-                        // Update modal title with client name
-                        document.getElementById('modalVenteLabel').textContent =
-                            `Commandes impayées - ${clientName}`;
-
-                        // Store client ID for later use
-                        document.getElementById('put_id_in_there').value = clientId;
-
-                        // Show loading indicator
-                        const tableBody = document.querySelector('#CommandeImpayes table tbody');
-                        tableBody.innerHTML =
-                            '<tr><td colspan="6" class="text-center">Chargement des données...</td></tr>';
-
-                        // Fetch client debts data
-                        fetch(`/clients/${clientId}/debts`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Erreur lors du chargement des données');
-                                }
-                                return response.json();
-                            })
-                            .then(debts => {
-                                // Clear the loading message
-                                tableBody.innerHTML = '';
-
-                                if (debts.length === 0) {
-                                    // No debts found
-                                    tableBody.innerHTML =
-                                        '<tr><td colspan="6" class="text-center">Aucune commande impayée trouvée.</td></tr>';
-                                    return;
-                                }
-
-                                // Populate the table with debts
-                                debts.forEach(debt => {
-                                    const dueDate = new Date(debt.due_date);
-                                    const now = new Date();
-                                    const isLate = now > dueDate;
-
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                        <td>${debt.commande_id}</td>
-                                        <td>${Number(debt.amount).toLocaleString()} FCFA</td>
-                                        <td>${formatDate(debt.due_date)}</td>
-                                        <td>
-                                            ${isLate 
-                                                ? '<span class="badge bg-danger">En retard</span>' 
-                                                : '<span class="badge bg-success">À temps</span>'}
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn reveal-modal-btn btn-sm btn-secondary edit-btn"
-                                                data-id="${debt.commande_id}" 
-                                                data-bs-toggle="modal" data-bs-target="#remboursementModal">
-                                                <i class="ti ti-receipt"></i>
-                                            </button>
-                                            <button type="button" class="btn reveal-modal-btn btn-sm btn-info precommande-btn"
-                                                data-id="${debt.commande_id}" 
-                                                data-bs-toggle="modal" data-bs-target="#mmodalListeDeProduits">
-                                                <i class="ti ti-eye"></i>
-                                            </button>
-                                        </td>
-                                    `;
-                                    tableBody.appendChild(row);
-                                });
-
-                                // Add event listeners to remboursement buttons
-                                setupRemboursementButtons();
-                                // Add event listeners to precommande buttons
-                                setupPrecommandeButtons();
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                tableBody.innerHTML =
-                                    `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
-                            });
-                    }
-                });
-            });
-
-            // Function to set up the precommande buttons
-            function setupPrecommandeButtons() {
-                document.querySelectorAll('.precommande-btn').forEach(function(button) {
+            document.querySelectorAll('.precommande-btn').forEach(function(button) {
                     button.addEventListener('click', function() {
                         const serviceId = this.getAttribute('data-id');
 
@@ -174,37 +91,37 @@
                             const template = document.createElement('div');
                             template.className = 'product-row mb-3';
                             template.innerHTML = `
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="productSelect0" class="form-label">Produit</label>
-    
-                        <select readonly disabled name="products[0][product_id]" class="form-control productSelect" required>
-                            <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="quantity0" class="form-label">Quantité</label>
-    
-                        <input readonly disabled type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="discount${0}" class="form-label">Remise (%)</label>
-                        <input readonly disabled type="number" name="products[0][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="price${0}" class="form-label">Prix Unitaire</label>
-                        <input readonly disabled type="number" name="products[0][price]" class="form-control product-price" placeholder="Prix" readonly>
-                    </div>
-                    <div class="col-md-1">
-                        <button disabled type="button" class="btn btn-danger remove-product-btn">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="productSelect0" class="form-label">Produit</label>
+                    
+                                        <select readonly disabled name="products[0][product_id]" class="form-control productSelect" required>
+                                            <option value="">-- Sélectionner un produit --</option>
+                                            @foreach ($stocks as $product)
+                                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="quantity0" class="form-label">Quantité</label>
+                    
+                                        <input readonly disabled type="number" name="products[0][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="discount${0}" class="form-label">Remise (%)</label>
+                                        <input readonly disabled type="number" name="products[0][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="price${0}" class="form-label">Prix Unitaire</label>
+                                        <input readonly disabled type="number" name="products[0][price]" class="form-control product-price" placeholder="Prix" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button disabled type="button" class="btn btn-danger remove-product-btn">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
 
                             productsContainer.appendChild(template);
 
@@ -241,40 +158,40 @@
                             const newRow = document.createElement('div');
                             newRow.className = 'product-row mb-3';
                             newRow.innerHTML = `
-                <div class="row">
-                    <div class="col-md-4">
-                       <label for="productSelect${rowCount}" class="form-label">Produit</label>
-    
-                        <select readonly disabled name="products[${rowCount}][product_id]" class="form-control productSelect" required>
-                            <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
-                                {{ $product->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="quantity${rowCount}" class="form-label">Quantité</label>
-    
-                        <input readonly disabled type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="discount${rowCount}" class="form-label">Remise (%)</label>
-                        <input readonly disabled type="number" name="products[${rowCount}][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="price${rowCount}" class="form-label">Prix Unitaire</label>
-    
-                        <input readonly disabled type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
-                    </div>
-                    <div class="col-md-1">
-                        <button  disabled type="button" class="btn btn-danger remove-product-btn">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
+                            <div class="row">
+                                <div class="col-md-4">
+                                <label for="productSelect${rowCount}" class="form-label">Produit</label>
+                
+                                    <select readonly disabled name="products[${rowCount}][product_id]" class="form-control productSelect" required>
+                                        <option value="">-- Sélectionner un produit --</option>
+                                        @foreach ($stocks as $product)
+                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
+                                            {{ $product->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="quantity${rowCount}" class="form-label">Quantité</label>
+                
+                                    <input readonly disabled type="number" name="products[${rowCount}][quantity]" class="form-control product-quantity" placeholder="Quantité" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="discount${rowCount}" class="form-label">Remise (%)</label>
+                                    <input readonly disabled type="number" name="products[${rowCount}][discount]" class="form-control product-discount" placeholder="Remise %" value="0">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="price${rowCount}" class="form-label">Prix Unitaire</label>
+                
+                                    <input readonly disabled type="number" name="products[${rowCount}][price]" class="form-control product-price" placeholder="Prix" readonly>
+                                </div>
+                                <div class="col-md-1">
+                                    <button  disabled type="button" class="btn btn-danger remove-product-btn">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
 
                             productsContainer.appendChild(newRow);
 
@@ -671,6 +588,93 @@
                         xhr.send();
                     });
                 });
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Check if this button is for the CommandeImpayes modal
+                    if (this.getAttribute('data-bs-target') === '#CommandeImpayes') {
+                        const clientId = this.getAttribute('data-id');
+                        const clientName = this.getAttribute('data-name');
+
+                        // Update modal title with client name
+                        document.getElementById('modalVenteLabel').textContent =
+                            `Commandes impayées - ${clientName}`;
+
+                        // Store client ID for later use
+                        document.getElementById('put_id_in_there').value = clientId;
+
+                        // Show loading indicator
+                        const tableBody = document.querySelector('#CommandeImpayes table tbody');
+                        tableBody.innerHTML =
+                            '<tr><td colspan="6" class="text-center">Chargement des données...</td></tr>';
+
+                        // Fetch client debts data
+                        fetch(`/clients/${clientId}/debts`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Erreur lors du chargement des données');
+                                }
+                                return response.json();
+                            })
+                            .then(debts => {
+                                // Clear the loading message
+                                tableBody.innerHTML = '';
+
+                                if (debts.length === 0) {
+                                    // No debts found
+                                    tableBody.innerHTML =
+                                        '<tr><td colspan="6" class="text-center">Aucune commande impayée trouvée.</td></tr>';
+                                    return;
+                                }
+
+                                // Populate the table with debts
+                                debts.forEach(debt => {
+                                    const dueDate = new Date(debt.due_date);
+                                    const now = new Date();
+                                    const isLate = now > dueDate;
+
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${debt.commande_id}</td>
+                                        <td>${Number(debt.amount).toLocaleString()} FCFA</td>
+                                        <td>${formatDate(debt.due_date)}</td>
+                                        <td>
+                                            ${isLate 
+                                                ? '<span class="badge bg-danger">En retard</span>' 
+                                                : '<span class="badge bg-success">À temps</span>'}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn reveal-modal-btn btn-sm btn-secondary edit-btn"
+                                                data-id="${debt.commande_id}" 
+                                                data-bs-toggle="modal" data-bs-target="#remboursementModal">
+                                                <i class="ti ti-receipt"></i>
+                                            </button>
+                                            <button type="button" class="btn reveal-modal-btn btn-sm btn-info"
+                                                data-id="${debt.commande_id}" 
+                                                data-bs-toggle="modal" data-bs-target="#mmodalListeDeProduits">
+                                                <i class="ti ti-eye"></i>
+                                            </button>
+                                        </td>
+                                    `;
+                                    tableBody.appendChild(row);
+                                });
+
+                                // Add event listeners to remboursement buttons
+                                setupRemboursementButtons();
+                                // Add event listeners to precommande buttons
+                                setupPrecommandeButtons();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                tableBody.innerHTML =
+                                    `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
+                            });
+                    }
+                });
+            });
+
+            // Function to set up the precommande buttons
+            function setupPrecommandeButtons() {
+               
             }
 
             // Function to set up the remboursement buttons
