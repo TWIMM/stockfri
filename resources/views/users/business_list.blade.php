@@ -27,7 +27,6 @@
                                 <label for="search">Recherche par nom</label>
                                 <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Rechercher un business...">
                             </div>
-                           
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
                                 <a href="{{ route('business.listes') }}" class="btn btn-secondary">Réinitialiser</a>

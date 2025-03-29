@@ -17,22 +17,30 @@ class BusinessController extends Controller
 {
     
     
-    public function showBusinessListPage()
+    public function showBusinessListPage(Request $request)
     {
         $user = Auth::user();
+
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
-
         }
 
-        $businesses = $user->business()->paginate(10);
+        // Check if a search term is provided
+        $query = $user->business();
+
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Pagination
+        $businesses = $query->paginate(10);
 
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
-
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
 
         return view('users/business_list', compact('businesses', 'hasPhysique', 'hasPrestation', 'user'));
     }
+
 
     public function getBusinessesByTeam($teamId): JsonResponse
     {
