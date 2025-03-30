@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-8 text-end">
                     <div class="head-icons">
-                        <a href="campaign.html" data-bs-toggle="tooltip" data-bs-placement="top"
+                        <a href="{{route('dashboard')}}" data-bs-toggle="tooltip" data-bs-placement="top"
                             data-bs-original-title="Refresh">
                             <i class="ti ti-refresh-dot"></i>
                         </a>
@@ -77,7 +77,7 @@
         <div class="campaign-tab">
             <ul class="nav">
                 <li>
-                    <a href="campaign.html" class="active">Commandes en cours<span>24</span></a>
+                    <a href="{{route('dashboard')}}" class="active">Commandes en cours<span>24</span></a>
                 </li>
                 <li>
                     <a href="campaign-complete.html">Factures en attente</a>

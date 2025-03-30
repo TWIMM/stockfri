@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Clients;
 use App\Models\Commandes;
 use App\Models\ClientDebt;
+use App\Models\Magasins;
+use App\Models\Stock;
 
 class DashboardController extends Controller
 {
@@ -37,28 +39,90 @@ class DashboardController extends Controller
 
             $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
 
+            $categories = $user->categorieProduits;
+            $fournisseurs = $user->fournisseurs;
+
+            // Get the client by ID (for later use in views)
+            $getClientFromId = function($id) {
+                return Clients::find($id);
+            };
+
             $countClients = count(Clients::where('user_id' ,$user->id)->get());
             $countTeams = count(Team::where('user_id' ,$user->id)->get());
             $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
             $countBusiness = count(Business::where('user_id' ,$user->id)->get());
-            $commandeNotApproved = Commandes::where('user_id' , auth()->id())
-            ->where('validation_status' , 'not_approved')
-            ->get(); 
-            $countOrderNotApproved = count($commandeNotApproved);
-            $commandeApproved = Commandes::where('user_id' , auth()->id())
+            $approvedSelledProduct = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
+            })
+            ->where('user_id' , auth()->id())
             ->where('validation_status' , 'approved')
             ->get(); 
-            $countOrderApproved = count($commandeApproved);
+            $countApprovedSelledProduct = count($approvedSelledProduct);
+            $commandeApproved = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('service_id'); // Filters CommandItems where service_id is null
+            })
+            ->where('user_id' , auth()->id())
+            ->where('validation_status' , 'approved')
+            ->get(); 
+            $countApprovedSelledServices = count($commandeApproved);
+
+            $query = $query = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
+            })
+            ->where('user_id', $user->id)
+            ->where('validation_status', 'approved');
+    
+            // Apply filters based on form input
+            if ($clientId = request('client')) {
+                $query->where('client_id', $clientId);  // Filter by client ID
+            }
+    
+            if ($status = request('status')) {
+                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
+                    $query->where('delivery_status', $status);  // Filter by delivery status
+                }
+            }
+    
+            if ($minPrice = request('min_price')) {
+                $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
+            }
+    
+            if ($maxPrice = request('max_price')) {
+                $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
+            }
+    
+            if ($dateStart = request('date_start')) {
+                $query->where('created_at', '>=', $dateStart);  // Filter by start date
+            }
+    
+            if ($dateEnd = request('date_end')) {
+                $query->where('created_at', '<=', $dateEnd);  // Filter by end date
+            }
+    
+            // Execute the query and paginate the results
+            $commandeNotApproved = $query->paginate(10);
            
 
+             // Get additional data
+            $clients = Clients::where('user_id', $user->id)->get();
+            $magasins = Magasins::where('user_id', $user->id)->paginate(10);
+            $stocks = Stock::where('user_id', $user->id)->paginate(10);
 
 
-            return view('welcome', compact('businesses', 'hasPhysique', 'countOrderApproved',  'countOrderNotApproved' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
+            return view('welcome', compact('businesses' , 'categories', 'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
         } else if(auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }
 
         
+    }
+
+    public function updateTabSession(Request $request)
+    {
+        $tab = $request->query('tab', 'service');
+        session(['active_tab' => $tab]);
+        
+        return response()->json(['success' => true]);
     }
 
 

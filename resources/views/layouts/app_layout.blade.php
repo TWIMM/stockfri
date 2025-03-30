@@ -144,7 +144,7 @@
                             </a>
                             <div class="dropdown-menu menu-drop-user">
                                 <div class="profilename">
-                                    <a class="dropdown-item" href="index-2.html">
+                                    <a class="dropdown-item" href="{{route('dashboard')}}">
                                         <i class="ti ti-layout-2"></i> Dashboard
                                     </a>
                                     <a class="dropdown-item" href="profile.html">
