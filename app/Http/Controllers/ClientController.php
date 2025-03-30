@@ -14,15 +14,37 @@ class ClientController extends Controller
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+    
         $user = auth()->user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
-
-        $clients = Clients::where('user_id' ,$user->id)->paginate(10);
-        return view('users.clients.index', compact('clients','hasPhysique', 
-        'hasPrestation', "businesses",  'user'));
+    
+        // Start the query to fetch clients
+        $query = Clients::where('user_id', $user->id);
+    
+        // Apply the 'search' filter if provided
+        if ($search = request('search')) {
+            $query->where('name', 'like', "%" . $search . "%");
+        }
+    
+        // Apply the 'email' filter if provided
+        if ($email = request('email')) {
+            $query->where('email', 'like', "%" . $email . "%");
+        }
+    
+        // Apply the 'tel' (telephone) filter if provided
+        if ($tel = request('tel')) {
+            $query->where('tel', 'like', "%" . $tel . "%");
+        }
+    
+        // Get the filtered clients and paginate the results
+        $clients = $query->paginate(10);
+    
+        return view('users.clients.index', compact('clients', 'hasPhysique', 
+            'hasPrestation', "businesses", 'user'));
     }
+    
 
     public function handleDebt( Request $request){
         $request->validate([

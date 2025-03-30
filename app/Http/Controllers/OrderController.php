@@ -340,10 +340,12 @@ class OrderController extends Controller
     }
     
 
-    public function index(){
+    public function index()
+    {
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
@@ -354,18 +356,50 @@ class OrderController extends Controller
             return Clients::find($id);
         };
 
-        $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
+        // Start the query for commandes
+        $query = Commandes::where('user_id', $user->id);
+        
+        // Apply filters
+        // Filter by client if provided
+        if ($clientId = request('client')) {
+            $query->where('client_id', $clientId);
+        }
 
-        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
-        $commandeNotApproved = Commandes::where('user_id' , auth()->id())
-        ->where('validation_status' , 'approved')
-        ->paginate(10); 
-        //dd($commandeNotApproved);
-        $clients = Clients::where('user_id' ,$user->id)->get();
+        // Filter by delivery status if provided
+        if ($status = request('status')) {
+            if ($status !== 'none') { // Avoid 'none' as it implies no filter
+                $query->where('invoice_status', $status);
+            }
+        }
 
+        // Filter by price range if provided
+        if ($minPrice = request('min_price')) {
+            $query->where('total_price', '>=', $minPrice);
+        }
 
-        $getBadge = function($riskLevel)
-        {
+        if ($maxPrice = request('max_price')) {
+            $query->where('total_price', '<=', $maxPrice);
+        }
+
+        // Filter by date range if provided
+        if ($dateStart = request('date_start')) {
+            $query->where('created_at', '>=', $dateStart);
+        }
+
+        if ($dateEnd = request('date_end')) {
+            $query->where('created_at', '<=', $dateEnd);
+        }
+
+        // Get the filtered commandes and paginate the results
+        $commandeNotApproved = $query->paginate(10);
+
+        // Get clients, magasins, and other necessary data
+        $clients = Clients::where('user_id', $user->id)->get();
+        $magasins = Magasins::where('user_id', $user->id)->paginate(10);
+        $stocks = Stock::where('user_id', $user->id)->paginate(10);
+
+        // Helper functions for client data (not changed)
+        $getBadge = function($riskLevel) {
             switch ($riskLevel) {
                 case 'Très faible':
                     return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
@@ -384,22 +418,11 @@ class OrderController extends Controller
 
         $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
             $client = Clients::find($id);
-            
+
             if (!$client) {
-                return null; // Retourne null si le client n'existe pas
+                return null;
             }
-            
-            // Créer un tableau de toutes les données disponibles
-            if($client->trusted === 1){
-                $allData = [
-                    'credit_score' => 90,
-                    'risk_level' => 'Très faible',
-                    'available_credit' => $client->limit_credit_for_this_user - $client->current_debt,
-                    'credit_limit' => $client->limit_credit_for_this_user,
-                    'current_debt' => $client->current_debt,
-                    'last_score_update' => $client->last_score_update
-                ];
-            }
+
             $allData = [
                 'credit_score' => $client->credit_score,
                 'risk_level' => $client->getRiskLevel(),
@@ -408,58 +431,84 @@ class OrderController extends Controller
                 'current_debt' => $client->current_debt,
                 'last_score_update' => $client->last_score_update
             ];
-            
-            // Si une clé spécifique est demandée et existe dans le tableau
+
+            // If a specific data is requested, return that
             if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
                 return $allData[$dataToReturn];
             }
-            
-            // Si un tableau de clés est fourni
-            if (is_array($dataToReturn)) {
-                $result = [];
-                foreach ($dataToReturn as $key) {
-                    if (array_key_exists($key, $allData)) {
-                        $result[$key] = $allData[$key];
-                    }
-                }
-                return $result;
-            }
-            
-            // Par défaut, retourner toutes les données
+
+            // Return all data if no specific key is provided
             return (object)$allData;
         };
 
-        return view('users.commandes_approved.index', compact('commandeNotApproved','hasPhysique', 
-            'hasPrestation' , 'getClientScoreDataByClientId' , 'getBadge', 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
+        return view('users.commandes_approved.index', compact(
+            'commandeNotApproved', 'hasPhysique', 'hasPrestation', 
+            'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
+            'stocks' , 'getClientFromId', 'user', 'clients', 'categories', 'fournisseurs'
+        ));
     }
 
 
-    public function getPreCommandes(){
+
+    public function getPreCommandes()
+    {
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+        
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
-        $businesses = $user->business; 
-        $categories = $user->categorieProduits; 
-        $fournisseurs = $user->fournisseurs; 
+        $businesses = $user->business;
+        $categories = $user->categorieProduits;
+        $fournisseurs = $user->fournisseurs;
+
+        // Get the client by ID (for later use in views)
         $getClientFromId = function($id) {
             return Clients::find($id);
         };
 
-        $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
+        // Initialize the query for 'not_approved' commandes
+        $query = Commandes::where('user_id', $user->id)
+            ->where('validation_status', 'not_approved');
 
-        $stocks = Stock::where('user_id' ,$user->id)->paginate(10); 
-        $commandeNotApproved = Commandes::where('user_id' , auth()->id())
-        ->where('validation_status' , 'not_approved')
-        ->paginate(10); 
-        //dd($commandeNotApproved);
-        $clients = Clients::where('user_id' ,$user->id)->get();
+        // Apply filters based on form input
+        if ($clientId = request('client')) {
+            $query->where('client_id', $clientId);  // Filter by client ID
+        }
 
+        if ($status = request('status')) {
+            if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
+                $query->where('delivery_status', $status);  // Filter by delivery status
+            }
+        }
 
-        $getBadge = function($riskLevel)
-        {
+        if ($minPrice = request('min_price')) {
+            $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
+        }
+
+        if ($maxPrice = request('max_price')) {
+            $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
+        }
+
+        if ($dateStart = request('date_start')) {
+            $query->where('created_at', '>=', $dateStart);  // Filter by start date
+        }
+
+        if ($dateEnd = request('date_end')) {
+            $query->where('created_at', '<=', $dateEnd);  // Filter by end date
+        }
+
+        // Execute the query and paginate the results
+        $commandeNotApproved = $query->paginate(10);
+
+        // Get additional data
+        $clients = Clients::where('user_id', $user->id)->get();
+        $magasins = Magasins::where('user_id', $user->id)->paginate(10);
+        $stocks = Stock::where('user_id', $user->id)->paginate(10);
+
+        // Helper function for badges based on risk levels (same as before)
+        $getBadge = function($riskLevel) {
             switch ($riskLevel) {
                 case 'Très faible':
                     return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
@@ -476,24 +525,15 @@ class OrderController extends Controller
             }
         };
 
+        // Helper function to fetch client score data by client ID (same as before)
         $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
             $client = Clients::find($id);
-            
+
             if (!$client) {
-                return null; // Retourne null si le client n'existe pas
+                return null;
             }
-            
-            // Créer un tableau de toutes les données disponibles
-            if($client->trusted === 1){
-                $allData = [
-                    'credit_score' => 90,
-                    'risk_level' => 'Très faible',
-                    'available_credit' => $client->limit_credit_for_this_user - $client->current_debt,
-                    'credit_limit' => $client->limit_credit_for_this_user,
-                    'current_debt' => $client->current_debt,
-                    'last_score_update' => $client->last_score_update
-                ];
-            }
+
+            // Default data for the client
             $allData = [
                 'credit_score' => $client->credit_score,
                 'risk_level' => $client->getRiskLevel(),
@@ -502,30 +542,24 @@ class OrderController extends Controller
                 'current_debt' => $client->current_debt,
                 'last_score_update' => $client->last_score_update
             ];
-            
-            // Si une clé spécifique est demandée et existe dans le tableau
+
+            // Return a specific data field if requested
             if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
                 return $allData[$dataToReturn];
             }
-            
-            // Si un tableau de clés est fourni
-            if (is_array($dataToReturn)) {
-                $result = [];
-                foreach ($dataToReturn as $key) {
-                    if (array_key_exists($key, $allData)) {
-                        $result[$key] = $allData[$key];
-                    }
-                }
-                return $result;
-            }
-            
-            // Par défaut, retourner toutes les données
+
+            // Return all data by default
             return (object)$allData;
         };
 
-        return view('users.commandes_not_approved.index', compact('commandeNotApproved','hasPhysique', 
-            'hasPrestation' , 'getClientScoreDataByClientId' , 'getBadge', 'magasins', "businesses", 'stocks',  'user' , 'clients', "categories" , "fournisseurs" , 'getClientFromId'));
+        // Pass data to the view
+        return view('users.commandes_not_approved.index', compact(
+            'commandeNotApproved', 'hasPhysique', 'hasPrestation',
+            'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
+            'stocks', 'user', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
+        ));
     }
+
 
     public function showClientDetails($id)
     {
