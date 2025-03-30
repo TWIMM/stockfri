@@ -320,7 +320,7 @@
                                     @if ($hasPrestation)
                                         <li class="submenu">
                                             <a href="javascript:void(0);"
-                                                class="{{ request()->routeIs('services.*') ? 'subdrop active' : '' }}"><i
+                                                class="{{ request()->routeIs('services.*') || request()->routeIs('pre_commandes_s.*') || request()->routeIs('commandes_s.*') ? 'subdrop active' : '' }}"><i
                                                     class="ti ti-brand-airtable"></i>
                                                 <span>Services Offert</span>
                                                 <span class="menu-arrow"></span>
@@ -331,11 +331,11 @@
                                                 <li><a href="{{ route('clients.listes') }}"
                                                         class="{{ request()->routeIs('clients.listes') ? 'active' : '' }}">Gestion
                                                         des clients</a></li>
-                                                <li><a href="{{ route('pre_commandes.services') }}"
-                                                        class="{{ request()->routeIs('pre_commandes.services') ? 'active' : '' }}">Approuver
+                                                <li><a href="{{ route('pre_commandes_s.services') }}"
+                                                        class="{{ request()->routeIs('pre_commandes_s.services') ? 'active' : '' }}">Approuver
                                                         des commandes</a></li>
-                                                <li><a href="{{ route('commandes.services') }}"
-                                                        class="{{ request()->routeIs('commandes.services') ? 'active' : '' }}">
+                                                <li><a href="{{ route('commandes_s.services') }}"
+                                                        class="{{ request()->routeIs('commandes_s.services') ? 'active' : '' }}">
                                                         Commandes actives</a></li>
                                             </ul>
                                         </li>

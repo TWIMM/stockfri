@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Services\InvoiceService;
 use App\Models\Invoice;
 use Carbon\Carbon;
+use App\Models\Magasins;
 
 class ServicesController extends Controller
 {
@@ -453,4 +454,226 @@ class ServicesController extends Controller
 
         return back()->with('success', 'Service deleted successfully');
     }
+
+    public function getPrecommandes(){
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+
+        $user = Auth::user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+        $categories = $user->categorieProduits; 
+        $fournisseurs = $user->fournisseurs; 
+        $getClientFromId = function($id) {
+            return Clients::find($id);
+        };
+
+        $query = Commandes::whereHas('commandeItems', function ($query) {
+            $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
+        })
+        ->where('user_id', $user->id) // Filters by the user ID
+        ->where('validation_status', 'not_approved');
+        
+        // Apply filters
+        // Filter by client if provided
+        if ($clientId = request('client')) {
+            $query->where('client_id', $clientId);
+        }
+
+        // Filter by delivery status if provided
+        if ($status = request('status')) {
+            if ($status !== 'none') { // Avoid 'none' as it implies no filter
+                $query->where('invoice_status', $status);
+            }
+        }
+
+        // Filter by price range if provided
+        if ($minPrice = request('min_price')) {
+            $query->where('total_price', '>=', $minPrice);
+        }
+
+        if ($maxPrice = request('max_price')) {
+            $query->where('total_price', '<=', $maxPrice);
+        }
+
+        // Filter by date range if provided
+        if ($dateStart = request('date_start')) {
+            $query->where('created_at', '>=', $dateStart);
+        }
+
+        if ($dateEnd = request('date_end')) {
+            $query->where('created_at', '<=', $dateEnd);
+        }
+
+        // Get the filtered commandes and paginate the results
+        $commandeNotApproved = $query->paginate(10);
+
+        // Get clients, magasins, and other necessary data
+        $clients = Clients::where('user_id', $user->id)->get();
+        $magasins = Magasins::where('user_id', $user->id)->paginate(10);
+        $stocks = Stock::where('user_id', $user->id)->paginate(10);
+
+        // Helper functions for client data (not changed)
+        $getBadge = function($riskLevel) {
+            switch ($riskLevel) {
+                case 'Très faible':
+                    return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
+                case 'Faible':
+                    return '<span class="badge badge-pill badge-status bg-info">Faible</span>';
+                case 'Moyen':
+                    return '<span class="badge badge-pill badge-status bg-warning">Moyen</span>';
+                case 'Élevé':
+                    return '<span class="badge badge-pill badge-status bg-danger">Élevé</span>';
+                case 'Très élevé':
+                    return '<span class="badge badge-pill badge-status bg-dark">Très élevé</span>';
+                default:
+                    return '<span class="badge badge-pill badge-status bg-secondary">Inconnu</span>';
+            }
+        };
+
+        $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
+            $client = Clients::find($id);
+
+            if (!$client) {
+                return null;
+            }
+
+            $allData = [
+                'credit_score' => $client->credit_score,
+                'risk_level' => $client->getRiskLevel(),
+                'available_credit' => $client->credit_limit - $client->current_debt,
+                'credit_limit' => $client->credit_limit,
+                'current_debt' => $client->current_debt,
+                'last_score_update' => $client->last_score_update
+            ];
+
+            // If a specific data is requested, return that
+            if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
+                return $allData[$dataToReturn];
+            }
+
+            // Return all data if no specific key is provided
+            return (object)$allData;
+        };
+
+        return view('users.services.commande_not_approved', compact(
+            'commandeNotApproved', 'hasPhysique', 'hasPrestation', 
+            'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
+            'stocks' , 'getClientFromId', 'user', 'clients', 'categories', 'fournisseurs'
+        ));
+    }
+    public function activeCommandes(){
+        if(auth()->user()->type === 'team_member'){
+            return redirect()->route('dashboard_team_member');
+        }
+        
+        $user = Auth::user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business;
+        $categories = $user->categorieProduits;
+        $fournisseurs = $user->fournisseurs;
+
+        // Get the client by ID (for later use in views)
+        $getClientFromId = function($id) {
+            return Clients::find($id);
+        };
+
+        
+
+        $query = $query = Commandes::whereHas('commandeItems', function ($query) {
+            $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
+        })
+        ->where('user_id', $user->id)
+        ->where('validation_status', 'approved');
+
+        // Apply filters based on form input
+        if ($clientId = request('client')) {
+            $query->where('client_id', $clientId);  // Filter by client ID
+        }
+
+        if ($status = request('status')) {
+            if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
+                $query->where('delivery_status', $status);  // Filter by delivery status
+            }
+        }
+
+        if ($minPrice = request('min_price')) {
+            $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
+        }
+
+        if ($maxPrice = request('max_price')) {
+            $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
+        }
+
+        if ($dateStart = request('date_start')) {
+            $query->where('created_at', '>=', $dateStart);  // Filter by start date
+        }
+
+        if ($dateEnd = request('date_end')) {
+            $query->where('created_at', '<=', $dateEnd);  // Filter by end date
+        }
+
+        // Execute the query and paginate the results
+        $commandeNotApproved = $query->paginate(10);
+
+        // Get additional data
+        $clients = Clients::where('user_id', $user->id)->get();
+        $magasins = Magasins::where('user_id', $user->id)->paginate(10);
+        $stocks = Stock::where('user_id', $user->id)->paginate(10);
+
+        // Helper function for badges based on risk levels (same as before)
+        $getBadge = function($riskLevel) {
+            switch ($riskLevel) {
+                case 'Très faible':
+                    return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
+                case 'Faible':
+                    return '<span class="badge badge-pill badge-status bg-info">Faible</span>';
+                case 'Moyen':
+                    return '<span class="badge badge-pill badge-status bg-warning">Moyen</span>';
+                case 'Élevé':
+                    return '<span class="badge badge-pill badge-status bg-danger">Élevé</span>';
+                case 'Très élevé':
+                    return '<span class="badge badge-pill badge-status bg-dark">Très élevé</span>';
+                default:
+                    return '<span class="badge badge-pill badge-status bg-secondary">Inconnu</span>';
+            }
+        };
+
+        // Helper function to fetch client score data by client ID (same as before)
+        $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
+            $client = Clients::find($id);
+
+            if (!$client) {
+                return null;
+            }
+
+            // Default data for the client
+            $allData = [
+                'credit_score' => $client->credit_score,
+                'risk_level' => $client->getRiskLevel(),
+                'available_credit' => $client->credit_limit - $client->current_debt,
+                'credit_limit' => $client->credit_limit,
+                'current_debt' => $client->current_debt,
+                'last_score_update' => $client->last_score_update
+            ];
+
+            // Return a specific data field if requested
+            if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
+                return $allData[$dataToReturn];
+            }
+
+            // Return all data by default
+            return (object)$allData;
+        };
+
+        // Pass data to the view
+        return view('users.services.commande_approved', compact(
+            'commandeNotApproved', 'hasPhysique', 'hasPrestation',
+            'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
+            'stocks', 'user', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
+        ));
+    }    
 }
