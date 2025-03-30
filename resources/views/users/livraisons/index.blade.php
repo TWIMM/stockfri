@@ -25,8 +25,9 @@
                                 <label for="client">Client</label>
                                 <select name="client" id="client" class="form-control">
                                     <option value="">Tous les clients</option>
-                                    @foreach($clients as $client)
-                                        <option value="{{ $client->id }}" {{ request('client') == $client->id ? 'selected' : '' }}>
+                                    @foreach ($clients as $client)
+                                        <option value="{{ $client->id }}"
+                                            {{ request('client') == $client->id ? 'selected' : '' }}>
                                             {{ $client->name }}
                                         </option>
                                     @endforeach
@@ -36,30 +37,39 @@
                                 <label for="status">Statut livraison</label>
                                 <select name="status" id="status" class="form-control">
                                     <option value="">Tous les statuts</option>
-                                    <option value="none" {{ request('status') == 'none' ? 'selected' : '' }}>Aucun</option>
-                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En attente</option>
-                                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Livré</option>
-                                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>En cours</option>
-                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Annulé</option>
+                                    <option value="none" {{ request('status') == 'none' ? 'selected' : '' }}>Aucun
+                                    </option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En
+                                        attente</option>
+                                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Livré
+                                    </option>
+                                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>
+                                        En cours</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>
+                                        Annulé</option>
                                 </select>
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="min_price">Prix minimum</label>
-                                <input min=0 type="number" name="min_price" id="min_price" class="form-control" value="{{ request('min_price') }}">
+                                <input min=0 type="number" name="min_price" id="min_price" class="form-control"
+                                    value="{{ request('min_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="max_price">Prix maximum</label>
-                                <input min=0 type="number" name="max_price" id="max_price" class="form-control" value="{{ request('max_price') }}">
+                                <input min=0 type="number" name="max_price" id="max_price" class="form-control"
+                                    value="{{ request('max_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_start">Date début</label>
-                                <input type="date" name="date_start" id="date_start" class="form-control" value="{{ request('date_start') }}">
+                                <input type="date" name="date_start" id="date_start" class="form-control"
+                                    value="{{ request('date_start') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_end">Date fin</label>
-                                <input type="date" name="date_end" id="date_end" class="form-control" value="{{ request('date_end') }}">
+                                <input type="date" name="date_end" id="date_end" class="form-control"
+                                    value="{{ request('date_end') }}">
                             </div>
-                            
+
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
                                 <a href="{{ route('commandes.listes') }}" class="btn btn-secondary">Réinitialiser</a>
@@ -78,21 +88,37 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($livraisons as $eachLiv)
+                                @foreach ($livraisons as $eachLiv)
+                                   
+
                                     <tr>
-                                        <td> <span class="badge badge-pill badge-status bg-blue">{{$eachLiv->tracking_number}}</span></td>
-                                        <td> 
-                                            <button type="button" data-id='{{ $eachLiv->commande_id }}'
-                                                id='precommande-btn' data-bs-toggle="modal"
-                                                data-bs-target="#mmodalListeDeProduits" class="btn btn-sm btn-secondary"><i class="ti ti-eye"></i></button>
+                                        <td> <span
+                                                class="badge badge-pill badge-status bg-blue">{{ $eachLiv->tracking_number }}</span>
                                         </td>
                                         <td>
                                             <button type="button" data-id='{{ $eachLiv->commande_id }}'
                                                 id='precommande-btn' data-bs-toggle="modal"
-                                                data-bs-target="#livraisonDetailsModal" class="btn btn-sm bg-violet"><i class="ti ti-eye"></i></button>
+                                                data-bs-target="#mmodalListeDeProduits" class="btn btn-sm btn-secondary"><i
+                                                    class="ti ti-eye"></i></button>
                                         </td>
-                                        <td> {{$eachLiv->delivery_status}}</td>
-                                        <td> {{number_format($eachLiv->shipping_cost)}}</td>
+                                        <td>
+                                            <button type="button" data-id='{{ $eachLiv->commande_id }}'
+                                                data-tracking="{{ $eachLiv->tracking_number }}"
+                                                data-delivery-date="{{ $eachLiv->delivery_date }}"
+                                                data-delivery-status="{{ $eachLiv->delivery_status }}"
+                                                data-address="{{ $eachLiv->delivery_address }}"
+                                                data-notes="{{ $eachLiv->delivery_notes }}"
+                                                data-delivered-by="{{ $eachLiv->delivered_by }}"
+                                                data-received-by="{{ $eachLiv->received_by }}"
+                                                data-shipping-method="{{ $eachLiv->shipping_method }}"
+                                                data-shipping-cost="{{ number_format($eachLiv->shipping_cost) }}"
+                                                id="precommande-btn" data-bs-toggle="modal"
+                                                data-bs-target="#livraisonDetailsModal" class="btn btn-sm bg-violet">
+                                                <i class="ti ti-eye"></i>
+                                            </button>
+                                        </td>
+                                        <td> {{ $eachLiv->delivery_status }}</td>
+                                        <td> {{ number_format($eachLiv->shipping_cost) }}</td>
 
                                     </tr>
                                 @endforeach
@@ -111,255 +137,282 @@
     <script>
         const precommandesee = document.querySelectorAll('#precommande-btn');
 
+        // jQuery or Vanilla JS function to populate the modal dynamically
+        $('#livraisonDetailsModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var tracking = button.data('tracking'); // Extract data from the button
+            var deliveryDate = button.data('delivery-date');
+            var deliveryStatus = button.data('delivery-status');
+            var deliveryAddress = button.data('address');
+            var deliveryNotes = button.data('notes');
+            var deliveredBy = button.data('delivered-by');
+            var receivedBy = button.data('received-by');
+            var shippingMethod = button.data('shipping-method');
+            var shippingCost = button.data('shipping-cost');
+
+            // Populate the modal with the data
+            var modal = $(this);
+            modal.find('#livraisonDate').text(deliveryDate);
+            modal.find('#livraisonStatus').text(deliveryStatus);
+            modal.find('#livraisonAddress').text(deliveryAddress);
+            modal.find('#livraisonNotes').text(deliveryNotes);
+            modal.find('#deliveredBy').text(deliveredBy);
+            modal.find('#receivedBy').text(receivedBy);
+            modal.find('#trackingNumber').text(tracking);
+            modal.find('#shippingMethod').text(shippingMethod);
+            modal.find('#shippingCost').text(shippingCost);
+        });
+
+
         precommandesee.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    const serviceId = button.getAttribute(
-                        'data-id'); // Get the ID from the clicked button
+            button.addEventListener('click', function() {
+                const serviceId = button.getAttribute(
+                    'data-id'); // Get the ID from the clicked button
 
-                    // Make the AJAX request to get the service details
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', '/precommande/' + serviceId, true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.onload = function() {
-                        if (xhr.status === 200) {
-                            const data = JSON.parse(xhr.responseText);
+                // Make the AJAX request to get the service details
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', '/precommande/' + serviceId, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
 
-                            // Mettre le modal en mode édition
-                            const modal = document.getElementById('mmodalListeDeProduits');
-                            modal.setAttribute('data-mode', 'edit');
+                        // Mettre le modal en mode édition
+                        const modal = document.getElementById('mmodalListeDeProduits');
+                        modal.setAttribute('data-mode', 'edit');
 
-                            // Mettre à jour le titre du modal
-                            document.getElementById('modalVenteLabel').textContent =
-                                'Détails de la Commande';
+                        // Mettre à jour le titre du modal
+                        document.getElementById('modalVenteLabel').textContent =
+                            'Détails de la Commande';
 
-                            // Remplir le formulaire avec les données
-                            document.querySelector(
-                                    '#mmodalListeDeProduits select[name="client_id"]')
-                                .value = data.commande.client_id;
-                            document.querySelector('#mmodalListeDeProduits input[name="tva"]')
-                                .value = data
-                                .commande.tva || 0;
-                            document.querySelector(
-                                    '#mmodalListeDeProduits select[name="payment_mode"]')
-                                .value = data.commande.payment_mode;
-                            document.querySelector(
-                                    '#mmodalListeDeProduits select[name="invoice_status"]')
-                                .value = data.commande.invoice_status;
+                        // Remplir le formulaire avec les données
+                        document.querySelector(
+                                '#mmodalListeDeProduits select[name="client_id"]')
+                            .value = data.commande.client_id;
+                        document.querySelector('#mmodalListeDeProduits input[name="tva"]')
+                            .value = data
+                            .commande.tva || 0;
+                        document.querySelector(
+                                '#mmodalListeDeProduits select[name="payment_mode"]')
+                            .value = data.commande.payment_mode;
+                        document.querySelector(
+                                '#mmodalListeDeProduits select[name="invoice_status"]')
+                            .value = data.commande.invoice_status;
 
-                            // Vider complètement le conteneur de produits
-                            resetProductsContainer();
+                        // Vider complètement le conteneur de produits
+                        resetProductsContainer();
 
-                            // Remplir avec les produits de la commande
-                            // In the AJAX request success handler where you update form data
-                            // Modify this part of the code in the first script section:
+                        // Remplir avec les produits de la commande
+                        // In the AJAX request success handler where you update form data
+                        // Modify this part of the code in the first script section:
 
-                            data.products.forEach((product, index) => {
-                                // For the first product, utilize the existing row
-                                if (index === 0) {
-                                    const firstProductSelect = document.querySelector(
-                                        'select[name="products[0][product_id]"]');
-                                    const firstQuantityInput = document.querySelector(
-                                        'input[name="products[0][quantity]"]');
-                                    const firstDiscountInput = document.querySelector(
-                                        'input[name="products[0][discount]"]');
-                                    const firstPriceInput = document.querySelector(
-                                        'input[name="products[0][price]"]');
+                        data.products.forEach((product, index) => {
+                            // For the first product, utilize the existing row
+                            if (index === 0) {
+                                const firstProductSelect = document.querySelector(
+                                    'select[name="products[0][product_id]"]');
+                                const firstQuantityInput = document.querySelector(
+                                    'input[name="products[0][quantity]"]');
+                                const firstDiscountInput = document.querySelector(
+                                    'input[name="products[0][discount]"]');
+                                const firstPriceInput = document.querySelector(
+                                    'input[name="products[0][price]"]');
 
-                                    firstProductSelect.value = product.stock_id;
+                                firstProductSelect.value = product.stock_id;
 
-                                    // Make sure the option is visible in the dropdown
-                                    // Find the option with the matching value and ensure it's available
-                                    let optionExists = false;
-                                    for (let i = 0; i < firstProductSelect.options
-                                        .length; i++) {
-                                        if (firstProductSelect.options[i].value ==
-                                            product.stock_id) {
-                                            optionExists = true;
-                                            break;
-                                        }
+                                // Make sure the option is visible in the dropdown
+                                // Find the option with the matching value and ensure it's available
+                                let optionExists = false;
+                                for (let i = 0; i < firstProductSelect.options
+                                    .length; i++) {
+                                    if (firstProductSelect.options[i].value ==
+                                        product.stock_id) {
+                                        optionExists = true;
+                                        break;
                                     }
+                                }
 
-                                    // If the option doesn't exist, add it
-                                    if (!optionExists) {
-                                        // Find the product name from the original options
-                                        let productName = "Unknown Product";
-                                        const originalSelect = document.querySelector(
-                                            '#mmodalListeDeProduits select.productSelect'
-                                        );
-                                        if (originalSelect && originalSelect
-                                            .originalOptions) {
-                                            for (let opt of originalSelect
-                                                    .originalOptions) {
-                                                if (opt.value == product.stock_id) {
-                                                    productName = opt.text;
-                                                    break;
-                                                }
+                                // If the option doesn't exist, add it
+                                if (!optionExists) {
+                                    // Find the product name from the original options
+                                    let productName = "Unknown Product";
+                                    const originalSelect = document.querySelector(
+                                        '#mmodalListeDeProduits select.productSelect'
+                                    );
+                                    if (originalSelect && originalSelect
+                                        .originalOptions) {
+                                        for (let opt of originalSelect
+                                                .originalOptions) {
+                                            if (opt.value == product.stock_id) {
+                                                productName = opt.text;
+                                                break;
                                             }
                                         }
-
-                                        const newOption = new Option(productName,
-                                            product.stock_id);
-                                        newOption.dataset.price = product.unit_price;
-                                        firstProductSelect.add(newOption);
                                     }
 
-                                    firstProductSelect.value = product.stock_id;
-                                    firstQuantityInput.value = product.quantity;
-                                    firstDiscountInput.value = product.discount || 0;
-                                    firstPriceInput.value = product.unit_price;
-                                } else {
-                                    // For subsequent products, create new rows
-                                    createProductRow();
-
-                                    const productSelect = document.querySelector(
-                                        `select[name="products[${index}][product_id]"]`
-                                    );
-                                    const quantityInput = document.querySelector(
-                                        `input[name="products[${index}][quantity]"]`
-                                    );
-                                    const discountInput = document.querySelector(
-                                        `input[name="products[${index}][discount]"]`
-                                    );
-                                    const priceInput = document.querySelector(
-                                        `input[name="products[${index}][price]"]`);
-
-                                    // Same fix as above for new rows
-                                    let optionExists = false;
-                                    for (let i = 0; i < productSelect.options
-                                        .length; i++) {
-                                        if (productSelect.options[i].value == product
-                                            .stock_id) {
-                                            optionExists = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!optionExists) {
-                                        let productName = "Unknown Product";
-                                        const originalSelect = document.querySelector(
-                                            '#mmodalListeDeProduits select.productSelect'
-                                        );
-                                        if (originalSelect && originalSelect
-                                            .originalOptions) {
-                                            for (let opt of originalSelect
-                                                    .originalOptions) {
-                                                if (opt.value == product.stock_id) {
-                                                    productName = opt.text;
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        const newOption = new Option(productName,
-                                            product.stock_id);
-                                        newOption.dataset.price = product.unit_price;
-                                        productSelect.add(newOption);
-                                    }
-
-                                    productSelect.value = product.stock_id;
-                                    quantityInput.value = product.quantity;
-                                    discountInput.value = product.discount || 0;
-                                    priceInput.value = product.unit_price;
+                                    const newOption = new Option(productName,
+                                        product.stock_id);
+                                    newOption.dataset.price = product.unit_price;
+                                    firstProductSelect.add(newOption);
                                 }
-                            });
-                            // Update all product dropdowns after populating
-                            updateAllProductDropdowns();
 
-                            // Afficher les détails de paiement si nécessaire
-
-                            // Remplir les champs de détails de paiement si disponibles
-                            if (data.payment_details) {
-                                switch (data.commande.payment_mode) {
-                                    case 'mobile_money':
-                                        document.getElementById('mobileNumber').value = data
-                                            .commande.mobile_number || '';
-                                        document.getElementById('mobileReference').value = data
-                                            .commande.mobile_reference || '';
-                                        break;
-                                    case 'bank_transfer':
-                                        document.getElementById('bankName').value = data
-                                            .commande.bank_name || '';
-                                        document.getElementById('bankReference').value = data
-                                            .commande.bank_reference || '';
-                                        break;
-                                    case 'credit_card':
-                                        document.getElementById('cardType').value = data
-                                            .commande.card_type || '';
-                                        document.getElementById('cardReference').value = data
-                                            .commande.card_reference || '';
-                                        break;
-                                    case 'cash':
-                                        document.getElementById('cashReference').value = data
-                                            .commande.cash_reference || '';
-                                        break;
-                                }
-                            }
-
-                            // Ensure payment mode is properly formatted
-                            const paymentMode = data.commande.payment_mode;
-                            console.log("Payment mode:", paymentMode);
-
-                            // First hide all payment details
-                            const allPaymentRows = document.querySelectorAll(
-                                '.payment-details');
-                            allPaymentRows.forEach(row => row.classList.add('d-none'));
-
-                            document.getElementById('paymentDetailsContainer').classList.remove(
-                                'd-none');
-
-                            // Détails supplémentaires selon le mode de paiement
-                            if (paymentMode === "mobile_money") {
-                                document.getElementById('mobileMoneyDetails').classList.remove(
-                                    'd-none');
-                                /*  // document.getElementById('mobileMoneyRef').classList.remove(
-                                      'd-none'); */
-                                document.getElementById('mobileNumber').innerText =
-                                    data.commande.mobile_number || 'N/A';
-                                document.getElementById('mobileReference').innerText =
-                                    data.commande.mobile_reference || 'N/A';
-                            } else if (paymentMode === "credit_card") {
-                                document.getElementById('creditCardDetailsType').classList
-                                    .remove('d-none');
-                                document.getElementById('creditCardDetailsRef').classList
-                                    .remove('d-none');
-                                document.getElementById('cardType').innerText = data.commande
-                                    .card_type || 'N/A';
-                                document.getElementById('cardReference').innerText =
-                                    data.commande.card_reference || 'N/A';
-                            } else if (paymentMode === "bank_transfer") {
-                                document.getElementById('bankNameRow').classList.remove(
-                                    'd-none');
-                                document.getElementById('bankReferenceRow').classList.remove(
-                                    'd-none');
-                                document.getElementById('bankName').innerText = data.commande
-                                    .bank_name || 'N/A';
-                                document.getElementById('bankReference').innerText =
-                                    data.commande.bank_reference || 'N/A';
-                            } else if (paymentMode === "cash") {
-                                document.getElementById('cashDetailsOrderPay').classList.remove(
-                                    'd-none');
-                                document.getElementById('cashReference').innerText =
-                                    data.commande.cash_reference || 'N/A';
+                                firstProductSelect.value = product.stock_id;
+                                firstQuantityInput.value = product.quantity;
+                                firstDiscountInput.value = product.discount || 0;
+                                firstPriceInput.value = product.unit_price;
                             } else {
-                                console.log("Unknown payment mode:", paymentMode);
+                                // For subsequent products, create new rows
+                                createProductRow();
+
+                                const productSelect = document.querySelector(
+                                    `select[name="products[${index}][product_id]"]`
+                                );
+                                const quantityInput = document.querySelector(
+                                    `input[name="products[${index}][quantity]"]`
+                                );
+                                const discountInput = document.querySelector(
+                                    `input[name="products[${index}][discount]"]`
+                                );
+                                const priceInput = document.querySelector(
+                                    `input[name="products[${index}][price]"]`);
+
+                                // Same fix as above for new rows
+                                let optionExists = false;
+                                for (let i = 0; i < productSelect.options
+                                    .length; i++) {
+                                    if (productSelect.options[i].value == product
+                                        .stock_id) {
+                                        optionExists = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!optionExists) {
+                                    let productName = "Unknown Product";
+                                    const originalSelect = document.querySelector(
+                                        '#mmodalListeDeProduits select.productSelect'
+                                    );
+                                    if (originalSelect && originalSelect
+                                        .originalOptions) {
+                                        for (let opt of originalSelect
+                                                .originalOptions) {
+                                            if (opt.value == product.stock_id) {
+                                                productName = opt.text;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    const newOption = new Option(productName,
+                                        product.stock_id);
+                                    newOption.dataset.price = product.unit_price;
+                                    productSelect.add(newOption);
+                                }
+
+                                productSelect.value = product.stock_id;
+                                quantityInput.value = product.quantity;
+                                discountInput.value = product.discount || 0;
+                                priceInput.value = product.unit_price;
                             }
+                        });
+                        // Update all product dropdowns after populating
+                        updateAllProductDropdowns();
 
-                            // Modifier l'action du formulaire pour la mise à jour
-                            const form = document.querySelector('#mmodalListeDeProduits form');
-                            form.action = `/commandes/${serviceId}/update`;
+                        // Afficher les détails de paiement si nécessaire
 
-                            // Changer le texte du bouton de soumission
-                            const submitButton = document.querySelector(
-                                '#mmodalListeDeProduits button[type="submit"]');
-                            submitButton.textContent = 'Mettre à jour la commande';
-                        } else {
-                            alert('Impossible de récupérer les détails de la commande.');
+                        // Remplir les champs de détails de paiement si disponibles
+                        if (data.payment_details) {
+                            switch (data.commande.payment_mode) {
+                                case 'mobile_money':
+                                    document.getElementById('mobileNumber').value = data
+                                        .commande.mobile_number || '';
+                                    document.getElementById('mobileReference').value = data
+                                        .commande.mobile_reference || '';
+                                    break;
+                                case 'bank_transfer':
+                                    document.getElementById('bankName').value = data
+                                        .commande.bank_name || '';
+                                    document.getElementById('bankReference').value = data
+                                        .commande.bank_reference || '';
+                                    break;
+                                case 'credit_card':
+                                    document.getElementById('cardType').value = data
+                                        .commande.card_type || '';
+                                    document.getElementById('cardReference').value = data
+                                        .commande.card_reference || '';
+                                    break;
+                                case 'cash':
+                                    document.getElementById('cashReference').value = data
+                                        .commande.cash_reference || '';
+                                    break;
+                            }
                         }
-                    };
-                    xhr.send();
-                });
+
+                        // Ensure payment mode is properly formatted
+                        const paymentMode = data.commande.payment_mode;
+                        console.log("Payment mode:", paymentMode);
+
+                        // First hide all payment details
+                        const allPaymentRows = document.querySelectorAll(
+                            '.payment-details');
+                        allPaymentRows.forEach(row => row.classList.add('d-none'));
+
+                        document.getElementById('paymentDetailsContainer').classList.remove(
+                            'd-none');
+
+                        // Détails supplémentaires selon le mode de paiement
+                        if (paymentMode === "mobile_money") {
+                            document.getElementById('mobileMoneyDetails').classList.remove(
+                                'd-none');
+                            /*  // document.getElementById('mobileMoneyRef').classList.remove(
+                                  'd-none'); */
+                            document.getElementById('mobileNumber').innerText =
+                                data.commande.mobile_number || 'N/A';
+                            document.getElementById('mobileReference').innerText =
+                                data.commande.mobile_reference || 'N/A';
+                        } else if (paymentMode === "credit_card") {
+                            document.getElementById('creditCardDetailsType').classList
+                                .remove('d-none');
+                            document.getElementById('creditCardDetailsRef').classList
+                                .remove('d-none');
+                            document.getElementById('cardType').innerText = data.commande
+                                .card_type || 'N/A';
+                            document.getElementById('cardReference').innerText =
+                                data.commande.card_reference || 'N/A';
+                        } else if (paymentMode === "bank_transfer") {
+                            document.getElementById('bankNameRow').classList.remove(
+                                'd-none');
+                            document.getElementById('bankReferenceRow').classList.remove(
+                                'd-none');
+                            document.getElementById('bankName').innerText = data.commande
+                                .bank_name || 'N/A';
+                            document.getElementById('bankReference').innerText =
+                                data.commande.bank_reference || 'N/A';
+                        } else if (paymentMode === "cash") {
+                            document.getElementById('cashDetailsOrderPay').classList.remove(
+                                'd-none');
+                            document.getElementById('cashReference').innerText =
+                                data.commande.cash_reference || 'N/A';
+                        } else {
+                            console.log("Unknown payment mode:", paymentMode);
+                        }
+
+                        // Modifier l'action du formulaire pour la mise à jour
+                        const form = document.querySelector('#mmodalListeDeProduits form');
+                        form.action = `/commandes/${serviceId}/update`;
+
+                        // Changer le texte du bouton de soumission
+                        const submitButton = document.querySelector(
+                            '#mmodalListeDeProduits button[type="submit"]');
+                        submitButton.textContent = 'Mettre à jour la commande';
+                    } else {
+                        alert('Impossible de récupérer les détails de la commande.');
+                    }
+                };
+                xhr.send();
             });
-            // Fonction pour réinitialiser complètement le conteneur des produits
+        });
+        // Fonction pour réinitialiser complètement le conteneur des produits
         function resetProductsContainer() {
             const productsContainer = document.getElementById('productsContainer');
 
@@ -595,8 +648,7 @@
                 document.getElementById('totalPrice').textContent = total.toFixed(2);
             }
         }
-
     </script>
-    
-    
+
+
 @endsection
