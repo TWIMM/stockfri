@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Livraisons;
+use App\Models\Clients;
+use App\Models\Stock;
 
 class LivraisonController extends Controller
 {
@@ -32,6 +34,8 @@ class LivraisonController extends Controller
         if ($email = request('email')) {
             $query->where('email', 'like', "%" . $email . "%");
         }
+        $clients = Clients::where('user_id' ,$user->id)->get();
+
     
         // Apply the 'tel' (telephone) filter if provided
         if ($tel = request('tel')) {
@@ -40,8 +44,9 @@ class LivraisonController extends Controller
     
         // Get the filtered clients and paginate the results
         $livraisons = $query->paginate(10);
-    
+        $stocks = Stock::where('user_id' ,$user->id)->get();
+
         return view('users.livraisons.index', compact('livraisons', 'hasPhysique', 
-            'hasPrestation', "businesses", 'user'));
+            'hasPrestation', "businesses", 'user' , 'clients' , 'stocks'));
     }
 }
