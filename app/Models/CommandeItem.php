@@ -31,7 +31,7 @@ class CommandeItem extends Model
     
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Services::class);
     }
     
     public function calculateTotalPrice()

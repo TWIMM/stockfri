@@ -357,8 +357,10 @@ class OrderController extends Controller
             return Clients::find($id);
         };
 
-        // Start the query for commandes
-        $query = Commandes::where('user_id', $user->id)
+        $query = Commandes::whereHas('commandeItems', function ($query) {
+            $query->whereNull('service_id'); // Filters CommandItems where service_id is null
+        })
+        ->where('user_id', $user->id) // Filters by the user ID
         ->where('validation_status', 'approved');
         
         // Apply filters
@@ -472,9 +474,11 @@ class OrderController extends Controller
 
         
 
-        // Initialize the query for 'not_approved' commandes
-        $query = Commandes::where('user_id', $user->id)
-            ->where('validation_status', 'not_approved');
+        $query = $query = Commandes::whereHas('commandeItems', function ($query) {
+            $query->whereNull('service_id'); // Filters CommandItems where service_id is null
+        })
+        ->where('user_id', $user->id)
+        ->where('validation_status', 'not_approved');
 
         // Apply filters based on form input
         if ($clientId = request('client')) {

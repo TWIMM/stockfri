@@ -9,9 +9,131 @@ use App\Models\Clients;
 use App\Models\Stock;
 use App\Models\Commandes;
 use App\Models\CommandeItem;
+use Illuminate\Support\Facades\DB;
+use App\Services\InvoiceService;
+use App\Models\Invoice;
+use Carbon\Carbon;
 
 class ServicesController extends Controller
 {
+    protected $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
+    private function mapInvoiceStatus($orderStatus)
+    {
+        switch ($orderStatus) {
+            case 'paid':
+                return 'paid';
+            case 'partially_paid':
+                return 'partial';
+            case 'unpaid':
+                return 'pending';
+            default:
+                return 'generated';
+        }
+    }
+
+    private function getInvoiceStatusLabel($status)
+    {
+        $statuses = [
+            'paid' => 'Payée',
+            'partially_paid' => 'Partiellement payée',
+            'unpaid' => 'Non payée'
+        ];
+        
+        return $statuses[$status] ?? $status;
+    }
+
+    private function getPaymentModeLabel($mode)
+    {
+        $modes = [
+            'cash' => 'Espèces',
+            'credit_card' => 'Carte de crédit',
+            'mobile_money' => 'Mobile Money',
+            'bank_transfer' => 'Virement bancaire'
+        ];
+        
+        return $modes[$mode] ?? $mode;
+    }
+
+    private function generateInvoiceFromOrder(Commandes $commande)
+    {
+        // Format client data
+        $clientData = [
+            'name' => $commande->client->name,
+            'phone' => $commande->client->phone,
+            'custom_fields' => [
+                'ID Client' => $commande->client->id,
+                'Email' => $commande->client->email ?? '',
+            ],
+        ];
+
+        // Format customer data (using the same client data for now)
+        $customerData = [
+            'name' => $commande->client->name,
+            'address' => $commande->client->address ?? '',
+            'code' => 'CMD-' . $commande->id,
+            'custom_fields' => [
+                'Date Commande' => $commande->created_at->format('d/m/Y'),
+            ],
+            'email' => $commande->client->email ?? '',
+        ];
+
+        // Format items data
+        $itemsData = [];
+        foreach ($commande->commandeItems as $item) {
+            $itemsData[] = [
+                'name' => $item->service->title,
+                'description' => $item->service->description ?? 'Produit',
+                'price' => $item->unit_price,
+                'quantity' => $item->quantity,
+                'discount' => $item->discount,
+            ];
+        }
+
+        // Add notes
+        $notes = [
+            'Mode de paiement: ' . $this->getPaymentModeLabel($commande->payment_mode),
+            'TVA: ' . $commande->tva . '%',
+            'Statut: ' . $this->getInvoiceStatusLabel($commande->invoice_status),
+        ];
+
+        // Generate the invoice using the service
+        $invoiceLink = $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes);
+        
+        // Create invoice record in database
+        $invoiceNumber = 'INV-' . date('Ymd') . '-' . $commande->id;
+        
+        $invoice = Invoice::create([
+            'commande_id' => $commande->id,
+            'invoice_number' => $invoiceNumber,
+            'invoice_date' => Carbon::now(),
+            'invoice_link' => $invoiceLink,
+            'total_amount' => $commande->total_price,
+            'status' => $this->mapInvoiceStatus($commande->invoice_status)
+        ]);
+        
+        return $invoice;
+    }
+
+    public function generateOrderInvoice($commande_id)
+    {
+        try {
+            $commande = Commandes::with(['client', 'items.stock'])->findOrFail($commande_id);
+            
+            // Generate and save invoice
+            $invoice = $this->generateInvoiceFromOrder($commande);
+            
+            return redirect()->back()->with('success', 'Facture générée avec succès. Lien: ' . $invoice->invoice_link);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la génération de la facture: ' . $e->getMessage());
+        }
+    }
+
     public function index()
     {
         if(auth()->user()->type === 'team_member'){

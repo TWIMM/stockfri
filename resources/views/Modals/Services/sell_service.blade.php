@@ -112,8 +112,7 @@
                         <h6 class="mb-3">Facture</h6>
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <input type="file" class="form-control" id="factureId"
-                                    name="factureName">
+                                <input type="file" class="form-control" id="factureId" name="factureName">
                             </div>
                         </div>
                     </div>
@@ -185,7 +184,7 @@
                             </div>
                         </div>
 
-                        
+
                     </div>
                 </div>
 
@@ -343,7 +342,7 @@
         }
     });
 
-   
+
 
     // Initialize event listeners for product selects on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -365,6 +364,48 @@
         // Initialize available products
         updateAvailableProducts();
 
-        
+
     });
+
+
+    // Function to toggle payment details visibility based on invoice status and payment mode
+    function togglePaymentDetails() {
+        const invoiceStatus = document.getElementById('invoiceStatus').value;
+        const paymentMode = document.getElementById('paymentMode').value;
+        const paymentDetailsContainer = document.getElementById('paymentDetailsContainer');
+
+        // Hide all payment detail fields first
+        document.querySelectorAll('.payment-details').forEach(detail => {
+            detail.classList.add('d-none');
+        });
+
+        // Only show payment details if invoice status is "paid" or "partially_paid"
+        if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
+            paymentDetailsContainer.classList.remove('d-none');
+
+            // Show the specific payment detail fields based on payment mode
+            if (paymentMode === 'mobile_money') {
+                document.getElementById('mobileMoneyDetails').classList.remove('d-none');
+            } else if (paymentMode === 'bank_transfer') {
+                document.getElementById('bankTransferDetails').classList.remove('d-none');
+            } else if (paymentMode === 'credit_card') {
+                document.getElementById('creditCardDetails').classList.remove('d-none');
+            } else if (paymentMode === 'cash') {
+                document.getElementById('cashDetails').classList.remove('d-none');
+            }
+        } else {
+            paymentDetailsContainer.classList.add('d-none');
+        }
+
+        // Toggle the "already paid" input based on invoice status
+        if (invoiceStatus === 'paid' || invoiceStatus === 'unpaid') {
+            document.getElementById('alreadyPayIInput').classList.add('d-none');
+        } else if (invoiceStatus === 'partially_paid') {
+            document.getElementById('alreadyPayIInput').classList.remove('d-none');
+        }
+    }
+
+    // Event listeners for invoice status and payment mode changes
+    document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
+    document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
 </script>
