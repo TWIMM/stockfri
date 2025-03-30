@@ -92,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/services/{id}', [ServicesController::class, 'edit']);  // Used for fetching service data for editing
     Route::post('/services/{id}/update', [ServicesController::class, 'update'])->name('services.update');
     Route::get('/services/delete/{id}', [ServicesController::class, 'destroy'])->name('services.delete');
+    Route::post('/services/sell', [ServicesController::class, 'order'])->name('services.order');
 
 
     //stock 

@@ -6,7 +6,8 @@
 
     @include('Modals.add_services')
     @include('Modals.edit_services')
-
+    @include('Modals.Services.sell_service')
+    @include('Modals.add_client')
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
@@ -15,6 +16,13 @@
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
                             Ajouter un nouveau service
                         </button>
+
+                        <button type="button"  id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVente">
+                            <i class="ti ti-receipt"></i>
+                        </button> 
+                        <button type="button"  id='edit-stock-btn' class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addClientModal">
+                            <i class="ti ti-plus"></i>
+                        </button> 
                     </div>
                 </div>
 
@@ -34,7 +42,7 @@
                                     <tr>
                                         <td>{{ $service->title }}</td>
                                         <td>{{ $service->description }}</td>
-                                        <td>{{ $service->price }} €</td>
+                                        <td>{{ $service->price }} FCFA</td>
                                         <td>
                                             <!-- Edit Button -->
                                             <button type="button" data-id="{{ $service->id }}" class="btn btn-primary"
