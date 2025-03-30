@@ -44,11 +44,11 @@
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="min_price">Prix minimum</label>
-                                <input type="number" name="min_price" id="min_price" class="form-control" value="{{ request('min_price') }}">
+                                <input min=0 type="number" name="min_price" id="min_price" class="form-control" value="{{ request('min_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="max_price">Prix maximum</label>
-                                <input type="number" name="max_price" id="max_price" class="form-control" value="{{ request('max_price') }}">
+                                <input min=0 type="number" name="max_price" id="max_price" class="form-control" value="{{ request('max_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_start">Date début</label>
