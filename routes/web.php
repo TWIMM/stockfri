@@ -93,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/services/{id}/update', [ServicesController::class, 'update'])->name('services.update');
     Route::get('/services/delete/{id}', [ServicesController::class, 'destroy'])->name('services.delete');
     Route::post('/services/sell', [ServicesController::class, 'order'])->name('services.order');
+    Route::post('/services/precommandes', [ServicesController::class, 'getPrecommandes'])->name('pre_commandes.services');
+    Route::post('/services/commandes', [ServicesController::class, 'activeCommandes'])->name('commandes.services');
 
 
     //stock 

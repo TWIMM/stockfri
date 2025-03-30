@@ -78,7 +78,7 @@
 
                         <li class="nav-item nav-search-inputs me-auto">
                             <div class="top-nav-search">
-                                @if(request()->routeIs('dashboard.*'))
+                                @if (request()->routeIs('dashboard.*'))
                                     <a href="javascript:void(0);" class="responsive-search">
                                         <i class="fa fa-search"></i>
                                     </a>
@@ -229,9 +229,9 @@
                                         </ul>
                                     </li>
 
-                                    @if ($hasPhysique  || $hasPrestation)
+                                    @if ($hasPhysique || $hasPrestation)
                                         <li class="submenu">
-                                            <a class="{{ request()->routeIs('finances.*')  ? 'subdrop active' : '' }}"
+                                            <a class="{{ request()->routeIs('finances.*') ? 'subdrop active' : '' }}"
                                                 href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
                                                 <span>Finances</span>
                                                 <span class="menu-arrow"></span>
@@ -241,14 +241,14 @@
                                                         class="{{ request()->routeIs('finances.dettes') ? 'active' : '' }}">Gestion
                                                         des dettes</a></li>
                                                 <li><a href="{{ route('finances.paiement') }}"
-                                                            class="{{ request()->routeIs('finances.paiement') ? 'active' : '' }}">Gestion
-                                                            des paiements</a></li>
+                                                        class="{{ request()->routeIs('finances.paiement') ? 'active' : '' }}">Gestion
+                                                        des paiements</a></li>
 
                                             </ul>
                                         </li>
                                     @endif
 
-                                    
+
 
 
                                     @if ($hasPhysique)
@@ -267,10 +267,10 @@
                                                 <li><a href="{{ route('stock.listes') }}"
                                                         class="{{ request()->routeIs('stock.listes') ? 'active' : '' }}">Gerer
                                                         stock</a></li>
-                                                
+
                                                 <li><a href="{{ route('stock.moves') }}"
-                                                            class="{{ request()->routeIs('stock.moves') ? 'active' : '' }}">Mouvements
-                                                            stock</a></li>
+                                                        class="{{ request()->routeIs('stock.moves') ? 'active' : '' }}">Mouvements
+                                                        stock</a></li>
                                             </ul>
                                         </li>
 
@@ -328,6 +328,15 @@
                                             <ul>
                                                 <li><a class="{{ request()->routeIs('services.listes') ? 'active' : '' }}"
                                                         href="{{ route('services.listes') }}">Gerer services</a></li>
+                                                <li><a href="{{ route('clients.listes') }}"
+                                                        class="{{ request()->routeIs('clients.listes') ? 'active' : '' }}">Gestion
+                                                        des clients</a></li>
+                                                <li><a href="{{ route('pre_commandes.services') }}"
+                                                        class="{{ request()->routeIs('pre_commandes.services') ? 'active' : '' }}">Approuver
+                                                        des commandes</a></li>
+                                                <li><a href="{{ route('commandes.services') }}"
+                                                        class="{{ request()->routeIs('commandes.services') ? 'active' : '' }}">
+                                                        Commandes actives</a></li>
                                             </ul>
                                         </li>
                                     @endif
