@@ -66,7 +66,7 @@ class DashboardController extends Controller
             ->get(); 
             $countApprovedSelledServices = count($commandeApproved);
 
-            $query = $query = Commandes::whereHas('commandeItems', function ($query) {
+            $query  = Commandes::whereHas('commandeItems', function ($query) {
                 $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
             })
             ->where('user_id', $user->id)
@@ -99,8 +99,45 @@ class DashboardController extends Controller
                 $query->where('created_at', '<=', $dateEnd);  // Filter by end date
             }
     
-            // Execute the query and paginate the results
+            // Execute the query and paginate the results //SERVICES
             $commandeNotApproved = $query->paginate(10);
+
+
+            $querypROD  = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
+            })
+            ->where('user_id', $user->id)
+            ->where('validation_status', 'approved');
+    
+            // Apply filters based on form input
+            if ($clientId = request('client')) {
+                $querypROD->where('client_id', $clientId);  // Filter by client ID
+            }
+    
+            if ($status = request('status')) {
+                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
+                    $querypROD->where('delivery_status', $status);  // Filter by delivery status
+                }
+            }
+    
+            if ($minPrice = request('min_price')) {
+                $querypROD->where('total_price', '>=', $minPrice);  // Filter by minimum price
+            }
+    
+            if ($maxPrice = request('max_price')) {
+                $querypROD->where('total_price', '<=', $maxPrice);  // Filter by maximum price
+            }
+    
+            if ($dateStart = request('date_start')) {
+                $querypROD->where('created_at', '>=', $dateStart);  // Filter by start date
+            }
+    
+            if ($dateEnd = request('date_end')) {
+                $querypROD->where('created_at', '<=', $dateEnd);  // Filter by end date
+            }
+    
+            // Execute the query and paginate the results //SERVICES
+            $approvedSelledProduct = $querypROD->paginate(10);
            
 
              // Get additional data
@@ -109,7 +146,7 @@ class DashboardController extends Controller
             $stocks = Stock::where('user_id', $user->id)->paginate(10);
 
 
-            return view('welcome', compact('businesses' , 'categories', 'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
+            return view('welcome', compact('businesses' , 'categories', 'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
         } else if(auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }
