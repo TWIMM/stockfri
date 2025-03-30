@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="GET" action="{{ route('magasins.listes') }}" class="mb-4">
+                    <form method="GET" action="{{ route('magasins.detail' , request('id')) }}" class="mb-4">
                         <div class="row">
                             <div class="col-md-4 mb-2">
                                 <label for="name">Nom</label>
@@ -42,7 +42,7 @@
                             </div>
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
-                                <a href="{{ route('magasins.listes') }}" class="btn btn-secondary">Réinitialiser</a>
+                                <a href="{{ route('magasins.detail',  request('id')) }}" class="btn btn-secondary">Réinitialiser</a>
                             </div>
                         </div>
                     </form>

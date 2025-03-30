@@ -19,21 +19,38 @@ class MagasinsController extends Controller
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $businesses = $user->business; 
         $categories = $user->categorieProduits; 
         $fournisseurs = $user->fournisseurs; 
-        $businesses = $user->business; 
         $stocks = Stock::where('user_id' ,$user->id)->get();
 
-        $magasins = Magasins::where('user_id' ,$user->id)->paginate(10);
-        return view('users.magasins.index', compact('magasins','hasPhysique', 
-            'hasPrestation', "businesses",  'user' , "categories" , "fournisseurs" , "stocks"));
+        // Build query to filter magasins
+        $query = Magasins::where('user_id', $user->id);
+
+        // Apply filters if the input is provided
+        if ($name = request('search')) {
+            $query->where('name', 'like', "%{$name}%");
+        }
+
+        if ($quantity = request('email')) {
+            $query->where('email', '>=', $quantity); // Filter magasins where quantity is greater than or equal to the value
+        }
+
+        if ($price = request('tel')) {
+            $query->where('tel', '<=', $price); // Filter magasins where price is less than or equal to the value
+        }
+
+        // Get the filtered results with pagination
+        $magasins = $query->paginate(10);
+
+        return view('users.magasins.index', compact('magasins', 'hasPhysique', 'hasPrestation', 'businesses', 'user', 'categories', 'fournisseurs', 'stocks'));
     }
 
-    public function showList($id){
+    public function showList($id){ 
         $magasin = Magasins::find($id);
 
         $user = Auth::user();
@@ -47,11 +64,20 @@ class MagasinsController extends Controller
 
 
         $magasin = Magasins::find($id);
-        $stocksOfMagasin =  DB::table('magasin_stock')
-        ->where('magasin_id', $id)
-        ->get();
+        $stocksQuery = DB::table('magasin_stock')
+            ->where('magasin_id', $id);
+
+        /* if ($name = request('name')) {
+            $stocksQuery->where('name', 'like', "%" . $name . "%");
+        } */
+        if ($quantity = request('quantity')) {
+            $stocksQuery->where('quantity', '>=', $quantity);  // Filters stocks with quantity greater than or equal to the value
+        }
+        /* if ($price = request('price')) {
+            $stocksQuery->where('price', '>=', $price);
+        } */
+        $stocksOfMagasin = $stocksQuery->get();
         $stocks = Stock::where('user_id' ,$user->id)->get();
-        //dd($stocksOfMagasin);
         $stocksArray = [];
         foreach ($stocksOfMagasin as $magasinStock) {
             // Fetch the related Stock record based on the stock_id in magasin_stock
@@ -59,6 +85,18 @@ class MagasinsController extends Controller
     
             // If stock exists, push it into the array (formatted to the desired structure)
             if ($stock) {
+                if ($name = request('name')) {
+                    if (stripos($stock->name, $name) === false) {
+                        continue;  // Skip this stock if the name does not match
+                    }
+                }
+    
+                // Filter by 'price' if the 'price' filter is provided
+                if ($price = request('price')) {
+                    if ($stock->price < $price) {
+                        continue;  // Skip this stock if the price is less than the provided value
+                    }
+                }
                 $stocksArray[] = (object)[
                     'id' => $magasinStock->id,
                     'magasin_id' => $magasinStock->magasin_id, 
@@ -77,6 +115,8 @@ class MagasinsController extends Controller
             'hasPrestation', "businesses", 'clients',  'user' , "categories" , "fournisseurs" , "stocks" , "stocksArray"));
 
     }
+    
+
 
 
     public function store(Request $request)

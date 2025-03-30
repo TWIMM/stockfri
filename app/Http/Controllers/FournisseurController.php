@@ -13,15 +13,41 @@ class FournisseurController extends Controller
         if(auth()->user()->type === 'team_member'){
             return redirect()->route('dashboard_team_member');
         }
+
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
-        $businesses = $user->business; 
+        $businesses = $user->business;
 
-        $fournisseurs = Fournisseur::where('user_id' ,$user->id)->paginate(10); 
-        return view('users.fournisseurs.index', compact('fournisseurs','hasPhysique', 
-            'hasPrestation', "businesses",  'user'));
+        // Build query to filter suppliers
+        $query = Fournisseur::where('user_id', $user->id);
+
+        // Filter by 'search' if provided
+        if ($search = request('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Filter by 'email' if provided
+        if ($email = request('email')) {
+            $query->where('email', 'like', "%{$email}%");
+        }
+
+        // Filter by 'phone' if provided
+        if ($phone = request('phone')) {
+            $query->where('phone', 'like', "%{$phone}%");
+        }
+
+        // Filter by 'address' if provided
+        if ($address = request('address')) {
+            $query->where('address', 'like', "%{$address}%");
+        }
+
+        // Get the filtered results with pagination
+        $fournisseurs = $query->paginate(10);
+
+        return view('users.fournisseurs.index', compact('fournisseurs', 'hasPhysique', 'hasPrestation', 'businesses', 'user'));
     }
+
 
     // Afficher le formulaire de création
     public function create()
