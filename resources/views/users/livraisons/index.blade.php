@@ -5,7 +5,7 @@
 @section('content')
 
     @include('Modals.listes_des_produits_no_update')
-    @include('Modals.order_clients')
+    @include('Modals.livraisons_details')
     @include('Modals.risk_high')
     @include('Modals.orderpay')
     @include('Modals.risk_low')
@@ -87,7 +87,9 @@
                                                 data-bs-target="#mmodalListeDeProduits" class="btn btn-sm btn-secondary"><i class="ti ti-eye"></i></button>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-sm bg-blue"><i class="ti ti-eye"></i></button>
+                                            <button type="button" data-id='{{ $eachLiv->commande_id }}'
+                                                id='precommande-btn' data-bs-toggle="modal"
+                                                data-bs-target="#livraisonDetailsModal" class="btn btn-sm bg-violet"><i class="ti ti-eye"></i></button>
                                         </td>
                                         <td> {{$eachLiv->delivery_status}}</td>
                                         <td> {{number_format($eachLiv->shipping_cost)}}</td>
