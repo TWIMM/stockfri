@@ -19,6 +19,7 @@ use App\Models\TeamMember;
 use App\Models\ClientDebt;
 use App\Models\User;
 use App\Models\Pay;
+use App\Models\MouvementDeStocks;
 
 class OrderController extends Controller
 {
@@ -357,7 +358,8 @@ class OrderController extends Controller
         };
 
         // Start the query for commandes
-        $query = Commandes::where('user_id', $user->id);
+        $query = Commandes::where('user_id', $user->id)
+        ->where('validation_status', 'approved');
         
         // Apply filters
         // Filter by client if provided
@@ -467,6 +469,8 @@ class OrderController extends Controller
         $getClientFromId = function($id) {
             return Clients::find($id);
         };
+
+        
 
         // Initialize the query for 'not_approved' commandes
         $query = Commandes::where('user_id', $user->id)
@@ -821,6 +825,16 @@ class OrderController extends Controller
                 if ($discount > 0) {
                     $itemTotal = $itemTotal - ($itemTotal * ($discount / 100));
                 }
+
+
+                MouvementDeStocks::create([
+                    'stock_id' => $productData['product_id'],
+                    'magasin_id' => $request->client_id, //magasin id is client id in this case
+                    'quantity' => $quantity,
+                    'user_id' => Auth::id(),
+                    'type_de_mouvement' => env('ACHAT_CLIENT'),
+                    'files_paths' => null
+                ]);
                 
                 $totalOrderPrices += $itemTotal;
             }
