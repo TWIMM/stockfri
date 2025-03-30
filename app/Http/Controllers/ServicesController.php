@@ -51,6 +51,12 @@ class ServicesController extends Controller
             'price' => 'required|numeric',
         ]);
 
+        $business = Business::find($request->business_id); 
+
+        if(!$business || $business->type === 'business_physique'){
+            return back()->with('error', 'Le business est un business physique');
+        }
+
         $service = new Services();
         //$service->business_id = auth()->user()->business_id;
         $service->title = $request->title;
