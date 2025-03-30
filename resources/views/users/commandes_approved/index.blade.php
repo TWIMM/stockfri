@@ -141,7 +141,7 @@
                                                         // You can handle the response here
                                                         console.log(data);
 
-                                                        if (data.exists === true) {
+                                                        if (data.exists == true) {
                                                             // Example: You could use the livraison data to populate hidden fields or modals
                                                             const livraison = data.livraison;
                                                             document.getElementById(`status_livraison${commandeIdLoaded}`).value = livraison.delivery_status;
@@ -149,6 +149,7 @@
                                                         } else {
                                                             // Handle case where livraison doesn't exist
                                                             console.log(`Livraison not found for commande ${commandeIdLoaded}`);
+                                                            document.getElementById(`status_livraison${commandeIdLoaded}`).value = 'none';
                                                         }
                                                     })
                                                     .catch(error => {
