@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="modalVenteLabel">Nouvelle Vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('service.order') }}" method="POST">
+            <form action="{{ route('services.order') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <!-- Sélectionner un client -->

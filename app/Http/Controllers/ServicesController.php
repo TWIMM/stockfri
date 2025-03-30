@@ -35,7 +35,7 @@ class ServicesController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'magasin_id' => 'required|exists:magasins,id',
+            //'magasin_id' => 'required|exists:magasins,id',
             'products' => 'required|array',
             'products.*.product_id' => 'required|exists:stocks,id',
             'products.*.quantity' => 'required|integer|min:1',
@@ -160,7 +160,7 @@ class ServicesController extends Controller
                 'payment_mode' => $request->payment_mode,
                 'invoice_status' => $request->invoice_status,
                 'tva' => $request->tva,
-                'magasin_id' => $request->magasin_id,
+                //'magasin_id' => $request->magasin_id,
                 // Payment details based on payment mode
                 'mobile_number' => $request->mobile_number,
                 'mobile_reference' => $request->mobile_reference,
