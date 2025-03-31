@@ -168,7 +168,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('approve_client_order', [OrderController::class, 'approveClientOrder'])->name('commandes.approveClientOrder'); // Show individual supplier
     Route::get('/invoices/{id}', [InvoiceController::class, 'retrieveUrl'])->name('invoices.retrieveUrl'); // Show individual supplier
     Route::get('/clients/{client}/debts', [OrderController::class, 'getClientDebts'])->name('clients.debts');
-    
+    Route::get('/profile_page', [DashboardController::class, 'profilePage'])->name('profile.page');
+
     Route::prefix('pays')->group(function () {
         Route::post('/', [PayController::class, 'pay'])->name('finances.handle_dette');
         Route::get('{commandId}', [PayController::class, 'show']);
