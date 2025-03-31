@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LivraisonController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PayController;
+use App\Http\Controllers\ProfileController;
 
 
 Route::get('/invoice', [InvoiceController::class, 'generateInvoice'])->name('invoice');
@@ -145,6 +146,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Route to show the edit form for a category
     Route::get('/categories/{id}', [CategorieProduitController::class, 'edit'])->name('categories.edit');
+    Route::put('/update_general_profile', [ProfileController::class, 'updateGeneralProfile'])->name('profile.update');
 
     // Route to update a category
     Route::put('/categories/{category}', [CategorieProduitController::class, 'update'])->name('categories.update');

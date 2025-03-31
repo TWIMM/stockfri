@@ -29,6 +29,9 @@ class User extends Authenticatable
         'type',
         'otp_hashed',
         'is_email_verified',
+        'address',  
+        'country',  
+        'city',  
     ];
 
     /**

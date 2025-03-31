@@ -70,7 +70,7 @@ class Commandes extends Model
             'id' => $commande->id,
             'client' => $commande->client->name, 
             'client_id' => $commande->client_id,
-            'magasin' => $commande->magasin->name, 
+            'magasin' => $commande->magasin ? $commande->magasin->name : 'None', 
             'magasin_id' => $commande->magasin_id,
             'user' => $commande->user->name, 
             'validation_status' => $commande->validation_status,

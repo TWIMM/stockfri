@@ -54,11 +54,11 @@
             <div class="header">
 
                 <div class="header-left active">
-                    <a href="index-2.html" class="logo logo-normal">
+                    <a href="/dashboard" class="logo logo-normal">
                         <img src="/assets/img/logo.svg" alt="Logo">
                         <img src="/assets/img/white-logo.svg" class="white-logo" alt="Logo">
                     </a>
-                    <a href="index-2.html" class="logo-small">
+                    <a href="/dashboard" class="logo-small">
                         <img src="assets/img/logo-small.svg" alt="Logo">
                     </a>
                     <a id="toggle_btn" href="javascript:void(0);">
@@ -111,7 +111,7 @@
                                             <a href="activities.html">
                                                 <div class="media d-flex">
                                                     <span class="avatar flex-shrink-0">
-                                                        <img src="assets/img/profiles/avatar-02.jpg" alt="Profile">
+                                                        <img src="{{ $user->profile_image ? asset('public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/avatar-20.jpg') }}" alt="Profile">
                                                         <span class="badge badge-info rounded-pill"></span>
                                                     </span>
                                                     <div class="media-body flex-grow-1">
@@ -155,11 +155,12 @@
                         </li>
 
 
-                        <li class="nav-item dropdown has-arrow main-drop">
-                            <a href="javascript:void(0);" class="nav-link userset" data-bs-toggle="dropdown">
+                        <li class="nav-item dropdown has-arrow main-drop" >
+                            <a href="javascript:void(0);" onclick="event.preventDefault(); window.location.href = '/profile_page' " class="nav-link userset" data-bs-toggle="dropdown">
                                 <span class="user-info">
                                     <span class="user-letter">
-                                        <img src="/assets/img/profiles/avatar-20.jpg" alt="Profile">
+                                        <img src="{{ $user->profile_image ? asset('/public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/avatar-20.jpg') }}" alt="Profile">
+
                                     </span>
                                     <span class="badge badge-success rounded-pill"></span>
                                 </span>
@@ -174,10 +175,10 @@
                     <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="index-2.html">
+                        <a class="dropdown-item" href="/dashboard">
                             <i class="ti ti-layout-2"></i> Dashboard
                         </a>
-                        <a class="dropdown-item" href="profile.html">
+                        <a class="dropdown-item" href="/profile_page">
                             <i class="ti ti-user-pin"></i> My Profile
                         </a>
                         <a class="dropdown-item" href="login.html">
@@ -194,8 +195,9 @@
                     <div id="sidebar-menu" class="sidebar-menu">
                         <ul>
                             <li class="clinicdropdown">
-                                <a href="profile.html">
-                                    <img src="/assets/img/profiles/avatar-14.jpg" class="img-fluid" alt="Profile">
+                                <a href="/profile_page">
+                                    <img src="{{ $user->profile_image ? asset('public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/avatar-20.jpg') }}" alt="Profile">
+
                                     <div class="user-names">
                                         <h5>{{ $user->name }}</h5>
                                         <h6>Owner</h6>
@@ -407,7 +409,7 @@
                                                 class="menu-arrow"></span>
                                         </a>
                                         <ul>
-                                            <li><a href="profile.html">Profile</a></li>
+                                            <li><a href="/profile_page">Profile</a></li>
                                             <li><a href="security.html">securite</a></li>
                                             <li><a href="invoice-settings.html">Invoice Settings</a></li>
 
@@ -495,7 +497,7 @@
                     });
                 @endforeach
             </script>
-        @endif
+        @endif  
 
         @if (session('error'))
             <script>
@@ -504,7 +506,7 @@
                     zindex: 10000, // Adjust the z-index if needed
                 });
             </script>
-        @endif
+        @endif            
 
         @if (session('success'))
             <script>
