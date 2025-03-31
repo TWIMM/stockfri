@@ -34,6 +34,7 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::get('/team-member-signin/{id}' , [TeamMemberController::class, 'returnConfirmTeamMemberPwd'])->name('signin.team_member');
 Route::get('/user-signin/{id}' , [RegisterController::class, 'ValidateMail'])->name('signin.user_confirm');
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 //protected
 
@@ -180,7 +181,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/client-debts/create',  [OrderController::class, 'createDebtFromCommande'])->name('clients.debts.create');
 });
 
-Route::middleware(['auth']) -> group(function(){
+Route::middleware(['auth']) -> group(function(){ 
     Route::get('/dashboard_team_member', [DashboardController::class, 'team_member'])->name('dashboard_team_member');
 
 });

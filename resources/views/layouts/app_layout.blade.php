@@ -131,6 +131,28 @@
                                 </div>
                             </div>
                         </li>
+                        
+                        <li class="nav-item dropdown nav-item-box">
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Logout">
+                                <i class="ti ti-logout"></i>
+                            </a>
+                            
+                            <form id="logout-form" action="{{ route('logout') }}" method="GET" style="display: none;">
+                                @csrf
+                            </form>
+                            
+                        </li>
+                        
+                        <li class="nav-item dropdown nav-item-box">
+                            <a href="{{ route('dashboard') }}" onclick="event.preventDefault(); window.location.href = '/dashboard'  " data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Dashboard">
+                                <i class="ti ti-home"></i>
+                            </a>
+                            
+                            <form id="dash-form" action="{{ route('dashboard') }}" method="GET" style="display: none;">
+                                @csrf
+                            </form>
+                            
+                        </li>
 
 
                         <li class="nav-item dropdown has-arrow main-drop">
@@ -142,19 +164,7 @@
                                     <span class="badge badge-success rounded-pill"></span>
                                 </span>
                             </a>
-                            <div class="dropdown-menu menu-drop-user">
-                                <div class="profilename">
-                                    <a class="dropdown-item" href="{{route('dashboard')}}">
-                                        <i class="ti ti-layout-2"></i> Dashboard
-                                    </a>
-                                    <a class="dropdown-item" href="profile.html">
-                                        <i class="ti ti-user-pin"></i> My Profile
-                                    </a>
-                                    <a class="dropdown-item" href="login.html">
-                                        <i class="ti ti-lock"></i> Logout
-                                    </a>
-                                </div>
-                            </div>
+                            
                         </li>
 
                     </ul>

@@ -15,6 +15,7 @@ use App\Models\Commandes;
 use App\Models\ClientDebt;
 use App\Models\Magasins;
 use App\Models\Stock;
+use App\Models\Livraisons;
 
 class DashboardController extends Controller
 {
@@ -143,10 +144,34 @@ class DashboardController extends Controller
              // Get additional data
             $clients = Clients::where('user_id', $user->id)->get();
             $magasins = Magasins::where('user_id', $user->id)->paginate(10);
-            $stocks = Stock::where('user_id', $user->id)->paginate(10);
+            //$stocks = Stock::where('user_id', $user->id)->paginate(10);
+            // Start the query to fetch clients
+            $query = Livraisons::where('user_id', $user->id);
+        
+            // Apply the 'search' filter if provided
+            if ($search = request('search')) {
+                $query->where('name', 'like', "%" . $search . "%");
+            }
+        
+            // Apply the 'email' filter if provided
+            if ($email = request('email')) {
+                $query->where('email', 'like', "%" . $email . "%");
+            }
+            $clients = Clients::where('user_id' ,$user->id)->get();
+
+        
+            // Apply the 'tel' (telephone) filter if provided
+            if ($tel = request('tel')) {
+                $query->where('tel', 'like', "%" . $tel . "%");
+            }
+        
+            // Get the filtered clients and paginate the results
+            $livraisons = $query->paginate(10);
+            $stocks = Stock::where('user_id' ,$user->id)->get();
+            $countLivraions = count(Livraisons::where('user_id', $user->id)->get());
 
 
-            return view('welcome', compact('businesses' , 'categories', 'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
+            return view('welcome', compact('businesses' , 'categories' , 'livraisons', 'countLivraions',  'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
         } else if(auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }

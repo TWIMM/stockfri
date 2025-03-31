@@ -88,14 +88,10 @@
                 </li>
                 <li>
                     <a href="javascript:void(0);" class="{{ session('active_tab') == 'delivery' ? 'active' : '' }}" id="tab-delivery" data-target="card-delivery">
-                        Livraison en cours <span>{{ $countApprovedSelledProduct }}</span>
+                        Livraison en cours <span>{{ $countLivraions }}</span>
                     </a>
                 </li>
-                <li>
-                    <a href="javascript:void(0);" class="{{ session('active_tab') == 'payment' ? 'active' : '' }}" id="tab-payment" data-target="card-payment">
-                        Paiements <span>{{ $countApprovedSelledProduct }}</span>
-                    </a>
-                </li>
+                
             </ul>
         </div>
 
@@ -105,7 +101,7 @@
             @elseif(session('active_tab') == 'product')
                 @include('appbranch_without_layout.prod_approved')
             @elseif(session('active_tab') == 'delivery')
-                <div>kjjj</div>
+                @include('appbranch_without_layout.livraison')
             @elseif(session('active_tab') == 'payment')
                 <div>jojoo</div>
             @endif
