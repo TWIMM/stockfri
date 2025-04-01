@@ -55,11 +55,11 @@
 
                 <div class="header-left active">
                     <a href="index-2.html" class="logo logo-normal">
-                        <img src="assets/img/logo.svg" alt="Logo">
-                        <img src="assets/img/white-logo.svg" class="white-logo" alt="Logo">
+                        <img src="/assets/img/logo.svg" alt="Logo">
+                        <img src="/assets/img/white-logo.svg" class="white-logo" alt="Logo">
                     </a>
                     <a href="index-2.html" class="logo-small">
-                        <img src="assets/img/logo-small.svg" alt="Logo">
+                        <img src="/assets/img/logo-small.svg" alt="Logo">
                     </a>
                     <a id="toggle_btn" href="javascript:void(0);">
                         <i class="ti ti-arrow-bar-to-left"></i>
@@ -135,7 +135,7 @@
                             <a href="javascript:void(0);" class="nav-link userset" data-bs-toggle="dropdown">
                                 <span class="user-info">
                                     <span class="user-letter">
-                                        <img src="assets/img/profiles/avatar-20.jpg" alt="Profile">
+                                        <img src="/assets/img/profiles/avatar-20.jpg" alt="Profile">
                                     </span>
                                     <span class="badge badge-success rounded-pill"></span>
                                 </span>
@@ -183,7 +183,7 @@
                         <ul>
                             <li class="clinicdropdown">
                                 <a href="profile.html">
-                                    <img src="assets/img/profiles/avatar-14.jpg" class="img-fluid" alt="Profile">
+                                    <img src="/assets/img/profiles/avatar-14.jpg" class="img-fluid" alt="Profile">
                                     <div class="user-names">
                                         <h5>{{ $realTeamMember->name }}</h5>
                                         <h6>Coequipier</h6>
