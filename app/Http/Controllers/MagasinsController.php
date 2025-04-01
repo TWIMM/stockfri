@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Magasins;
 use App\Models\Stock;
-use Illuminate\Support\Facades\DB;
 use App\Models\MouvementDeStocks;
 use App\Models\Clients;
-
+use App\Models\Team;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\TeamMember;
+use App\Models\Fournisseur;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\DB;
 class MagasinsController extends Controller
 {
     //
@@ -17,7 +21,62 @@ class MagasinsController extends Controller
     public function index()
     {
         if(auth()->user()->type === 'team_member'){
-            return redirect()->route('dashboard_team_member');
+           // return redirect()->route('dashboard_team_member');
+           $teamMember = Auth::user();
+            $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+            
+            $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+            /*  if (!$team) {
+                abort(404, "Vous n'etes membre d'aucune equipe");
+            } */
+
+            
+            //$intBus = Business::find(optional($team->pivot)->business_id);
+            
+            $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+
+            
+            $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+            $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+            view()->share('realTeamMember', $realTeamMember);
+
+
+            $role = Role::find($realTeamMember->role_id);
+            $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+            $role = Role::find($realTeamMember->role_id);
+            view()->share('role', $formattedRole);
+            view()->share('roleObj', $role);
+
+            $categories = $teamBusinessOwner->categorieProduits; 
+            $fournisseurs = $teamBusinessOwner->fournisseurs; 
+            $stocks = Stock::where('user_id' ,$teamBusinessOwner->id)->get();
+
+            // Build query to filter magasins
+            $query = Magasins::where('user_id', $teamBusinessOwner->id);
+
+            // Apply filters if the input is provided
+            if ($name = request('search')) {
+                $query->where('name', 'like', "%{$name}%");
+            }
+
+            if ($quantity = request('email')) {
+                $query->where('email', '>=', $quantity); // Filter magasins where quantity is greater than or equal to the value
+            }
+
+            if ($price = request('tel')) {
+                $query->where('tel', '<=', $price); // Filter magasins where price is less than or equal to the value
+            }
+
+            // Get the filtered results with pagination
+            $magasins = $query->paginate(10);
+
+            return view('dashboard_team_member.magasins.index', compact('magasins', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 'categories', 'fournisseurs', 'stocks'));
+
         }
 
         $user = Auth::user();
@@ -126,20 +185,41 @@ class MagasinsController extends Controller
               'description' => 'nullable|max:1000',
               'tel' => 'required|string',
               'address' => 'required|string',
-              'email' => 'required|string',
+              'email' => 'required|string|unique:magasins,email',
               'business_id' => 'required|exists:business,id',
           ]);
-  
-          Magasins::create([
-              'name' => $request->name,
-              'description' => $request->description,
-              'address' => $request->address,
 
-              'tel' =>  $request->tel,
-              'email' => $request->email,
-              'business_id' => $request->business_id,
-              'user_id' => Auth::id(), 
-          ]);
+            $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+            if($isAuthTeamMemberQuestionMark->type === 'client'){
+                Magasins::create([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                    'address' => $request->address,
+      
+                    'tel' =>  $request->tel,
+                    'email' => $request->email,
+                    'business_id' => $request->business_id,
+                    'user_id' => Auth::id(), 
+                ]);
+            }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+                
+                $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+                //dd(Auth::id());
+                //dd( $test->user_id);
+                Magasins::create([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                    'address' => $request->address,
+      
+                    'tel' =>  $request->tel,
+                    'email' => $request->email,
+                    'business_id' => $request->business_id,
+                    'user_id' => $test->user_id, 
+                ]);
+            }
+  
+          
   
           return redirect()->back()->with('success', 'Magasin ajouté avec succès!');
     }
