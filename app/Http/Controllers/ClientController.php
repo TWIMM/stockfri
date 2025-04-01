@@ -326,13 +326,29 @@ class ClientController extends Controller
             'address' => 'required|string|max:255',
         ]);
 
-        Clients::create([
-            'user_id' => auth()->id(),
-            'name' => $request->name,
-            'email' => $request->email,
-            'tel' => $request->tel,
-            'address' => $request->address,
-        ]);
+       
+
+        $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+        if($isAuthTeamMemberQuestionMark->type === 'client'){
+            Clients::create([
+                'user_id' => auth()->id(),
+                'name' => $request->name,
+                'email' => $request->email,
+                'tel' => $request->tel,
+                'address' => $request->address,
+            ]);
+        }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+            
+            $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+            Clients::create([
+                'user_id' => $test->user_id,
+                'name' => $request->name,
+                'email' => $request->email,
+                'tel' => $request->tel,
+                'address' => $request->address,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Success');
     }
