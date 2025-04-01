@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Stock;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Business;
 use App\Models\MouvementDeStocks;
-
+use App\Models\CategorieProduits;
+use App\Models\Team;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\TeamMember;
+use App\Models\Fournisseur;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
 {
@@ -20,7 +26,63 @@ class StockController extends Controller
     public function index(Request $request)
     {
         if (auth()->user()->type === 'team_member') {
-            return redirect()->route('dashboard_team_member');
+            //return redirect()->route('dashboard_team_member');
+            $teamMember = Auth::user();
+            $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+            
+            $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+            /*  if (!$team) {
+                abort(404, "Vous n'etes membre d'aucune equipe");
+            } */
+
+            
+            //$intBus = Business::find(optional($team->pivot)->business_id);
+            
+            $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+            $categories = $teamBusinessOwner->categorieProduits; 
+            $fournisseurs = $teamBusinessOwner->fournisseurs; 
+            
+            $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+            $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+            view()->share('realTeamMember', $realTeamMember);
+
+
+            $role = Role::find($realTeamMember->role_id);
+            $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+            $role = Role::find($realTeamMember->role_id);
+            view()->share('role', $formattedRole);
+            view()->share('roleObj', $role);
+
+            // Build the query for the stocks, starting with the basic query for the logged-in user
+            $stocksQuery = Stock::where('user_id', $teamBusinessOwner->id);
+
+            // Apply filter by 'name' if provided
+            if ($request->has('name') && !empty($request->name)) {
+                $stocksQuery->where('name', 'like', '%' . $request->name . '%');
+            }
+
+            // Apply filter by 'quantity' if provided
+            if ($request->has('quantity') && !empty($request->quantity)) {
+                $stocksQuery->where('quantity', '<=' ,  $request->quantity);
+            }
+
+            // Apply filter by 'price' if provided
+            if ($request->has('price') && !empty($request->price)) {
+                $stocksQuery->where('price' , '<=' , $request->price);
+            }
+
+            // Paginate the filtered stocks
+            $stocks = $stocksQuery->paginate(10);
+
+            // Return the view with the filtered stocks and other necessary data
+            return view('dashboard_team_member.stocks.index', compact(
+                'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 'categories', 'fournisseurs'
+            ));
         }
 
         $user = Auth::user();
