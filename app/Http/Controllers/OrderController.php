@@ -20,6 +20,9 @@ use App\Models\ClientDebt;
 use App\Models\User;
 use App\Models\Pay;
 use App\Models\MouvementDeStocks;
+use App\Models\Team;
+use App\Models\Role;
+use App\Models\Fournisseur;
 
 class OrderController extends Controller
 {
@@ -344,7 +347,143 @@ class OrderController extends Controller
     public function index()
     {
         if(auth()->user()->type === 'team_member'){
-            return redirect()->route('dashboard_team_member');
+            //return redirect()->route('dashboard_team_member');
+
+            $teamMember = Auth::user();
+            $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+            
+            $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+            /*  if (!$team) {
+                abort(404, "Vous n'etes membre d'aucune equipe");
+            } */
+
+            
+            //$intBus = Business::find(optional($team->pivot)->business_id);
+            
+            $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+
+            
+            $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+            $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+            view()->share('realTeamMember', $realTeamMember);
+
+
+            $role = Role::find($realTeamMember->role_id);
+            $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+            $role = Role::find($realTeamMember->role_id);
+            view()->share('role', $formattedRole);
+            view()->share('roleObj', $role);
+
+
+
+
+            $categories = $teamBusinessOwner->categorieProduits;
+            $fournisseurs = $teamBusinessOwner->fournisseurs;
+
+            // Get the client by ID (for later use in views)
+            $getClientFromId = function($id) {
+                return Clients::find($id);
+            };
+
+            
+
+            $query = $query = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('service_id'); // Filters CommandItems where service_id is null
+            })
+            ->where('user_id', $teamBusinessOwner->id)
+            ->where('validation_status', 'approved');
+
+            // Apply filters based on form input
+            if ($clientId = request('client')) {
+                $query->where('client_id', $clientId);  // Filter by client ID
+            }
+
+            if ($status = request('status')) {
+                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
+                    $query->where('delivery_status', $status);  // Filter by delivery status
+                }
+            }
+
+            if ($minPrice = request('min_price')) {
+                $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
+            }
+
+            if ($maxPrice = request('max_price')) {
+                $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
+            }
+
+            if ($dateStart = request('date_start')) {
+                $query->where('created_at', '>=', $dateStart);  // Filter by start date
+            }
+
+            if ($dateEnd = request('date_end')) {
+                $query->where('created_at', '<=', $dateEnd);  // Filter by end date
+            }
+
+            // Execute the query and paginate the results
+            $commandeNotApproved = $query->paginate(10);
+
+            // Get additional data
+            $clients = Clients::where('user_id', $teamBusinessOwner->id)->get();
+            $magasins = Magasins::where('user_id', $teamBusinessOwner->id)->paginate(10);
+            $stocks = Stock::where('user_id', $teamBusinessOwner->id)->paginate(10);
+
+            // Helper function for badges based on risk levels (same as before)
+            $getBadge = function($riskLevel) {
+                switch ($riskLevel) {
+                    case 'Très faible':
+                        return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
+                    case 'Faible':
+                        return '<span class="badge badge-pill badge-status bg-info">Faible</span>';
+                    case 'Moyen':
+                        return '<span class="badge badge-pill badge-status bg-warning">Moyen</span>';
+                    case 'Élevé':
+                        return '<span class="badge badge-pill badge-status bg-danger">Élevé</span>';
+                    case 'Très élevé':
+                        return '<span class="badge badge-pill badge-status bg-dark">Très élevé</span>';
+                    default:
+                        return '<span class="badge badge-pill badge-status bg-secondary">Inconnu</span>';
+                }
+            };
+
+            // Helper function to fetch client score data by client ID (same as before)
+            $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
+                $client = Clients::find($id);
+
+                if (!$client) {
+                    return null;
+                }
+
+                // Default data for the client
+                $allData = [
+                    'credit_score' => $client->credit_score,
+                    'risk_level' => $client->getRiskLevel(),
+                    'available_credit' => $client->credit_limit - $client->current_debt,
+                    'credit_limit' => $client->credit_limit,
+                    'current_debt' => $client->current_debt,
+                    'last_score_update' => $client->last_score_update
+                ];
+
+                // Return a specific data field if requested
+                if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
+                    return $allData[$dataToReturn];
+                }
+
+                // Return all data by default
+                return (object)$allData;
+            };
+
+            // Pass data to the view
+            return view('dashboard_team_member.commandes_approved.index', compact(
+                'commandeNotApproved', 'hasPhysique', 'hasPrestation',
+                'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
+                'stocks', 'realTeamMember', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
+            ));
         }
 
         $user = Auth::user();
@@ -457,7 +596,143 @@ class OrderController extends Controller
     public function getPreCommandes()
     {
         if(auth()->user()->type === 'team_member'){
-            return redirect()->route('dashboard_team_member');
+            //return redirect()->route('dashboard_team_member');
+
+            $teamMember = Auth::user();
+            $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+            
+            $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+            /*  if (!$team) {
+                abort(404, "Vous n'etes membre d'aucune equipe");
+            } */
+
+            
+            //$intBus = Business::find(optional($team->pivot)->business_id);
+            
+            $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+
+            
+            $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+            $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+            view()->share('realTeamMember', $realTeamMember);
+
+
+            $role = Role::find($realTeamMember->role_id);
+            $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+            $role = Role::find($realTeamMember->role_id);
+            view()->share('role', $formattedRole);
+            view()->share('roleObj', $role);
+
+
+
+
+            $categories = $teamBusinessOwner->categorieProduits;
+            $fournisseurs = $teamBusinessOwner->fournisseurs;
+
+            // Get the client by ID (for later use in views)
+            $getClientFromId = function($id) {
+                return Clients::find($id);
+            };
+
+            
+
+            $query = $query = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('service_id'); // Filters CommandItems where service_id is null
+            })
+            ->where('user_id', $teamBusinessOwner->id)
+            ->where('validation_status', 'not_approved');
+
+            // Apply filters based on form input
+            if ($clientId = request('client')) {
+                $query->where('client_id', $clientId);  // Filter by client ID
+            }
+
+            if ($status = request('status')) {
+                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
+                    $query->where('delivery_status', $status);  // Filter by delivery status
+                }
+            }
+
+            if ($minPrice = request('min_price')) {
+                $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
+            }
+
+            if ($maxPrice = request('max_price')) {
+                $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
+            }
+
+            if ($dateStart = request('date_start')) {
+                $query->where('created_at', '>=', $dateStart);  // Filter by start date
+            }
+
+            if ($dateEnd = request('date_end')) {
+                $query->where('created_at', '<=', $dateEnd);  // Filter by end date
+            }
+
+            // Execute the query and paginate the results
+            $commandeNotApproved = $query->paginate(10);
+
+            // Get additional data
+            $clients = Clients::where('user_id', $teamBusinessOwner->id)->get();
+            $magasins = Magasins::where('user_id', $teamBusinessOwner->id)->paginate(10);
+            $stocks = Stock::where('user_id', $teamBusinessOwner->id)->paginate(10);
+
+            // Helper function for badges based on risk levels (same as before)
+            $getBadge = function($riskLevel) {
+                switch ($riskLevel) {
+                    case 'Très faible':
+                        return '<span class="badge badge-pill badge-status bg-success">Très faible</span>';
+                    case 'Faible':
+                        return '<span class="badge badge-pill badge-status bg-info">Faible</span>';
+                    case 'Moyen':
+                        return '<span class="badge badge-pill badge-status bg-warning">Moyen</span>';
+                    case 'Élevé':
+                        return '<span class="badge badge-pill badge-status bg-danger">Élevé</span>';
+                    case 'Très élevé':
+                        return '<span class="badge badge-pill badge-status bg-dark">Très élevé</span>';
+                    default:
+                        return '<span class="badge badge-pill badge-status bg-secondary">Inconnu</span>';
+                }
+            };
+
+            // Helper function to fetch client score data by client ID (same as before)
+            $getClientScoreDataByClientId = function ($id, $dataToReturn = null) {
+                $client = Clients::find($id);
+
+                if (!$client) {
+                    return null;
+                }
+
+                // Default data for the client
+                $allData = [
+                    'credit_score' => $client->credit_score,
+                    'risk_level' => $client->getRiskLevel(),
+                    'available_credit' => $client->credit_limit - $client->current_debt,
+                    'credit_limit' => $client->credit_limit,
+                    'current_debt' => $client->current_debt,
+                    'last_score_update' => $client->last_score_update
+                ];
+
+                // Return a specific data field if requested
+                if ($dataToReturn && array_key_exists($dataToReturn, $allData)) {
+                    return $allData[$dataToReturn];
+                }
+
+                // Return all data by default
+                return (object)$allData;
+            };
+
+            // Pass data to the view
+            return view('dashboard_team_member.commandes_not_approved.index', compact(
+                'commandeNotApproved', 'hasPhysique', 'hasPrestation',
+                'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
+                'stocks', 'realTeamMember', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
+            ));
         }
         
         $user = Auth::user();
@@ -855,23 +1130,51 @@ class OrderController extends Controller
                 }
             }            
             // Create the order
-            $commande = Commandes::create([
-                'client_id' => $request->client_id,
-                'total_price' => 0, // Will calculate after adding items
-                'payment_mode' => $request->payment_mode,
-                'invoice_status' => $request->invoice_status,
-                'tva' => $request->tva,
-                'magasin_id' => $request->magasin_id,
-                // Payment details based on payment mode
-                'mobile_number' => $request->mobile_number,
-                'mobile_reference' => $request->mobile_reference,
-                'bank_name' => $request->bank_name,
-                'bank_reference' => $request->bank_reference,
-                'card_type' => $request->card_type,
-                'card_reference' => $request->card_reference,
-                'cash_reference' => $request->cash_reference,
-                'user_id' => auth()->id(),
-            ]);
+            
+
+            $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+            if($isAuthTeamMemberQuestionMark->type === 'client'){
+                $commande = Commandes::create([
+                    'client_id' => $request->client_id,
+                    'total_price' => 0, // Will calculate after adding items
+                    'payment_mode' => $request->payment_mode,
+                    'invoice_status' => $request->invoice_status,
+                    'tva' => $request->tva,
+                    'magasin_id' => $request->magasin_id,
+                    // Payment details based on payment mode
+                    'mobile_number' => $request->mobile_number,
+                    'mobile_reference' => $request->mobile_reference,
+                    'bank_name' => $request->bank_name,
+                    'bank_reference' => $request->bank_reference,
+                    'card_type' => $request->card_type,
+                    'card_reference' => $request->card_reference,
+                    'cash_reference' => $request->cash_reference,
+                    'user_id' => auth()->id(),
+                ]);
+            }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+                
+                $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+                //dd(Auth::id());
+                //dd( $test->user_id);
+                $commande = Commandes::create([
+                    'client_id' => $request->client_id,
+                    'total_price' => 0, // Will calculate after adding items
+                    'payment_mode' => $request->payment_mode,
+                    'invoice_status' => $request->invoice_status,
+                    'tva' => $request->tva,
+                    'magasin_id' => $request->magasin_id,
+                    // Payment details based on payment mode
+                    'mobile_number' => $request->mobile_number,
+                    'mobile_reference' => $request->mobile_reference,
+                    'bank_name' => $request->bank_name,
+                    'bank_reference' => $request->bank_reference,
+                    'card_type' => $request->card_type,
+                    'card_reference' => $request->card_reference,
+                    'cash_reference' => $request->cash_reference,
+                    'user_id' => $test->user_id,
+                ]);
+            }
             
             $totalOrderPrice = 0;
             

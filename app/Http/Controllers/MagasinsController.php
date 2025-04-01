@@ -22,7 +22,7 @@ class MagasinsController extends Controller
     {
         if(auth()->user()->type === 'team_member'){
            // return redirect()->route('dashboard_team_member');
-           $teamMember = Auth::user();
+            $teamMember = Auth::user();
             $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
 
             
