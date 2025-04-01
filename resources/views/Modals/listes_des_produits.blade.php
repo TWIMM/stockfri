@@ -21,6 +21,7 @@
                         </select>
                     </div>
 
+                    @if(!isset($stocks))
                     <!-- Produits -->
                     <div id="productsContainer">
                         <!-- Initial product row -->
@@ -29,7 +30,60 @@
                                 <!-- Produit -->
                                 <div class="flex-fill">
                                     <label for="productSelect" class="form-label">Produit</label>
-                                    <select class="form-select productSelect" name="products[0][product_id]" required>
+                                    <select class="form-select productSelect" name="products[0][product_id]" required readonly disabled>
+                                        <option value="" disabled selected>Choisir un produit</option>
+                                        @foreach ($services as $stock)
+                                            <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
+                                                {{ $stock->title }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Quantité -->
+                                <div class="flex-fill ms-2">
+                                    <label for="quantity" class="form-label">Quantité</label>
+                                    <input type="number" class="form-control" name="products[0][quantity]"
+                                        min="1" required readonly>
+                                </div>
+
+                                <!-- Remise -->
+                                <div class="flex-fill ms-2">
+                                    <label for="discount" class="form-label">Remise (%)</label>
+                                    <input type="number" class="form-control" name="products[0][discount]"
+                                        min="0" max="100" readonly>
+                                </div>
+
+                                <!-- Prix Unitaire -->
+                                <div class="flex-fill ms-2">
+                                    <label for="price" class="form-label">Prix Unitaire</label>
+                                    <input type="number" class="form-control" name="products[0][price]" required
+                                        readonly>
+                                </div>
+
+                                <!-- Supprimer Produit -->
+                                <div class="flex-fill ms-2">
+                                    <button type="button" class="btn btn-danger removeProduct"
+                                        aria-label="Supprimer produit" disabled>
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+
+                    @if(!isset($services))
+                    <!-- Produits -->
+                    <div id="productsContainer">
+                        <!-- Initial product row -->
+                        <div class="productRow mb-3">
+                            <div class="d-flex">
+                                <!-- Produit -->
+                                <div class="flex-fill">
+                                    <label for="productSelect" class="form-label">Produit</label>
+                                    <select class="form-select productSelect" name="products[0][product_id]" required readonly disabled>
                                         <option value="" disabled selected>Choisir un produit</option>
                                         @foreach ($stocks as $stock)
                                             <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
@@ -43,14 +97,14 @@
                                 <div class="flex-fill ms-2">
                                     <label for="quantity" class="form-label">Quantité</label>
                                     <input type="number" class="form-control" name="products[0][quantity]"
-                                        min="1" required>
+                                        min="1" required readonly>
                                 </div>
 
                                 <!-- Remise -->
                                 <div class="flex-fill ms-2">
                                     <label for="discount" class="form-label">Remise (%)</label>
                                     <input type="number" class="form-control" name="products[0][discount]"
-                                        min="0" max="100">
+                                        min="0" max="100" readonly>
                                 </div>
 
                                 <!-- Prix Unitaire -->
@@ -63,14 +117,14 @@
                                 <!-- Supprimer Produit -->
                                 <div class="flex-fill ms-2">
                                     <button type="button" class="btn btn-danger removeProduct"
-                                        aria-label="Supprimer produit">
+                                        aria-label="Supprimer produit" disabled>
                                         <i class="ti ti-trash"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    @endif
                     <!-- Ajouter un produit -->
                     <button type="button" class="btn btn-primary" id="addProductButton">Ajouter un produit</button>
 
@@ -271,11 +325,21 @@
                     <label for="productSelect${currentIndex}" class="form-label">Produit</label>
                     <select class="form-select productSelect" id="productSelect${currentIndex}" name="products[${currentIndex}][product_id]" required>
                         <option value="" disabled selected>Choisir un produit</option>
-                        @foreach ($stocks as $stock)
-                            <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
-                                {{ $stock->name }}
-                            </option>
-                        @endforeach
+                        @if(isset($stocks))
+                            @foreach ($stocks as $stock)
+                                <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
+                                    {{ $stock->name }}
+                                </option>
+                            @endforeach
+                        @endif
+
+                        @if(isset($services))
+                            @foreach ($services as $stock)
+                                <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
+                                    {{ $stock->title }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
