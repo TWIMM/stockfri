@@ -1106,14 +1106,30 @@ class OrderController extends Controller
                 }
 
 
-                MouvementDeStocks::create([
-                    'stock_id' => $productData['product_id'],
-                    'magasin_id' => $request->client_id, //magasin id is client id in this case
-                    'quantity' => $quantity,
-                    'user_id' => Auth::id(),
-                    'type_de_mouvement' => env('ACHAT_CLIENT'),
-                    'files_paths' => null
-                ]);
+                
+                if($isAuthTeamMemberQuestionMark->type === 'client'){
+                    MouvementDeStocks::create([
+                        'stock_id' => $productData['product_id'],
+                        'magasin_id' => $request->client_id, //magasin id is client id in this case
+                        'quantity' => $quantity,
+                        'user_id' => Auth::id(),
+                        'type_de_mouvement' => env('ACHAT_CLIENT'),
+                        'files_paths' => null
+                    ]);
+                }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+                    
+                    $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+                    //dd(Auth::id());
+                    //dd( $test->user_id);
+                    MouvementDeStocks::create([
+                        'stock_id' => $productData['product_id'],
+                        'magasin_id' => $request->client_id, //magasin id is client id in this case
+                        'quantity' => $quantity,
+                        'user_id' => $test->user_id,
+                        'type_de_mouvement' => env('ACHAT_CLIENT'),
+                        'files_paths' => null
+                    ]);
+                }
                 
                 $totalOrderPrices += $itemTotal;
             }
