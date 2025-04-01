@@ -124,7 +124,71 @@ class StockController extends Controller
     public function getMoveOfStocks(Request $request)
     {
         if (auth()->user()->type === 'team_member') {
-            return redirect()->route('dashboard_team_member');
+            //return redirect()->route('dashboard_team_member');
+
+            $teamMember = Auth::user();
+            $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+            
+            $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+            /*  if (!$team) {
+                abort(404, "Vous n'etes membre d'aucune equipe");
+            } */
+
+            
+            //$intBus = Business::find(optional($team->pivot)->business_id);
+            
+            $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+            $categories = $teamBusinessOwner->categorieProduits; 
+            $fournisseurs = $teamBusinessOwner->fournisseurs; 
+            
+            $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+            $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+            view()->share('realTeamMember', $realTeamMember);
+
+
+            $role = Role::find($realTeamMember->role_id);
+            $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+            $role = Role::find($realTeamMember->role_id);
+            view()->share('role', $formattedRole);
+            view()->share('roleObj', $role);
+
+            // Retrieve all stocks associated with the user
+            $stocks = Stock::where('user_id', $teamBusinessOwner->id)->get(); 
+
+            // Start with the base query for stock movements
+            $movesQuery = MouvementDeStocks::where('user_id', $teamBusinessOwner->id);
+
+            // Apply filter by product if provided
+            if ($request->has('product') && !empty($request->product)) {
+                $movesQuery->where('stock_id', $request->product);
+            }
+
+            // Apply filter by type of movement if provided
+            if ($request->has('type') && !empty($request->type)) {
+                $movesQuery->where('type_de_mouvement', $request->type);
+            }
+
+            // Apply filter by start date if provided
+            if ($request->has('date_start') && !empty($request->date_start)) {
+                $movesQuery->where('created_at', '>=', $request->date_start);
+            }
+
+            // Apply filter by end date if provided
+            if ($request->has('date_end') && !empty($request->date_end)) {
+                $movesQuery->where('created_at', '<=', $request->date_end);
+            }
+
+            // Paginate the filtered stock movements
+            $moves = $movesQuery->paginate(10);
+            return view('dashboard_team_member.stocks.moves', compact(
+                'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 
+                'categories', 'fournisseurs', 'moves'
+            ));
         }
 
         $user = Auth::user();
@@ -199,14 +263,34 @@ class StockController extends Controller
             }
         }
     
-        MouvementDeStocks::create([
-            'stock_id' => $stock->id,
-            'fournisseur_id' => $request->fournisseur_id,
-            'quantity' => $request->quantity,
-            'user_id' => Auth::id(),
-            'type_de_mouvement' => env('ACHAT_DE_STOCK'),
-            'files_paths' => json_encode($filePaths)
-        ]);
+       
+
+        $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+        if($isAuthTeamMemberQuestionMark->type === 'client'){
+            
+            MouvementDeStocks::create([
+                'stock_id' => $stock->id,
+                'fournisseur_id' => $request->fournisseur_id,
+                'quantity' => $request->quantity,
+                'user_id' => Auth::id(),
+                'type_de_mouvement' => env('ACHAT_DE_STOCK'),
+                'files_paths' => json_encode($filePaths)
+            ]);
+        }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+
+            $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+            MouvementDeStocks::create([
+                'stock_id' => $stock->id,
+                'fournisseur_id' => $request->fournisseur_id,
+                'quantity' => $request->quantity,
+                'user_id' => $test->user_id, 
+                'type_de_mouvement' => env('ACHAT_DE_STOCK'),
+                'files_paths' => json_encode($filePaths)
+            ]);
+           
+
+        }
     
         return back()->with('success', 'Quantité mise à jour avec succès et factures téléchargées!');
     }
@@ -223,17 +307,38 @@ class StockController extends Controller
               'price' => 'required|numeric|min:0',
               'business_id' => 'required|exists:business,id',
           ]);
+
+          $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+          if($isAuthTeamMemberQuestionMark->type === 'client'){
+            
+            Stock::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'quantity' => 0,
+                'quantite_inventorie' => 0,
+                'category_id'=> $request->category_id,
+                'price' => $request->price,
+                'business_id' => $request->business_id,
+                'user_id' => Auth::id(), 
+            ]);
+          }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+
+            $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+            Stock::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'quantity' => 0,
+                'quantite_inventorie' => 0,
+                'category_id'=> $request->category_id,
+                'price' => $request->price,
+                'business_id' => $request->business_id,
+                'user_id' => $test->user_id, 
+            ]);
+
+          }
   
-          Stock::create([
-              'name' => $request->name,
-              'description' => $request->description,
-              'quantity' => 0,
-              'quantite_inventorie' => 0,
-              'category_id'=> $request->category_id,
-              'price' => $request->price,
-              'business_id' => $request->business_id,
-              'user_id' => Auth::id(), 
-          ]);
+          
   
           return redirect()->back()->with('success', 'Stock ajouté avec succès!');
       }
