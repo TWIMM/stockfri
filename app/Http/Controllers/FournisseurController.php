@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\TeamMember;
 use App\Models\Fournisseur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\DB;
 
 class FournisseurController extends Controller
 {
     public function index()
     {
         if(auth()->user()->type === 'team_member'){
-            return redirect()->route('dashboard_team_member');
+            return redirect()->route('dashboard');
         }
 
         $user = Auth::user();
@@ -48,6 +53,93 @@ class FournisseurController extends Controller
         return view('users.fournisseurs.index', compact('fournisseurs', 'hasPhysique', 'hasPrestation', 'businesses', 'user'));
     }
 
+    public function indexTeamMember()
+    {
+        if(auth()->user()->type === 'client'){
+            return redirect()->route('dashboard');
+
+        }
+
+        $teamMember = Auth::user();
+        $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+        
+        $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+       /*  if (!$team) {
+            abort(404, "Vous n'etes membre d'aucune equipe");
+        } */
+
+        
+        //$intBus = Business::find(optional($team->pivot)->business_id);
+        
+        $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+
+        
+        $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+        $businesses = $teamBusinessOwner->business()->paginate(10);
+        $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+        view()->share('realTeamMember', $realTeamMember);
+
+
+        $role = Role::find($realTeamMember->role_id);
+        $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+        $role = Role::find($realTeamMember->role_id);
+        view()->share('role', $formattedRole);
+        view()->share('roleObj', $role);
+
+        $query = Fournisseur::where('user_id', $teamBusinessOwner->id);
+
+        // Filter by 'search' if provided
+        if ($search = request('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Filter by 'email' if provided
+        if ($email = request('email')) {
+            $query->where('email', 'like', "%{$email}%");
+        }
+
+        // Filter by 'phone' if provided
+        if ($phone = request('phone')) {
+            $query->where('phone', 'like', "%{$phone}%");
+        }
+
+        // Filter by 'address' if provided
+        if ($address = request('address')) {
+            $query->where('address', 'like', "%{$address}%");
+        }
+
+        // Get the filtered results with pagination
+        $fournisseurs = $query->paginate(10);
+
+
+        
+        $teamAdminMarked = Team::where('name', 'admin')->where('user_id', $clientOwner->id)->first();
+
+
+        $isUserAdminQuestionMarkMode  = DB::table('team_member_team')
+            ->where('team_id', $teamAdminMarked->id)
+            ->where('team_member_id', $realTeamMember->id)
+            ->where('mode_admin', 1)
+            ->first();
+
+        $isUserAdminQuestionMark = false; 
+
+        if($isUserAdminQuestionMarkMode && $isUserAdminQuestionMarkMode->id){
+            $isUserAdminQuestionMark = true ; 
+        }
+
+        //$permissions = 
+        view()->share('isUserAdminQuestionMark', $isUserAdminQuestionMark);
+
+
+        return view('dashboard_team_member.fournisseurs.index', compact('fournisseurs', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'));
+
+    }
+
 
     // Afficher le formulaire de création
     public function create()
@@ -67,14 +159,34 @@ class FournisseurController extends Controller
 
         ]);
 
-        Fournisseur::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'ifu' => $request->ifu ? $request->ifu : null,
-            'user_id' => Auth::id(), 
-        ]);
+        $isAuthTeamMemberQuestionMark = Auth::id();
+        $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+        if($isAuthTeamMemberQuestionMark->type === 'client'){
+            Fournisseur::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'ifu' => $request->ifu ? $request->ifu : null,
+                'user_id' => Auth::id(), 
+            ]);
+        }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+
+            $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+            //dd(Auth::id());
+            //dd( $test->user_id);
+            Fournisseur::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'ifu' => $request->ifu ? $request->ifu : null,
+                'user_id' => $test->user_id, 
+            ]);
+        }
+
+        
 
         return redirect()->back()->with('success', 'Fournisseur ajouté avec succès!');
     }

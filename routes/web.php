@@ -112,6 +112,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/fournisseurs_list', [FournisseurController::class, 'index'])->name('fournisseurs.listes');
     Route::get('/cat_prod_list', [CategorieProduitController::class, 'index'])->name('cat_prod.listes');
     Route::post('/stock/add_up_quantity', [StockController::class, 'add_up_quantity'])->name('stock.add_up_quantity');
+    Route::get('/team_fournisseurs_list', [FournisseurController::class, 'indexTeamMember'])->name('team_member.fournisseurs.listes');
 
 
     Route::get('/check-livraison-exists/{commandeId}', [OrderController::class, 'checkExists'])->name('livraison.check-exists');

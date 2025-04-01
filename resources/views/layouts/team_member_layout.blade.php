@@ -197,7 +197,7 @@
                                 <h6 class="submenu-hdr">Main Menu</h6>
                                 <ul>
 
-                                    @if ($isUserAdminQuestionMark)
+                                    {{-- @if ($isUserAdminQuestionMark) --}}
                                         <li class="submenu">
                                             <a href="javascript:void(0);"
                                                 class="{{ request()->routeIs('owner.business.*') ? 'subdrop active' : '' }}"
@@ -228,40 +228,117 @@
 
                                             </ul>
                                         </li>
+                                    {{-- @endif --}}
+
+
+                                    @if ($hasPhysique || $hasPrestation)
+                                        <li class="submenu">
+                                            <a class="{{ request()->routeIs('finances.*') ? 'subdrop active' : '' }}"
+                                                href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                                <span>Finances</span>
+                                                <span class="menu-arrow"></span>
+                                            </a>
+                                            <ul>
+                                                <li><a href="{{ route('finances.dettes') }}"
+                                                        class="{{ request()->routeIs('finances.dettes') ? 'active' : '' }}">Gestion
+                                                        des dettes</a></li>
+                                                <li><a href="{{ route('finances.paiement') }}"
+                                                        class="{{ request()->routeIs('finances.paiement') ? 'active' : '' }}">Gestion
+                                                        des paiements</a></li>
+
+                                            </ul>
+                                        </li>
                                     @endif
+
+
 
 
                                     @if ($hasPhysique)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);" class="{{ request()->routeIs('owner.stock.*') ? 'subdrop active' : '' }}"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('stock.*') || request()->routeIs('cat_prod.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i>
                                                 <span>Stock</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="{{ route('owner.stock.listes') }}">Gerer produits</a></li>
+                                                <li><a href="{{ route('cat_prod.listes') }}"
+                                                        class="{{ request()->routeIs('cat_prod.listes') ? 'active' : '' }}">Categorie
+                                                        de produits</a></li>
+
+                                                <li><a href="{{ route('stock.listes') }}"
+                                                        class="{{ request()->routeIs('stock.listes') ? 'active' : '' }}">Gerer
+                                                        stock</a></li>
+
+                                                <li><a href="{{ route('stock.moves') }}"
+                                                        class="{{ request()->routeIs('stock.moves') ? 'active' : '' }}">Mouvements
+                                                        stock</a></li>
                                             </ul>
                                         </li>
 
                                         <li class="submenu">
-                                            <a href="javascript:void(0);" class="{{ request()->routeIs('owner.magasin.*') ? 'subdrop active' : '' }}" ><i class="ti ti-brand-airtable"></i>
-                                                <span>Magasin</span>
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('team_member.fournisseurs.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i>
+                                                <span>Fournisseurs</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="audio-call.html">Gerer les magasins</a></li>
+                                                <li><a href="{{ route('team_member.fournisseurs.listes') }}"
+                                                        class="{{ request()->routeIs('team_member.fournisseurs.listes') ? 'active' : '' }}">Gerer
+                                                        Fournisseurs</a></li>
+
+                                            </ul>
+                                        </li>
+
+                                        <li class="submenu">
+                                            <a class="{{ request()->routeIs('magasins.*') || request()->routeIs('clients.*') || request()->routeIs('livraisons.*') || request()->routeIs('pre_commandes.*') || request()->routeIs('commandes.*') ? 'subdrop active' : '' }}"
+                                                href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                                <span>Magasins</span>
+                                                <span class="menu-arrow"></span>
+                                            </a>
+                                            <ul>
+                                                <li><a href="{{ route('magasins.listes') }}"
+                                                        class="{{ request()->routeIs('magasins.listes') ? 'active' : '' }}">Gestion
+                                                        des magasins</a></li>
+                                                <li><a href="{{ route('clients.listes') }}"
+                                                        class="{{ request()->routeIs('clients.listes') ? 'active' : '' }}">Gestion
+                                                        des clients</a></li>
+                                                <li><a href="{{ route('pre_commandes.listes') }}"
+                                                        class="{{ request()->routeIs('pre_commandes.listes') ? 'active' : '' }}">Approuver
+                                                        des commandes</a></li>
+                                                <li><a href="{{ route('commandes.listes') }}"
+                                                        class="{{ request()->routeIs('commandes.listes') ? 'active' : '' }}">
+                                                        Commandes actives</a></li>
+                                                <li><a href="{{ route('livraisons.listes') }}"
+                                                        class="{{ request()->routeIs('livraisons.listes') ? 'active' : '' }}">Gestion
+                                                        des Livraisons</a></li>
+
+
                                             </ul>
                                         </li>
                                     @endif
 
                                     @if ($hasPrestation)
                                         <li class="submenu">
-                                            <a href="javascript:void(0);"><i class="ti ti-brand-airtable"></i>
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('services.*') || request()->routeIs('pre_commandes_s.*') || request()->routeIs('commandes_s.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i>
                                                 <span>Services Offert</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
                                             <ul>
-                                                <li><a href="video-call.html">Ajouter service</a></li>
-                                                <li><a href="audio-call.html">Liste des services</a></li>
+                                                <li><a class="{{ request()->routeIs('services.listes') ? 'active' : '' }}"
+                                                        href="{{ route('services.listes') }}">Gerer services</a></li>
+                                                <li><a href="{{ route('clients.listes') }}"
+                                                        class="{{ request()->routeIs('clients.listes') ? 'active' : '' }}">Gestion
+                                                        des clients</a></li>
+                                                <li><a href="{{ route('pre_commandes_s.services') }}"
+                                                        class="{{ request()->routeIs('pre_commandes_s.services') ? 'active' : '' }}">Approuver
+                                                        des commandes</a></li>
+                                                <li><a href="{{ route('commandes_s.services') }}"
+                                                        class="{{ request()->routeIs('commandes_s.services') ? 'active' : '' }}">
+                                                        Commandes actives</a></li>
                                             </ul>
                                         </li>
                                     @endif
