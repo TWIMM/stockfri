@@ -122,7 +122,7 @@ class TeamMemberController extends Controller
 
 
 
-    public function showOwnerTeamMemberListPage()
+    public function showOwnerTeamMemberListPage(Request $request)
     {
         if(auth()->user()->type === 'client'){
             return redirect()->route('dashboard');
@@ -151,7 +151,18 @@ class TeamMemberController extends Controller
 
         // Retrieve team members even if their business was deleted
         $teamIds = $teams->pluck('id');
-        $teamMembers = TeamMember::with('team')->where('user_id', $user->id)->paginate(10);
+        // Query to retrieve team members, applying the search filter if available
+        $teamMembersQuery = TeamMember::with('team')->where('user_id', $user->id);
+
+        // Apply search filter if 'search' query parameter is set
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $teamMembersQuery->where('name', 'like', '%' . $search . '%');
+        }
+
+        // Paginate the results
+        $teamMembers = $teamMembersQuery->paginate(10);
+        //$teamMembers = TeamMember::with('team')->where('user_id', $user->id)->paginate(10);
         view()->share('teamMembers', $teamMembers);
         view()->share('realTeamMember', $realTeamMember);
 
