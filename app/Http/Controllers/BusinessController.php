@@ -57,7 +57,7 @@ class BusinessController extends Controller
 
 
 
-    public function showOwnerBusinessListPage()
+    public function showOwnerBusinessListPage(Request $request)
     {
         $teamMember = Auth::user();
         if(auth()->user()->type === 'client'){
@@ -74,7 +74,17 @@ class BusinessController extends Controller
         
         $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
 
-        $businesses = $teamBusinessOwner->business()->paginate(10);
+        // Check if a search term is provided
+        $query = $teamBusinessOwner->business();
+
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Pagination
+        $businesses = $query->paginate(10);
+
+       // $businesses = $teamBusinessOwner->business()->paginate(10);
 
         $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
 
