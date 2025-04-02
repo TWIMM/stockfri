@@ -1106,7 +1106,8 @@ class OrderController extends Controller
                 }
 
 
-                
+                $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
                 if($isAuthTeamMemberQuestionMark->type === 'client'){
                     MouvementDeStocks::create([
                         'stock_id' => $productData['product_id'],
