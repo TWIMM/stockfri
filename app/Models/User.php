@@ -28,7 +28,7 @@ class User extends Authenticatable
         'sex',
         'type',
         'otp_hashed',
-        'is_email_verified',
+        'email_verified_at',
         'address',  
         'country',  
         'city',  
