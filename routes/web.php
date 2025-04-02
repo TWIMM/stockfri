@@ -187,6 +187,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth']) -> group(function(){ 
     Route::get('/dashboard_team_member', [DashboardController::class, 'team_member'])->name('dashboard_team_member');
+    Route::get('/dashboard_admin', [DashboardController::class, 'dashboard_admin'])->name('dashboard_admin');
 
 });
 

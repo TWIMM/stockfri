@@ -49,6 +49,9 @@ class LoginController extends Controller
                 return redirect()->route('pricing.page');
             } else if(auth()->user()->type === 'team_member'){
                 return redirect()->route('dashboard_team_member');
+            } else if (auth()->user()->type === 'admin_sys'){
+                return redirect()->route('dashboard_admin');
+           
             }
         }
 
