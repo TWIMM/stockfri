@@ -140,8 +140,7 @@ class TeamMemberController extends Controller
         }
         $intBus = Business::find(optional($team->pivot)->business_id); */
         
-        $user = User::findOrFail($realTeamMember->user_id);  
-
+        $user = User::where('id' , $realTeamMember->user_id)->first();
         // Retrieve all businesses the user owns (including soft deleted ones)
         $businessIds = Business::where('user_id', $user->id)->withTrashed()->pluck('id');
 
@@ -183,6 +182,7 @@ class TeamMemberController extends Controller
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
         $roles = Role::with('permissions')->get();
         $permissions = Permission::all();
+        $user = User::where('email' , $realTeamMember->email)->first();
 
         return view('dashboard_team_member.team_member.owner_index', compact(
             'teamMembers', 

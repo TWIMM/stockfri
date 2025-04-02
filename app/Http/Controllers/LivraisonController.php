@@ -76,9 +76,9 @@ class LivraisonController extends Controller
             $livraisons = $query->paginate(10);
             $stocks = Stock::where('user_id' ,$teamBusinessOwner->id)->get();
 
+            $user = User::where('email' , $realTeamMember->email)->first();
 
-
-            return view('dashboard_team_member.livraisons.index', compact('livraisons', 'hasPhysique', 
+            return view('dashboard_team_member.livraisons.index', compact('livraisons', 'user', 'hasPhysique', 
             'hasPrestation', "businesses", 'realTeamMember' , 'clients' , 'stocks'));
         }
     

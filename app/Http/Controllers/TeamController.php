@@ -114,8 +114,8 @@ class TeamController extends Controller
         //$permissions = 
         view()->share('isUserAdminQuestionMark', $isUserAdminQuestionMark);
 
-
-        return view('dashboard_team_member.teams.owner_index', compact('teams' , 'businesses' ,  'hasPhysique', 'hasPrestation'));
+        $user = User::where('email' , $realTeamMember->email)->first();
+        return view('dashboard_team_member.teams.owner_index', compact('teams' , 'businesses' , 'user',  'hasPhysique', 'hasPrestation'));
     }
 
     public function create()

@@ -181,8 +181,8 @@ class ServicesController extends Controller
             $servicesAll = Services::whereIn('business_id', $teamBusinessOwner->business->pluck('id'))->get();
             // Get services related to the user's businesses with pagination
             $services = Services::whereIn('business_id', $teamBusinessOwner->business->pluck('id'))->paginate(10);
-
-            return view('dashboard_team_member.services.index', compact('services','hasPhysique', 
+            $user = User::where('email' , $realTeamMember->email)->first();
+            return view('dashboard_team_member.services.index', compact('services' , 'user','hasPhysique', 
                 'hasPrestation', "businesses",  'realTeamMember' , 'clients' , 'servicesAll'));
 
         }
@@ -660,14 +660,14 @@ class ServicesController extends Controller
                 // Return all data if no specific key is provided
                 return (object)$allData;
             };
-
+            $user = User::where('email' , $realTeamMember->email)->first();
             $services = Services::whereIn('business_id', $teamBusinessOwner->business->pluck('id'))->paginate(10);
             view()->share('services', $services);
             view()->share('realTeamMember', $realTeamMember);
             return view('dashboard_team_member.services.commande_not_approved', compact(
                 'commandeNotApproved', 'hasPhysique', 'hasPrestation', 
                 'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
-                'services' , 'getClientFromId', 'realTeamMember', 'clients', 'categories', 'fournisseurs'
+                'services' , 'user', 'getClientFromId', 'realTeamMember', 'clients', 'categories', 'fournisseurs'
             ));
 
 
@@ -912,9 +912,9 @@ class ServicesController extends Controller
                 // Return all data if no specific key is provided
                 return (object)$allData;
             };
-
+            $user = User::where('email' , $realTeamMember->email)->first();
             return view('dashboard_team_member.services.commande_approved', compact(
-                'commandeNotApproved', 'hasPhysique', 'hasPrestation', 
+                'commandeNotApproved', 'hasPhysique', 'hasPrestation', 'user',
                 'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
                 'services' , 'getClientFromId', 'realTeamMember', 'clients', 'categories', 'fournisseurs'
             ));
