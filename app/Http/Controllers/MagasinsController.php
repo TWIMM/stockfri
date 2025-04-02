@@ -74,8 +74,9 @@ class MagasinsController extends Controller
 
             // Get the filtered results with pagination
             $magasins = $query->paginate(10);
+            $user = User::where('email' , $realTeamMember->email)->first();
 
-            return view('dashboard_team_member.magasins.index', compact('magasins', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 'categories', 'fournisseurs', 'stocks'));
+            return view('dashboard_team_member.magasins.index', compact('magasins', 'user', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 'categories', 'fournisseurs', 'stocks'));
 
         }
 
@@ -189,9 +190,10 @@ class MagasinsController extends Controller
                     ];
                 }
             }
+            $user = User::where('email' , $realTeamMember->email)->first();
             $clients = Clients::where('user_id' ,$teamBusinessOwner->id)->get();
             return view('dashboard_team_member.magasins.details', compact('magasin', 'magasins','hasPhysique', 
-            'hasPrestation', "businesses", 'clients',  'realTeamMember' , "categories" , "fournisseurs" , "stocks" , "stocksArray"));
+            'hasPrestation', "businesses", 'clients',  'realTeamMember' , 'user' , "categories" , "fournisseurs" , "stocks" , "stocksArray"));
         }
         $magasin = Magasins::find($id);
 

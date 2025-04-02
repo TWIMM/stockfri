@@ -79,9 +79,12 @@ class StockController extends Controller
             // Paginate the filtered stocks
             $stocks = $stocksQuery->paginate(10);
 
+            $user = User::where('email' , $realTeamMember->email)->first();
+
+
             // Return the view with the filtered stocks and other necessary data
             return view('dashboard_team_member.stocks.index', compact(
-                'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 'categories', 'fournisseurs'
+                'stocks' , 'user', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 'categories', 'fournisseurs'
             ));
         }
 
@@ -182,12 +185,13 @@ class StockController extends Controller
             if ($request->has('date_end') && !empty($request->date_end)) {
                 $movesQuery->where('created_at', '<=', $request->date_end);
             }
+            $user = User::where('email' , $realTeamMember->email)->first();
 
             // Paginate the filtered stock movements
             $moves = $movesQuery->paginate(10);
             return view('dashboard_team_member.stocks.moves', compact(
                 'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember', 
-                'categories', 'fournisseurs', 'moves'
+                'categories', 'fournisseurs', 'moves' , 'user'
             ));
         }
 

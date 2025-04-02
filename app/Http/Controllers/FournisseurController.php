@@ -134,9 +134,10 @@ class FournisseurController extends Controller
 
         //$permissions = 
         view()->share('isUserAdminQuestionMark', $isUserAdminQuestionMark);
+        $user = User::where('email' , $realTeamMember->email)->first();
 
 
-        return view('dashboard_team_member.fournisseurs.index', compact('fournisseurs', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'));
+        return view('dashboard_team_member.fournisseurs.index', compact('fournisseurs', 'user', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'));
 
     }
 
