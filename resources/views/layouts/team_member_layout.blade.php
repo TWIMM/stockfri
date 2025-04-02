@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
@@ -111,7 +112,7 @@
                                             <a href="activities.html">
                                                 <div class="media d-flex">
                                                     <span class="avatar flex-shrink-0">
-                                                        <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
+                                                        <img src="{{ $user->profile_image ? asset('/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
                                                         <span class="badge badge-info rounded-pill"></span>
                                                     </span>
                                                     <div class="media-body flex-grow-1">
@@ -144,11 +145,11 @@
                         </li>
                         
                         <li class="nav-item dropdown nav-item-box">
-                            <a href="{{ route('dashboard') }}" onclick="event.preventDefault(); window.location.href = '/dashboard'  " data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Dashboard">
+                            <a href="/dashboard_team_member" onclick="event.preventDefault(); window.location.href = '/dashboard_team_member'  " data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Dashboard">
                                 <i class="ti ti-home"></i>
                             </a>
                             
-                            <form id="dash-form" action="{{ route('dashboard') }}" method="GET" style="display: none;">
+                            <form id="dash-form" action="/dashboard_team_member" method="GET" style="display: none;">
                                 @csrf
                             </form>
                             
@@ -159,7 +160,7 @@
                             <a href="javascript:void(0);" onclick="event.preventDefault(); window.location.href = '/profile_page' " class="nav-link userset" data-bs-toggle="dropdown">
                                 <span class="user-info">
                                     <span class="user-letter">
-                                        <img src="{{ $realTeamMember->profile_image ? asset('/public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
+                                        <img src="{{ $user->profile_image ? asset('/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
 
                                     </span>
                                     <span class="badge badge-success rounded-pill"></span>
@@ -196,9 +197,9 @@
                         <ul>
                             <li class="clinicdropdown">
                                 <a href="/profile_page">
-                                    <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" class="img-fluid" alt="Profile">
+                                    <img src="{{ $user->profile_image ? asset('/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" class="img-fluid" alt="Profile">
                                     <div class="user-names">
-                                        <h5>{{ $realTeamMember->name }}</h5>
+                                        <h5>{{ $user->name }}</h5>
                                         <h6>Coequipier</h6>
 
                                     </div>

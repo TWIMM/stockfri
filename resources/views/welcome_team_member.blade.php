@@ -9,12 +9,12 @@
             <div class="row align-items-center">
                 <div class="col-4">
                     <h4 class="page-title">
-                        Commande en attente<span class="count-title">123</span>
+                        Vous gérez <span class="count-title">{{ $countBusiness }}</span> business
                     </h4>
                 </div>
                 <div class="col-8 text-end">
                     <div class="head-icons">
-                        <a href="{{route('dashboard')}}" data-bs-toggle="tooltip" data-bs-placement="top"
+                        <a href="{{ route('dashboard') }}" data-bs-toggle="tooltip" data-bs-placement="top"
                             data-bs-original-title="Refresh">
                             <i class="ti ti-refresh-dot"></i>
                         </a>
@@ -36,7 +36,7 @@
                         </span>
                         <p>Clients</p>
                     </div>
-                    <h2>474</h2>
+                    <h2>{{ $countClients }}</h2>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-6">
@@ -47,7 +47,7 @@
                         </span>
                         <p>Equipe</p>
                     </div>
-                    <h2>454</h2>
+                    <h2>{{ $countTeams }}</h2>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-6">
@@ -56,9 +56,9 @@
                         <span>
                             <i class="ti ti-brand-feedly"></i>
                         </span>
-                        <p>Coequipiers</p>
+                        <p>Coéquipiers</p>
                     </div>
-                    <h2>658</h2>
+                    <h2>{{ $countTeamMembers }}</h2>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-6">
@@ -69,7 +69,7 @@
                         </span>
                         <p>Business</p>
                     </div>
-                    <h2>747</h2>
+                    <h2>{{ $countBusiness }}</h2>
                 </div>
             </div>
         </div>
@@ -77,18 +77,65 @@
         <div class="campaign-tab">
             <ul class="nav">
                 <li>
-                    <a href="{{route('dashboard')}}" class="active">Commandes en cours<span>24</span></a>
+                    <a href="javascript:void(0);" class="{{ session('active_tab', 'service') == 'service' ? 'active' : '' }}" id="tab-service" data-target="card-service">
+                        Service (s) vendu (s) <span>{{ $countApprovedSelledServices }}</span>
+                    </a>
                 </li>
                 <li>
-                    <a href="campaign-complete.html">Factures en attente</a>
+                    <a href="javascript:void(0);" class="{{ session('active_tab') == 'product' ? 'active' : '' }}" id="tab-product" data-target="card-product">
+                        Produit (s) vendu (s) <span>{{ $countApprovedSelledProduct }}</span>
+                    </a>
                 </li>
                 <li>
-                    <a href="campaign-archieve.html">Listes des clients</a>
+                    <a href="javascript:void(0);" class="{{ session('active_tab') == 'delivery' ? 'active' : '' }}" id="tab-delivery" data-target="card-delivery">
+                        Livraison en cours <span>{{ $countLivraions }}</span>
+                    </a>
                 </li>
+                
             </ul>
         </div>
 
-     
+        <div class="card" id="all-content">
+            @if(session('active_tab', 'service') == 'service')
+                @include('appbranch_without_layout.approved')
+            @elseif(session('active_tab') == 'product')
+                @include('appbranch_without_layout.prod_approved')
+            @elseif(session('active_tab') == 'delivery')
+                @include('appbranch_without_layout.livraison')
+            @elseif(session('active_tab') == 'payment')
+                <div>jojoo</div>
+            @endif
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const tabs = document.querySelectorAll('.nav li a');
+                
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Remove active class from all tabs
+                        tabs.forEach(t => t.classList.remove('active'));
+                        
+                        // Add active class to clicked tab
+                        this.classList.add('active');
+                        
+                        // Get the target content type from data attribute
+                        const contentType = this.getAttribute('data-target').replace('card-', '');
+                        
+                        // Use fetch or axios to update session and reload the content
+                        fetch('/update-tab-session?tab=' + contentType, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            }
+                        }).then(response => window.location.reload());
+                    });
+                });
+            });
+        </script>
     </div>
 
 

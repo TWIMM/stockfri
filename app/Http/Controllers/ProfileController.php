@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Http\Request;
 
@@ -14,16 +15,16 @@ class ProfileController extends Controller
         // Validate the request
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'tel' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'address' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:800', // Validate the image
+            //'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:800', // Validate the image
         ]);
 
         // Update user profile data
-        $user->update($request->only('name', 'phone', 'email', 'address', 'country', 'city'));
+        $user->update($request->only('name', 'tel', 'email', 'address', 'country', 'city'));
 
         // Handle profile image upload
         if ($request->hasFile('profile_image')) {

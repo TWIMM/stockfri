@@ -1,4 +1,4 @@
-@extends('layouts.app_layout')
+@extends('layouts.team_member_layout')
 
 @section('title', 'Stock Fri')
 
