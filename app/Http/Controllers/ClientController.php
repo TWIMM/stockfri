@@ -71,7 +71,8 @@ class ClientController extends Controller
         
             // Get the filtered clients and paginate the results
             $clients = $query->paginate(10);
-            return view('dashboard_team_member.clients.index', compact('clients', 'hasPhysique', 
+            $user = User::where('email' , $realTeamMember->email)->first();
+            return view('dashboard_team_member.clients.index', compact('clients' , 'user', 'hasPhysique', 
             'hasPrestation', "businesses", 'realTeamMember'));
         }
     

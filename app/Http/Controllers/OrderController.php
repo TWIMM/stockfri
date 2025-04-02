@@ -477,10 +477,10 @@ class OrderController extends Controller
                 // Return all data by default
                 return (object)$allData;
             };
-
+            $user = User::where('email' , $realTeamMember->email)->first();
             // Pass data to the view
             return view('dashboard_team_member.commandes_approved.index', compact(
-                'commandeNotApproved', 'hasPhysique', 'hasPrestation',
+                'commandeNotApproved', 'hasPhysique', 'hasPrestation', 'user', 
                 'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
                 'stocks', 'realTeamMember', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
             ));
@@ -726,10 +726,10 @@ class OrderController extends Controller
                 // Return all data by default
                 return (object)$allData;
             };
-
+            $user = User::where('email' , $realTeamMember->email)->first();
             // Pass data to the view
             return view('dashboard_team_member.commandes_not_approved.index', compact(
-                'commandeNotApproved', 'hasPhysique', 'hasPrestation',
+                'commandeNotApproved', 'hasPhysique', 'hasPrestation', 'user',
                 'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
                 'stocks', 'realTeamMember', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
             ));
