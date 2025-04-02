@@ -309,7 +309,7 @@ class TeamMemberController extends Controller
 
         $success = $this->emailService->sendEmailWithTemplate($teamM->email, 'emails.teammate_confirm' , [
             'name' => $teamM->name,      
-            'appLink' => env("APP_URL")."/".env('SIGN_IN_TEAM_MATE_LINK')."/".$teamM->id,   
+            'appLink' => env("APP_URL").env('SIGN_IN_TEAM_MATE_LINK')."/".$teamM->id,   
         ]);
 
 
