@@ -62,11 +62,12 @@ class CategorieProduitController extends Controller
             if ($request->has('type') && !empty($request->type)) {
                 $categoriesQuery->where('type', $request->type);  // Filter by category type (or any other field)
             }
+            $user = User::where('email' , $realTeamMember->email)->first();
 
             // Paginate the categories with the applied filters
             $categories = $categoriesQuery->paginate(10);
             return view('dashboard_team_member.categorie_produits.index', compact(
-                'categories', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'
+               'user', 'categories', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'
             ));
 
         }

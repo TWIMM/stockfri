@@ -199,10 +199,11 @@ class ClientController extends Controller
 
             // Fetch stock data (if needed)
             $stocks = Stock::where('user_id', $teamBusinessOwner->id)->paginate(10);
+            $user = User::where('email' , $realTeamMember->email)->first();
 
             
             return view('dashboard_team_member.finances.creence_clients', compact(
-                'clients', 'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'
+                'clients'   , 'user', 'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'realTeamMember'
             ));
         }
 
@@ -286,8 +287,9 @@ class ClientController extends Controller
             //->where('limit_credit_for_this_user' , '<=' , 0)
             ->paginate(10);
             $stocks = Stock::where('user_id' ,$teamBusinessOwner->id)->paginate(10); 
+            $user = User::where('email' , $realTeamMember->email)->first();
 
-            return view('dashboard_team_member.finances.paiements', compact('paiements' , 'clients' , 'stocks','hasPhysique', 
+            return view('dashboard_team_member.finances.paiements', compact('paiements' , 'user', 'clients' , 'stocks','hasPhysique', 
                 'hasPrestation', "businesses",  'realTeamMember'));
         }
         $user = auth()->user();
