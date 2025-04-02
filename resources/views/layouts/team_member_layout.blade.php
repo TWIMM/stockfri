@@ -54,11 +54,11 @@
             <div class="header">
 
                 <div class="header-left active">
-                    <a href="index-2.html" class="logo logo-normal">
+                    <a href="/dashboard_team_member" class="logo logo-normal">
                         <img src="/assets/img/logo.svg" alt="Logo">
                         <img src="/assets/img/white-logo.svg" class="white-logo" alt="Logo">
                     </a>
-                    <a href="index-2.html" class="logo-small">
+                    <a href="/dashboard_team_member" class="logo-small">
                         <img src="/assets/img/logo-small.svg" alt="Logo">
                     </a>
                     <a id="toggle_btn" href="javascript:void(0);">
@@ -78,17 +78,19 @@
 
                         <li class="nav-item nav-search-inputs me-auto">
                             <div class="top-nav-search">
-                                <a href="javascript:void(0);" class="responsive-search">
-                                    <i class="fa fa-search"></i>
-                                </a>
-                                <form action="#" class="dropdown">
-                                    <div class="searchinputs" id="dropdownMenuClickable">
-                                        <input type="text" placeholder="Search">
-                                        <div class="search-addon">
-                                            <button type="submit"><i class="ti ti-command"></i></button>
+                                @if (request()->routeIs('dashboard.*'))
+                                    <a href="javascript:void(0);" class="responsive-search">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                                    <form action="#" class="dropdown">
+                                        <div class="searchinputs" id="dropdownMenuClickable">
+                                            <input type="text" placeholder="Search">
+                                            <div class="search-addon">
+                                                <button type="submit"><i class="ti ti-command"></i></button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                @endif
                             </div>
                         </li>
 
@@ -109,7 +111,7 @@
                                             <a href="activities.html">
                                                 <div class="media d-flex">
                                                     <span class="avatar flex-shrink-0">
-                                                        <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" alt="Profile">
+                                                        <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
                                                         <span class="badge badge-info rounded-pill"></span>
                                                     </span>
                                                     <div class="media-body flex-grow-1">
@@ -129,30 +131,41 @@
                                 </div>
                             </div>
                         </li>
+                        
+                        <li class="nav-item dropdown nav-item-box">
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Logout">
+                                <i class="ti ti-logout"></i>
+                            </a>
+                            
+                            <form id="logout-form" action="{{ route('logout') }}" method="GET" style="display: none;">
+                                @csrf
+                            </form>
+                            
+                        </li>
+                        
+                        <li class="nav-item dropdown nav-item-box">
+                            <a href="{{ route('dashboard') }}" onclick="event.preventDefault(); window.location.href = '/dashboard'  " data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Dashboard">
+                                <i class="ti ti-home"></i>
+                            </a>
+                            
+                            <form id="dash-form" action="{{ route('dashboard') }}" method="GET" style="display: none;">
+                                @csrf
+                            </form>
+                            
+                        </li>
 
 
-                        <li class="nav-item dropdown has-arrow main-drop">
-                            <a href="javascript:void(0);" class="nav-link userset" data-bs-toggle="dropdown">
+                        <li class="nav-item dropdown has-arrow main-drop" >
+                            <a href="javascript:void(0);" onclick="event.preventDefault(); window.location.href = '/profile_page' " class="nav-link userset" data-bs-toggle="dropdown">
                                 <span class="user-info">
                                     <span class="user-letter">
-                                        <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" alt="Profile">
+                                        <img src="{{ $realTeamMember->profile_image ? asset('/public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
+
                                     </span>
                                     <span class="badge badge-success rounded-pill"></span>
                                 </span>
                             </a>
-                            <div class="dropdown-menu menu-drop-user">
-                                <div class="profilename">
-                                    <a class="dropdown-item" href="index-2.html">
-                                        <i class="ti ti-layout-2"></i> Dashboard
-                                    </a>
-                                    <a class="dropdown-item" href="profile.html">
-                                        <i class="ti ti-user-pin"></i> My Profile
-                                    </a>
-                                    <a class="dropdown-item" href="login.html">
-                                        <i class="ti ti-lock"></i> Logout
-                                    </a>
-                                </div>
-                            </div>
+                            
                         </li>
 
                     </ul>
@@ -162,10 +175,10 @@
                     <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="index-2.html">
+                        <a class="dropdown-item" href="/dashboard_team_member">
                             <i class="ti ti-layout-2"></i> Dashboard
                         </a>
-                        <a class="dropdown-item" href="profile.html">
+                        <a class="dropdown-item" href="/profile_page">
                             <i class="ti ti-user-pin"></i> My Profile
                         </a>
                         <a class="dropdown-item" href="login.html">
@@ -182,7 +195,7 @@
                     <div id="sidebar-menu" class="sidebar-menu">
                         <ul>
                             <li class="clinicdropdown">
-                                <a href="profile.html">
+                                <a href="/profile_page">
                                     <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" class="img-fluid" alt="Profile">
                                     <div class="user-names">
                                         <h5>{{ $realTeamMember->name }}</h5>
@@ -373,7 +386,7 @@
                                                 class="menu-arrow"></span>
                                         </a>
                                         <ul>
-                                            <li><a href="profile.html">Profile</a></li>
+                                            <li><a href="/profile_page">Profile</a></li>
                                             <li><a href="security.html">securite</a></li>
                                             <li><a href="invoice-settings.html">Invoice Settings</a></li>
 
