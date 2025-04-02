@@ -113,8 +113,7 @@
                         <h6 class="mb-3">Facture</h6>
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <input type="file" class="form-control" id="factureId"
-                                    name="factureName">
+                                <input type="file" class="form-control" id="factureId" name="factureName">
                             </div>
                         </div>
                     </div>
@@ -233,16 +232,24 @@
                 select.remove(1);
             }
 
-            // Add back options that aren't selected elsewhere (except the current selection)
+            // Add back options that aren't selected elsewhere OR are the current selection
             select.originalOptions.forEach(option => {
-                if (option.value === "" || option.value === currentValue || !selectedIds.includes(option
-                        .value)) {
-                    // Skip the first empty option since we kept it
+                // Include if: empty/placeholder OR this select's current value OR not selected elsewhere
+                if (option.value === "" ||
+                    option.value === currentValue ||
+                    !selectedIds.includes(option.value)) {
+
+                    // Skip the first empty option if we already have it
                     if (option.value !== "" || select.options.length === 0) {
                         select.add(option.cloneNode(true));
                     }
                 }
             });
+
+            // Make sure the current value is still selected
+            if (currentValue) {
+                select.value = currentValue;
+            }
         });
     }
 
@@ -315,7 +322,7 @@
         const productSelect = productRow.querySelector(`#productSelect${currentIndex}`);
         productSelect.addEventListener('change', function() {
             updatePrice(this);
-            updateAvailableProducts();
+             updateAvailableProducts();
         });
 
         // Update available products
