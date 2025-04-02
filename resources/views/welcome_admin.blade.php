@@ -1,4 +1,4 @@
-@extends('layouts.app_layout')
+@extends('layouts.admin_layout')
 
 @section('title', 'Stock fri')
 

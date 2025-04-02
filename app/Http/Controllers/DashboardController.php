@@ -205,9 +205,9 @@ class DashboardController extends Controller
 
             $businesses = $user->business()->paginate(10);
 
-            $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+            $hasPhysique = Business::where('type', 'business_physique')->exists();
 
-            $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+            $hasPrestation = Business::where('type', 'prestation_de_service')->exists();
 
             $categories = $user->categorieProduits;
             $fournisseurs = $user->fournisseurs;
@@ -217,21 +217,21 @@ class DashboardController extends Controller
                 return Clients::find($id);
             };
 
-            $countClients = count(Clients::where('user_id' ,$user->id)->get());
-            $countTeams = count(Team::where('user_id' ,$user->id)->get());
-            $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
-            $countBusiness = count(Business::where('user_id' ,$user->id)->get());
+            $countClients = count(Clients::all());
+            $countTeams = count(Team::all());
+            $countTeamMembers = count(TeamMember::all());
+            $countBusiness = count(Business::all());
             $approvedSelledProduct = Commandes::whereHas('commandeItems', function ($query) {
                 $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
             })
-            ->where('user_id' , auth()->id())
+            //->where('user_id' , auth()->id())
             ->where('validation_status' , 'approved')
             ->get(); 
             $countApprovedSelledProduct = count($approvedSelledProduct);
             $commandeApproved = Commandes::whereHas('commandeItems', function ($query) {
                 $query->whereNull('service_id'); // Filters CommandItems where service_id is null
             })
-            ->where('user_id' , auth()->id())
+           // ->where('user_id' , auth()->id())
             ->where('validation_status' , 'approved')
             ->get(); 
             $countApprovedSelledServices = count($commandeApproved);
@@ -239,7 +239,7 @@ class DashboardController extends Controller
             $query  = Commandes::whereHas('commandeItems', function ($query) {
                 $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
             })
-            ->where('user_id', $user->id)
+            //->where('user_id', $user->id)
             ->where('validation_status', 'approved');
     
             // Apply filters based on form input
@@ -276,7 +276,7 @@ class DashboardController extends Controller
             $querypROD  = Commandes::whereHas('commandeItems', function ($query) {
                 $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
             })
-            ->where('user_id', $user->id)
+            //->where('user_id', $user->id)
             ->where('validation_status', 'approved');
     
             // Apply filters based on form input
@@ -311,11 +311,11 @@ class DashboardController extends Controller
            
 
              // Get additional data
-            $clients = Clients::where('user_id', $user->id)->get();
-            $magasins = Magasins::where('user_id', $user->id)->paginate(10);
-            //$stocks = Stock::where('user_id', $user->id)->paginate(10);
+            $clients = Clients::all();
+            $magasins = Magasins::all();
+            //$stocks = Stock::all();
             // Start the query to fetch clients
-            $query = Livraisons::where('user_id', $user->id);
+            $query = Livraisons::all();
         
             // Apply the 'search' filter if provided
             if ($search = request('search')) {
@@ -335,12 +335,12 @@ class DashboardController extends Controller
             }
         
             // Get the filtered clients and paginate the results
-            $livraisons = $query->paginate(10);
+           // $livraisons = $query->paginate(10);
             $stocks = Stock::where('user_id' ,$user->id)->get();
-            $countLivraions = count(Livraisons::where('user_id', $user->id)->get());
+            $countLivraions = count(Livraisons::all());
 
 
-            return view('welcome_admin', compact('businesses' , 'categories' , 'livraisons', 'countLivraions',  'getClientFromId', 'fournisseurs', 
+            return view('welcome_admin', compact('businesses' , 'categories' , 'countLivraions',  'getClientFromId', 'fournisseurs', 
             'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  
             'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' , 
              'countTeams', 'countClients', 'user'));
