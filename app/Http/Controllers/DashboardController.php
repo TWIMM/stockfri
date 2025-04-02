@@ -193,9 +193,9 @@ class DashboardController extends Controller
     {
         
         if(auth()->user()->type === 'admin_sys'){
-            if (!Auth::user()->pricing_id) {
+            /* if (!Auth::user()->pricing_id) {
                 return redirect()->route('pricing.page');
-            }
+            } */
             
             if (!session()->has('active_tab')) {
                 session(['active_tab' => 'service']);
