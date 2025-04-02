@@ -33,13 +33,14 @@ class TeamMemberController extends Controller
     public function returnConfirmTeamMemberPwd($id){
 
         $teamM = TeamMember::findOrFail($id);
-        $isUserPasswordConfirmed = User::find($teamM->id);
-        if(!$isUserPasswordConfirmed || !$isUserPasswordConfirmed->id){
-            return view('auth.create_team_member_password' , compact('teamM'));
+        $isUserPasswordConfirmed = User::where('email', $teamM->email)->first();
+        //dd($isUserPasswordConfirmed);
+        if(isset($isUserPasswordConfirmed->password)){
+            return redirect()->route('login');
+            return view('login');
 
         }
-
-        return redirect()->route('login');
+        return view('auth.create_team_member_password' , compact('teamM'));
 
     }
 
