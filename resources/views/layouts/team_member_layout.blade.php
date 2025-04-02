@@ -109,7 +109,7 @@
                                             <a href="activities.html">
                                                 <div class="media d-flex">
                                                     <span class="avatar flex-shrink-0">
-                                                        <img src="assets/img/profiles/avatar-02.jpg" alt="Profile">
+                                                        <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" alt="Profile">
                                                         <span class="badge badge-info rounded-pill"></span>
                                                     </span>
                                                     <div class="media-body flex-grow-1">
@@ -135,7 +135,7 @@
                             <a href="javascript:void(0);" class="nav-link userset" data-bs-toggle="dropdown">
                                 <span class="user-info">
                                     <span class="user-letter">
-                                        <img src="/assets/img/profiles/avatar-20.jpg" alt="Profile">
+                                        <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" alt="Profile">
                                     </span>
                                     <span class="badge badge-success rounded-pill"></span>
                                 </span>
@@ -183,7 +183,7 @@
                         <ul>
                             <li class="clinicdropdown">
                                 <a href="profile.html">
-                                    <img src="/assets/img/profiles/avatar-14.jpg" class="img-fluid" alt="Profile">
+                                    <img src="{{ $realTeamMember->profile_image ? asset('public/storage/profiles/' . $realTeamMember->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" class="img-fluid" alt="Profile">
                                     <div class="user-names">
                                         <h5>{{ $realTeamMember->name }}</h5>
                                         <h6>Coequipier</h6>

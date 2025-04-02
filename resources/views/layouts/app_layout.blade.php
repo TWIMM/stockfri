@@ -111,7 +111,7 @@
                                             <a href="activities.html">
                                                 <div class="media d-flex">
                                                     <span class="avatar flex-shrink-0">
-                                                        <img src="{{ $user->profile_image ? asset('public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/avatar-20.jpg') }}" alt="Profile">
+                                                        <img src="{{ $user->profile_image ? asset('public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
                                                         <span class="badge badge-info rounded-pill"></span>
                                                     </span>
                                                     <div class="media-body flex-grow-1">
@@ -159,7 +159,7 @@
                             <a href="javascript:void(0);" onclick="event.preventDefault(); window.location.href = '/profile_page' " class="nav-link userset" data-bs-toggle="dropdown">
                                 <span class="user-info">
                                     <span class="user-letter">
-                                        <img src="{{ $user->profile_image ? asset('/public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/avatar-20.jpg') }}" alt="Profile">
+                                        <img src="{{ $user->profile_image ? asset('/public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/' . 'default.jfif') }}" alt="Profile">
 
                                     </span>
                                     <span class="badge badge-success rounded-pill"></span>
@@ -196,7 +196,7 @@
                         <ul>
                             <li class="clinicdropdown">
                                 <a href="/profile_page">
-                                    <img src="{{ $user->profile_image ? asset('public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/avatar-20.jpg') }}" alt="Profile">
+                                    <img src="{{ $user->profile_image ? asset('public/storage/profiles/' . $user->profile_image) : asset('/assets/img/profiles/' . 'default.jfif')}}" alt="Profile">
 
                                     <div class="user-names">
                                         <h5>{{ $user->name }}</h5>

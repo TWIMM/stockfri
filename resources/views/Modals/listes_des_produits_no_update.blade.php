@@ -315,7 +315,7 @@
                     <label for="productSelect${currentIndex}" class="form-label">Produit</label>
                     <select class="form-select productSelect" id="productSelect${currentIndex}" name="products[${currentIndex}][product_id]" required readonly disabled>
                         <option value="" disabled selected>Choisir un produit</option>
-                        @if(isset($stocks))
+                            @if(isset($stocks))
                                 @foreach ($stocks as $stock)
                                     <option value="{{ $stock->id }}" data-price="{{ $stock->price }}">
                                         {{ $stock->name }}
