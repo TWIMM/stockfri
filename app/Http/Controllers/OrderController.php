@@ -1274,6 +1274,25 @@ class OrderController extends Controller
                 return redirect()->back()->with('success', 'Commande créée avec succès.' . $invoice->invoice_link);
             }
 
+            $filePaths = [];
+
+            if ($request->hasFile('factures_achat')) {
+                foreach ($request->file('factures_achat') as $file) {
+                    // Get the command ID and current timestamp
+                    $commandeId = $commande->id; // Assuming you have the commande_id in the request
+                    $createdAt = $commande->created_at; // Format: YYYY-MM-DD_HH-MM-SS
+                    
+                    // Create a custom filename using the commande ID and creation time
+                    $filename = $commandeId . '_' . $createdAt . '.' . $file->getClientOriginalExtension();
+                    
+                    // Store the file with the custom name in the 'proof_client_achat' directory
+                    $filePath = $file->storeAs('proof_client_achat', $filename, 'public');
+                    
+                    // Save the file path in the array for later use
+                    $filePaths[] = $filePath;
+                }
+            }
+
             
             // Commit the transaction
             DB::commit();

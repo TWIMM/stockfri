@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="modalVenteLabel">Nouvelle Vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('stock.stock_fri_order_stock') }}" method="POST">
+            <form action="{{ route('stock.stock_fri_order_stock') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <!-- Sélectionner un client -->
@@ -113,7 +113,7 @@
                         <h6 class="mb-3">Facture</h6>
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <input type="file" class="form-control" id="factureId" name="factureName">
+                                <input type="file" class="form-control" id="factureId" name="factures_achat[]" multiple>
                             </div>
                         </div>
                     </div>
