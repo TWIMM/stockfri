@@ -112,7 +112,7 @@
                         <h6 class="mb-3">Facture</h6>
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <input type="file" class="form-control" id="factureId" name="factures_achat[]">
+                                <input type="file" class="form-control" id="factureId" name="factures_achat[]" multiple>
                             </div>
                         </div>
                     </div>
