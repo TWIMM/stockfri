@@ -1071,5 +1071,7 @@ class ServicesController extends Controller
             'name' => $client->name,      
             'appLink' => $invoice->invoice_link,   
         ]);
+
+        return redirect()->back()->with('success' , 'Invoice transmis');
     }  
 }

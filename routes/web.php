@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/services_precommandes', [ServicesController::class, 'getPrecommandes'])->name('pre_commandes_s.services');
     Route::get('/services_commandes', [ServicesController::class, 'activeCommandes'])->name('commandes_s.services');
     Route::post('/update-tab-session', [DashboardController::class, 'updateTabSession'])->name('update-tab-session');
+    Route::post('/send_invoices', [ServicesController::class, 'sendInvoiceToRecipient'])->name('services.send_invoices');
 
     //stock 
 
