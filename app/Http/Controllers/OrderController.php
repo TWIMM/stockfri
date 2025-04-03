@@ -900,7 +900,7 @@ class OrderController extends Controller
         $itemsData = [];
         foreach ($commande->commandeItems as $item) {
             $itemsData[] = [
-                'name' => $item->stock->name,
+                'name' => $item->stock->name ?? $item->service->title,
                 'description' => $item->stock->description ?? 'Produit',
                 'price' => $item->unit_price,
                 'quantity' => $item->quantity,
