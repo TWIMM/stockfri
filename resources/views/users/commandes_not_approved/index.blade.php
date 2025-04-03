@@ -241,6 +241,16 @@
                                     '#mmodalListeDeProduits select[name="invoice_status"]')
                                 .value = data.commande.invoice_status;
 
+                                
+                                if (data.commande.invoice_status === 'paid' || data.commande.invoice_status === 'partially_paid') {
+                                    document.getElementById('factureId').classList.remove('d-none');
+
+
+                                } else {
+                                    document.getElementById('factureId').classList.add('d-none');
+
+                                }
+
                             // Vider complètement le conteneur de produits
                             resetProductsContainer();
 
@@ -777,6 +787,8 @@
                     const restToPayFormatted = new Intl.NumberFormat().format(paymentDetails.rest_to_pay || 0.00);
                     const payment_totalAmount = new Intl.NumberFormat().format(paymentDetails.total_price || 0.00);
 
+
+
                     // Set the formatted values
                     document.getElementById('payment_amountPaid').innerText = amountPaidFormatted;
                     document.getElementById('payment_restToPay').innerText = restToPayFormatted;
@@ -907,15 +919,7 @@
             }
         }
 
-        const invoiceStatus = document.getElementById('invoiceStatus').value;
-        if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
-            document.getElementById('factureId').classList.remove('d-none');
-
-
-        } else {
-            document.getElementById('factureId').classList.add('d-none');
-
-        }
+        
         // Event listeners for invoice status and payment mode changes
         document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
         document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
