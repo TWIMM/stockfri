@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\Magasins;
 use App\Models\Team;
 use App\Models\Business;
+use App\Services\EmailService;
 
 use App\Models\User;
 use App\Models\Role;
@@ -25,10 +26,12 @@ use Illuminate\Support\Facades\DB;
 class ServicesController extends Controller
 {
     protected $invoiceService;
-
+    protected $emailService;
     public function __construct(InvoiceService $invoiceService)
     {
         $this->invoiceService = $invoiceService;
+        $this->emailService = $emailService;
+
     }
 
     private function mapInvoiceStatus($orderStatus)
@@ -1047,5 +1050,26 @@ class ServicesController extends Controller
             'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
             'stocks' , 'user', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
         ));
-    }    
+    }  
+
+
+    public function sendInvoiceToRecipient(Request $request){
+
+        $request->validate([
+            'commande_id' => 'required|exists:commandes,id',
+            'email' => 'required|email',
+            //'name' => 'required|string',
+        ]);
+
+        $invoice = Invoice::where('commande_id' , $request->commande_id)->first();
+        $commande = Commandes::find($request->commande_id);
+        $magasin = Magasins::find($commande->magasin_id);
+
+        $client = Clients::find($commande->client_id);
+        $success = $this->emailService->sendEmailWithTemplate($request->email, 'emails.invoice' , [
+            'magasin' => $magasin->name,    
+            'name' => $client->name,      
+            'appLink' => $invoice->invoice_link,   
+        ]);
+    }  
 }
