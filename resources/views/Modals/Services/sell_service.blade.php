@@ -190,7 +190,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer la vente</button>
+                    <button type="submit" class="btn btn-primary">Modifier la vente</button>
                 </div>
             </form>
         </div>

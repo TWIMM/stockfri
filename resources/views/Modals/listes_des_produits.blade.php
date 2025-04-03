@@ -6,13 +6,13 @@
                 <h5 class="modal-title" id="modalVenteLabel">Nouvelle Vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('stock.stock_fri_update_order_stock') }}" method="POST">
+            <form action="{{ route('stock.stock_fri_update_order_stock') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <!-- Sélectionner un client -->
                     <div class="mb-3">
                         <label for="clientSelect" class="form-label">Sélectionner un Client</label>
-                        <input type="hidden" value="" name="magasin_id">
+                        <input type="hidden" value="" name="magasin_id" id="magadsinIdId">
                         <select class="form-select" id="clientSelect" name="client_id" required>
                             <option value="" disabled selected>Choisir un client</option>
                             @foreach ($clients as $client)
@@ -20,6 +20,8 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <input type="hidden" value="" id="commandeIdId" name="order_id">
 
                     @if(!isset($stocks))
                     <!-- Produits -->
@@ -167,7 +169,7 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <input type="file" class="form-control" id="factureId"
-                                    name="factureName">
+                                    name="factures_achat[]" multiple>
                             </div>
                         </div>
                     </div>

@@ -1677,6 +1677,8 @@ class OrderController extends Controller
             }
 
             $this->storeInternally($request);
+            return redirect()->back()->with('success', 'Pré-Commande re-créée avec succès.' );
+
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Une erreur est survenue: ' . $e->getMessage());

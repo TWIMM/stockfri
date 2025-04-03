@@ -227,6 +227,10 @@
                             document.getElementById('modalVenteLabel').textContent =
                                 'Détails de la Commande';
 
+                            document.getElementById('commandeIdId').value = serviceId;
+                            document.getElementById('magadsinIdId').value = data
+                            .commande.magasin_id;
+
                             // Remplir le formulaire avec les données
                             document.querySelector(
                                     '#mmodalListeDeProduits select[name="client_id"]')
