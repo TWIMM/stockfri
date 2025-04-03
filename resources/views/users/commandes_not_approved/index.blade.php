@@ -24,8 +24,9 @@
                                 <label for="client">Client</label>
                                 <select name="client" id="client" class="form-control">
                                     <option value="">Tous les clients</option>
-                                    @foreach($clients as $client)
-                                        <option value="{{ $client->id }}" {{ request('client') == $client->id ? 'selected' : '' }}>
+                                    @foreach ($clients as $client)
+                                        <option value="{{ $client->id }}"
+                                            {{ request('client') == $client->id ? 'selected' : '' }}>
                                             {{ $client->name }}
                                         </option>
                                     @endforeach
@@ -35,30 +36,39 @@
                                 <label for="status">Statut livraison</label>
                                 <select name="status" id="status" class="form-control">
                                     <option value="">Tous les statuts</option>
-                                    <option value="none" {{ request('status') == 'none' ? 'selected' : '' }}>Aucun</option>
-                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En attente</option>
-                                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Livré</option>
-                                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>En cours</option>
-                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Annulé</option>
+                                    <option value="none" {{ request('status') == 'none' ? 'selected' : '' }}>Aucun
+                                    </option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En
+                                        attente</option>
+                                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Livré
+                                    </option>
+                                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>
+                                        En cours</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>
+                                        Annulé</option>
                                 </select>
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="min_price">Prix minimum</label>
-                                <input min=0 type="number" name="min_price" id="min_price" class="form-control" value="{{ request('min_price') }}">
+                                <input min=0 type="number" name="min_price" id="min_price" class="form-control"
+                                    value="{{ request('min_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="max_price">Prix maximum</label>
-                                <input min=0 type="number" name="max_price" id="max_price" class="form-control" value="{{ request('max_price') }}">
+                                <input min=0 type="number" name="max_price" id="max_price" class="form-control"
+                                    value="{{ request('max_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_start">Date début</label>
-                                <input type="date" name="date_start" id="date_start" class="form-control" value="{{ request('date_start') }}">
+                                <input type="date" name="date_start" id="date_start" class="form-control"
+                                    value="{{ request('date_start') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_end">Date fin</label>
-                                <input type="date" name="date_end" id="date_end" class="form-control" value="{{ request('date_end') }}">
+                                <input type="date" name="date_end" id="date_end" class="form-control"
+                                    value="{{ request('date_end') }}">
                             </div>
-                            
+
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
                                 <a href="{{ route('commandes.listes') }}" class="btn btn-secondary">Réinitialiser</a>
@@ -102,12 +112,13 @@
                                                 data-bs-target="#paymentDetailsModal">
                                                 <i style="color: white" class="ti ti-receipt"></i>
                                             </button></td>
-                                            <td>{{ number_format($eachcommandeNotApproved->total_price) }} FCFA</td>
-                                            <td>{{ number_format($eachcommandeNotApproved->rest_to_pay) }} FCFA</td>
+                                        <td>{{ number_format($eachcommandeNotApproved->total_price) }} FCFA</td>
+                                        <td>{{ number_format($eachcommandeNotApproved->rest_to_pay) }} FCFA</td>
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
-                                            <button type="button" data-command-id="{{$eachcommandeNotApproved->id}}" data-client-id="{{ $client->id }}"
+                                            <button type="button" data-command-id="{{ $eachcommandeNotApproved->id }}"
+                                                data-client-id="{{ $client->id }}"
                                                 data-id='{{ $eachcommandeNotApproved->id }}' id='validate-order-btn'
                                                 class="btn btn-secondary">
                                                 <i class="ti ti-check"></i>
@@ -147,7 +158,7 @@
                     const clientId = button.getAttribute(
                         'data-client-id');
                     const commandId = button.getAttribute(
-                            'data-command-id');
+                        'data-command-id');
 
                     // Fetch client data from the API
                     fetch(`/clients_data/${clientId}`)
@@ -162,24 +173,29 @@
                             if (clientData.trusted == 0) {
                                 if (clientData.risk_level === 'Très élevé' || clientData
                                     .risk_level === 'Élevé') {
-                                    document.getElementById('client_id_risk_high').value = clientId;
+                                    document.getElementById('client_id_risk_high').value =
+                                        clientId;
                                     const riskModal = new bootstrap.Modal(document
                                         .getElementById('riskConfirmationModal'));
                                     riskModal.show();
                                 } else {
-                                    document.getElementById('commande_id_risk_low').value = commandId;
+                                    document.getElementById('commande_id_risk_low').value =
+                                        commandId;
                                     const riskModal = new bootstrap.Modal(document
                                         .getElementById('excellentCreditModal'));
                                     riskModal.show();
                                 }
-                            } else if(clientData.trusted == 1){
-                                document.getElementById('available_credit_limit').value = clientData
-                                .limit_credit_for_this_user;
-                                document.getElementById('commande_id_risk_low').value = commandId;
-                                document.getElementById('current_debt').value = data.clientData.current_debt;
+                            } else if (clientData.trusted == 1) {
+                                document.getElementById('available_credit_limit').value =
+                                    clientData
+                                    .limit_credit_for_this_user;
+                                document.getElementById('commande_id_risk_low').value =
+                                    commandId;
+                                document.getElementById('current_debt').value = data.clientData
+                                    .current_debt;
                                 const riskModal = new bootstrap.Modal(document
-                                        .getElementById('excellentCreditModal'));
-                                    riskModal.show();
+                                    .getElementById('excellentCreditModal'));
+                                riskModal.show();
                             }
 
                         })
@@ -841,7 +857,7 @@
                 riskLevelBadge.innerText = 'Élevé';
             }
 
-// Format the credit limit and debt with comma separators
+            // Format the credit limit and debt with comma separators
             const creditFormatted = new Intl.NumberFormat().format(clientData.limit_credit_for_this_user);
             const debtFormatted = new Intl.NumberFormat().format(clientData.current_debt);
 
@@ -865,6 +881,7 @@
             // Only show payment details if invoice status is "paid" or "partially_paid"
             if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
                 paymentDetailsContainer.classList.remove('d-none');
+                document.getElementById('factureId').classList.remove('d-none');
 
                 // Show the specific payment detail fields based on payment mode
                 if (paymentMode === 'mobile_money') {
@@ -877,6 +894,8 @@
                     document.getElementById('cashDetails').classList.remove('d-none');
                 }
             } else {
+                document.getElementById('factureId').classList.add('d-none');
+
                 paymentDetailsContainer.classList.add('d-none');
             }
 
@@ -888,6 +907,15 @@
             }
         }
 
+        const invoiceStatus = document.getElementById('invoiceStatus').value;
+        if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
+            document.getElementById('factureId').classList.remove('d-none');
+
+
+        } else {
+            document.getElementById('factureId').classList.add('d-none');
+
+        }
         // Event listeners for invoice status and payment mode changes
         document.getElementById('invoiceStatus').addEventListener('change', togglePaymentDetails);
         document.getElementById('paymentMode').addEventListener('change', togglePaymentDetails);
