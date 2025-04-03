@@ -63,7 +63,7 @@
     <body>
         <div class="email-container">
             <div class="email-header">
-                <h4>Bienvenue chez $magasin !</h4>
+                <h4> Facture d'achat !</h4>
             </div>
             <div class="email-body">
                 <p>Bonjour <strong>{{ $name }}</strong>,</p>

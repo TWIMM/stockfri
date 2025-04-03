@@ -241,7 +241,7 @@
                                     const firstPriceInput = document.querySelector(
                                         'input[name="products[0][price]"]');
 
-                                    firstProductSelect.value = product.stock_id;
+                                    firstProductSelect.value = product.service_id;
 
                                     // Make sure the option is visible in the dropdown
                                     // Find the option with the matching value and ensure it's available
@@ -249,7 +249,7 @@
                                     for (let i = 0; i < firstProductSelect.options
                                         .length; i++) {
                                         if (firstProductSelect.options[i].value ==
-                                            product.stock_id) {
+                                            product.service_id) {
                                             optionExists = true;
                                             break;
                                         }
@@ -266,7 +266,7 @@
                                             .originalOptions) {
                                             for (let opt of originalSelect
                                                     .originalOptions) {
-                                                if (opt.value == product.stock_id) {
+                                                if (opt.value == product.service_id) {
                                                     productName = opt.text;
                                                     break;
                                                 }
@@ -274,12 +274,12 @@
                                         }
 
                                         const newOption = new Option(productName,
-                                            product.stock_id);
+                                            product.service_id);
                                         newOption.dataset.price = product.unit_price;
                                         firstProductSelect.add(newOption);
                                     }
 
-                                    firstProductSelect.value = product.stock_id;
+                                    firstProductSelect.value = product.service_id;
                                     firstQuantityInput.value = product.quantity;
                                     firstDiscountInput.value = product.discount || 0;
                                     firstPriceInput.value = product.unit_price;
@@ -304,7 +304,7 @@
                                     for (let i = 0; i < productSelect.options
                                         .length; i++) {
                                         if (productSelect.options[i].value == product
-                                            .stock_id) {
+                                            .service_id) {
                                             optionExists = true;
                                             break;
                                         }
@@ -319,7 +319,7 @@
                                             .originalOptions) {
                                             for (let opt of originalSelect
                                                     .originalOptions) {
-                                                if (opt.value == product.stock_id) {
+                                                if (opt.value == product.service_id) {
                                                     productName = opt.text;
                                                     break;
                                                 }
@@ -327,12 +327,12 @@
                                         }
 
                                         const newOption = new Option(productName,
-                                            product.stock_id);
+                                            product.service_id);
                                         newOption.dataset.price = product.unit_price;
                                         productSelect.add(newOption);
                                     }
 
-                                    productSelect.value = product.stock_id;
+                                    productSelect.value = product.service_id;
                                     quantityInput.value = product.quantity;
                                     discountInput.value = product.discount || 0;
                                     priceInput.value = product.unit_price;
@@ -457,8 +457,8 @@
     
                         <select name="products[0][product_id]" class="form-control productSelect" required>
                             <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                            @foreach ($services as $product)
+                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->title }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -523,9 +523,9 @@
     
                         <select name="products[${rowCount}][product_id]" class="form-control productSelect" required>
                             <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
+                            @foreach ($services as $product)
                             <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
-                                {{ $product->name }}
+                                {{ $product->title }}
                             </option>
                             @endforeach
                         </select>

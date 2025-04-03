@@ -98,7 +98,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/services_precommandes', [ServicesController::class, 'getPrecommandes'])->name('pre_commandes_s.services');
     Route::get('/services_commandes', [ServicesController::class, 'activeCommandes'])->name('commandes_s.services');
     Route::post('/update-tab-session', [DashboardController::class, 'updateTabSession'])->name('update-tab-session');
-    Route::post('/send_invoices', [ServicesController::class, 'sendInvoiceToRecipient'])->name('services.send_invoices');
+    Route::get('/send_invoices/{id}', [ServicesController::class, 'sendInvoiceToRecipient'])->name('services.send_invoices');
 
     //stock 
 
@@ -161,6 +161,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('clients/{id}', [ClientController::class, 'edit'])->name('clients.show'); // Show individual supplier
     Route::put('clients/update/{id}', [ClientController::class, 'update'])->name('clients.edit'); // Show individual supplier
     Route::post('/stock_fri_order_stock', [OrderController::class, 'store'])->name('stock.stock_fri_order_stock'); // Show individual supplier
+    Route::post('/stock_fri_update_order_stock', [OrderController::class, 'update'])->name('stock.stock_fri_update_order_stock'); // Show individual supplier
+
     Route::get('/commandes_listes', [OrderController::class, 'index'])->name('commandes.listes');
     Route::get('/factures_listes', [InvoiceController::class, 'index'])->name('factures.listes');
     Route::get('/livraisons_listes', [LivraisonController::class, 'index'])->name('livraisons.listes');

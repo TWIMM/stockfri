@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="modalVenteLabel">Nouvelle Vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('stock.stock_fri_order_stock') }}" method="POST">
+            <form action="{{ route('stock.stock_fri_update_order_stock') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <!-- Sélectionner un client -->
@@ -245,7 +245,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer la vente</button>
+                    <button type="submit" class="btn btn-primary">Modifier la vente</button>
                 </div>
             </form>
         </div>

@@ -25,31 +25,36 @@
                                 <label for="client">Client</label>
                                 <select name="client" id="client" class="form-control">
                                     <option value="">Tous les clients</option>
-                                    @foreach($clients as $client)
-                                        <option value="{{ $client->id }}" {{ request('client') == $client->id ? 'selected' : '' }}>
+                                    @foreach ($clients as $client)
+                                        <option value="{{ $client->id }}"
+                                            {{ request('client') == $client->id ? 'selected' : '' }}>
                                             {{ $client->name }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
-                            
+
                             <div class="col-md-3 mb-2">
                                 <label for="min_price">Prix minimum</label>
-                                <input min=0 type="number" name="min_price" id="min_price" class="form-control" value="{{ request('min_price') }}">
+                                <input min=0 type="number" name="min_price" id="min_price" class="form-control"
+                                    value="{{ request('min_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="max_price">Prix maximum</label>
-                                <input min=0 type="number" name="max_price" id="max_price" class="form-control" value="{{ request('max_price') }}">
+                                <input min=0 type="number" name="max_price" id="max_price" class="form-control"
+                                    value="{{ request('max_price') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_start">Date début</label>
-                                <input type="date" name="date_start" id="date_start" class="form-control" value="{{ request('date_start') }}">
+                                <input type="date" name="date_start" id="date_start" class="form-control"
+                                    value="{{ request('date_start') }}">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label for="date_end">Date fin</label>
-                                <input type="date" name="date_end" id="date_end" class="form-control" value="{{ request('date_end') }}">
+                                <input type="date" name="date_end" id="date_end" class="form-control"
+                                    value="{{ request('date_end') }}">
                             </div>
-                            
+
                             <div class="col-md-12 mt-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
                                 <a href="{{ route('commandes.listes') }}" class="btn btn-secondary">Réinitialiser</a>
@@ -96,17 +101,17 @@
                                             </button>
                                         </td>
 
-                                        
+
                                         <td>{{ number_format($eachcommandeNotApproved->total_price) }} FCFA</td>
                                         <td>{{ number_format($eachcommandeNotApproved->rest_to_pay) }} FCFA</td>
                                         <td>{{ count($eachcommandeNotApproved->commandeItems) }} </td>
 
                                         <td>
-                                            <button type="button" data-client-id="{{ $client->id }}"
-                                                data-id='{{ $eachcommandeNotApproved->id }}' id='validate-order-btn'
-                                                class="btn btn-secondary">
-                                                <i class="ti ti-send"></i>
-                                            </button>
+                                                <a href="{{route('services.send_invoices' , $eachcommandeNotApproved->id)}}" type="button" 
+                                                    class="btn btn-secondary">
+                                                    <i class="ti ti-send"></i>
+                                                </a>
+                                            
                                             <button type="button" data-payment-id='{{ $eachcommandeNotApproved->id }}'
                                                 data-id='{{ $eachcommandeNotApproved->id }}' id='invoice_viewer-btn'
                                                 class="btn bg-blue" {{-- data-bs-target="#pdfViewerModal" --}}>
@@ -864,8 +869,8 @@
     
                         <select readonly disabled name="products[0][product_id]" class="form-control productSelect" required>
                             <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->name }}</option>
+                            @foreach ($services as $product)
+                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">{{ $product->title }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -930,9 +935,9 @@
     
                         <select readonly disabled name="products[${rowCount}][product_id]" class="form-control productSelect" required>
                             <option value="">-- Sélectionner un produit --</option>
-                            @foreach ($stocks as $product)
+                            @foreach ($services as $product)
                             <option value="{{ $product->id }}" data-price="{{ $product->price }}" >
-                                {{ $product->name }}
+                                {{ $product->title }}
                             </option>
                             @endforeach
                         </select>
@@ -1161,7 +1166,7 @@
                     document.getElementById('payment_tva').innerText = paymentDetails.tva || 'N/A';
                     document.getElementById('payment_invoiceStatus').innerText = paymentDetails.invoice_status || 'N/A';
                     document.getElementById('payment_paymentMode').innerText = paymentDetails.payment_mode || 'N/A';
-                   // Format the amount paid and the rest to pay with comma separators
+                    // Format the amount paid and the rest to pay with comma separators
                     const amountPaidFormatted = new Intl.NumberFormat().format(paymentDetails.already_paid || 0.00);
                     const restToPayFormatted = new Intl.NumberFormat().format(paymentDetails.rest_to_pay || 0.00);
                     const payment_totalAmount = new Intl.NumberFormat().format(paymentDetails.total_price || 0.00);

@@ -29,7 +29,7 @@ class EmailService
 
      * @return bool
      */
-    public function sendEmailWithTemplate($toEmail, $templateName , $templateData)
+    public function sendEmailWithTemplate($toEmail, $templateName , $templateData , string $title = 'Complétez votre inscription chez Stockfri')
     {
         try {
             // Set the mail configuration dynamically using the class property
@@ -41,9 +41,9 @@ class EmailService
                 'mail.mailers.smtp.encryption' => $this->smtpConfig['encryption'],
             ]);
 
-            Mail::send($templateName, $templateData, function ($message) use ($toEmail) {
+            Mail::send($templateName, $templateData, function ($message) use ($toEmail , $title) {
                 $message->to($toEmail)
-                        ->subject('Complétez votre inscription chez Stockfri')
+                        ->subject($title)
                         ->from($this->smtpConfig['username']);
             });
 

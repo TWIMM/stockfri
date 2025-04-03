@@ -27,7 +27,7 @@ class ServicesController extends Controller
 {
     protected $invoiceService;
     protected $emailService;
-    public function __construct(InvoiceService $invoiceService)
+    public function __construct(InvoiceService $invoiceService, EmailService $emailService)
     {
         $this->invoiceService = $invoiceService;
         $this->emailService = $emailService;
@@ -603,7 +603,7 @@ class ServicesController extends Controller
             ->where('user_id', $teamBusinessOwner->id) // Filters by the user ID
             ->where('validation_status', 'not_approved');
             
-            // Apply filters
+            // Apply dd
             // Filter by client if provided
             if ($clientId = request('client')) {
                 $query->where('client_id', $clientId);
@@ -797,10 +797,12 @@ class ServicesController extends Controller
             return (object)$allData;
         };
 
+        //dd($services);
+
         return view('users.services.commande_not_approved', compact(
             'commandeNotApproved', 'hasPhysique', 'hasPrestation', 
             'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
-            'stocks'  , 'getClientFromId', 'user', 'clients', 'categories', 'fournisseurs'
+            'services'  , 'getClientFromId', 'user', 'clients', 'categories', 'fournisseurs'
         ));
     }
     public function activeCommandes(){
@@ -1048,30 +1050,29 @@ class ServicesController extends Controller
         return view('users.services.commande_approved', compact(
             'commandeNotApproved', 'hasPhysique', 'hasPrestation',
             'getClientScoreDataByClientId', 'getBadge', 'magasins', 'businesses', 
-            'stocks' , 'user', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
+            'services' , 'user', 'clients', 'categories', 'fournisseurs', 'getClientFromId'
         ));
     }  
 
 
-    public function sendInvoiceToRecipient(Request $request){
+    public function sendInvoiceToRecipient($id){
 
-        $request->validate([
-            'commande_id' => 'required|exists:commandes,id',
-            'email' => 'required|email',
-            //'name' => 'required|string',
-        ]);
-
-        $invoice = Invoice::where('commande_id' , $request->commande_id)->first();
-        $commande = Commandes::find($request->commande_id);
-        $magasin = Magasins::find($commande->magasin_id);
+    
+        $invoice = Invoice::where('commande_id' , $id)->first();
+        $commande = Commandes::find($id);
+       // $magasin = Magasins::find($commande->magasin_id);
 
         $client = Clients::find($commande->client_id);
-        $success = $this->emailService->sendEmailWithTemplate($request->email, 'emails.invoice' , [
-            'magasin' => $magasin->name,    
+        $success = $this->emailService->sendEmailWithTemplate($client->email, 'emails.invoice' , [
+           // 'magasin' => $magasin->name,    
             'name' => $client->name,      
             'appLink' => $invoice->invoice_link,   
-        ]);
+        ] , "Facture d'achat");
+        
+        if($success){
+           return redirect()->back()->with('success' , 'Facture Transmise');
 
-        return redirect()->back()->with('success' , 'Invoice transmis');
+        }
+        
     }  
 }
