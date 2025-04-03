@@ -380,9 +380,10 @@
         });
 
         // Only show payment details if invoice status is "paid" or "partially_paid"
+        // Only show payment details if invoice status is "paid" or "partially_paid"
         if (invoiceStatus === 'paid' || invoiceStatus === 'partially_paid') {
             paymentDetailsContainer.classList.remove('d-none');
-
+            document.getElementById('factureId').classList.remove('d-none');
             // Show the specific payment detail fields based on payment mode
             if (paymentMode === 'mobile_money') {
                 document.getElementById('mobileMoneyDetails').classList.remove('d-none');
@@ -394,6 +395,7 @@
                 document.getElementById('cashDetails').classList.remove('d-none');
             }
         } else {
+            document.getElementById('factureId').classList.add('d-none');
             paymentDetailsContainer.classList.add('d-none');
         }
 
