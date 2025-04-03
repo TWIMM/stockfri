@@ -113,7 +113,7 @@ class ServicesController extends Controller
         $fileName = 'CMD-'. date('Ymd') . '-' . $commande->id;
 
         // Generate the invoice using the service
-        $invoiceLink = $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes , $fileName);
+        $invoiceLink = $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes , 'vendor/invoices/sample-logo.png' , $fileName);
         
         // Create invoice record in database
         $invoiceNumber = 'INV-' . date('Ymd') . '-' . $commande->id;

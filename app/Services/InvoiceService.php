@@ -20,7 +20,7 @@ class InvoiceService
      * @param string $logoPath
      * @return \LaravelDaily\Invoices\Invoice
      */
-    public function generateInvoice(array $clientData, array $customerData, array $itemsData, array $notes, string $logoPath = 'vendor/invoices/sample-logo.png', $filename)
+    public function generateInvoice(array $clientData, array $customerData, array $itemsData, array $notes, string $logoPath = 'vendor/invoices/sample-logo.png', $fileName)
     {
         // Create the client (seller)
         $client = new Party([
