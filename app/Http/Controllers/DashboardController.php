@@ -58,14 +58,14 @@ class DashboardController extends Controller
             $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
             $countBusiness = count(Business::where('user_id' ,$user->id)->get());
             $approvedSelledProduct = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
+                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
             })
             ->where('user_id' , auth()->id())
             ->where('validation_status' , 'approved')
             ->get(); 
             $countApprovedSelledProduct = count($approvedSelledProduct);
             $commandeApproved = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where service_id is null
+                $query->whereNull('stock_id'); // Filters CommandItems where service_id is null
             })
             ->where('user_id' , auth()->id())
             ->where('validation_status' , 'approved')

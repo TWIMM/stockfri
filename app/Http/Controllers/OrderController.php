@@ -914,9 +914,10 @@ class OrderController extends Controller
             'TVA: ' . $commande->tva . '%',
             'Statut: ' . $this->getInvoiceStatusLabel($commande->invoice_status),
         ];
+        $fileName = 'CMD-'. date('Ymd') . '-' . $commande->id;
 
         // Generate the invoice using the service
-        $invoiceLink = $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes);
+        $invoiceLink = $this->invoiceService->generateInvoice($clientData, $customerData, $itemsData, $notes , $fileName);
         
         // Create invoice record in database
         $invoiceNumber = 'INV-' . date('Ymd') . '-' . $commande->id;

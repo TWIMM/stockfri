@@ -20,7 +20,7 @@ class InvoiceService
      * @param string $logoPath
      * @return \LaravelDaily\Invoices\Invoice
      */
-    public function generateInvoice(array $clientData, array $customerData, array $itemsData, array $notes, string $logoPath = 'vendor/invoices/sample-logo.png')
+    public function generateInvoice(array $clientData, array $customerData, array $itemsData, array $notes, string $logoPath = 'vendor/invoices/sample-logo.png', $filename)
     {
         // Create the client (seller)
         $client = new Party([
@@ -61,12 +61,12 @@ class InvoiceService
             ->date(now()->subWeeks(3))
             ->dateFormat('m/d/Y')
             ->payUntilDays(14)
-            ->currencySymbol('$')
-            ->currencyCode('USD')
-            ->currencyFormat('{SYMBOL}{VALUE}')
+            ->currencySymbol('XOF')
+            ->currencyCode('FCFA')
+            ->currencyFormat('{VALUE}{SYMBOL}')
             ->currencyThousandsSeparator('.')
             ->currencyDecimalPoint(',')
-            ->filename($client->name . ' ' . $customer->name)
+            ->filename($fileName)
             ->addItems($items)
             ->notes($notes)
             ->logo(public_path($logoPath))

@@ -9,7 +9,7 @@
             <div class="row align-items-center">
                 <div class="col-4">
                     <h4 class="page-title">
-                        Vous gérez <span class="count-title">{{ $countBusiness }}</span> business
+                       Total   <span class="count-title">{{ $countBusiness }}</span> business
                     </h4>
                 </div>
                 <div class="col-8 text-end">
