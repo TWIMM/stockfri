@@ -226,6 +226,7 @@
                             // Mettre à jour le titre du modal
                             document.getElementById('modalVenteLabel').textContent =
                                 'Détails de la Commande';
+                                document.getElementById('commandeIdId').value = serviceId;
 
                             // Remplir le formulaire avec les données
                             document.querySelector(

@@ -192,6 +192,7 @@
                     xhr.onload = function() {
                         if (xhr.status === 200) {
                             const data = JSON.parse(xhr.responseText);
+                            document.getElementById('commandeIdId').value = serviceId;
 
                             // Mettre le modal en mode édition
                             const modal = document.getElementById('mmodalListeDeProduits');
