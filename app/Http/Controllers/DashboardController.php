@@ -396,6 +396,13 @@ class DashboardController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function updateTabFournisseurSessionStat(Request $request){
+        $tab = $request->query('tab', 'service');
+        session(['active_tab_fournisseur_stat' => $tab]);
+        
+        return response()->json(['success' => true]);
+    }
+
 
     public function profilePage(){
         if(Auth::user()->type === 'client'){

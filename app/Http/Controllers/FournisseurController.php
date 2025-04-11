@@ -6,11 +6,15 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\TeamMember;
+use App\Models\Business;
+use App\Models\Commandes;
+
 use App\Models\Fournisseur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;
 use App\Models\MouvementDeStocks;
+use App\Models\Clients;
 
 class FournisseurController extends Controller
 {
@@ -161,6 +165,70 @@ class FournisseurController extends Controller
         
         return view('users.statistiques.fournisseur', compact('fournisseurs' , 'commandeTotalPerFournisseur' , 'hasPhysique', 
             'hasPrestation', "businesses", 'user'));
+    }
+
+
+    public function getStat($fournisseur){
+
+
+        if(auth()->user()->type === 'client'){
+            if (!Auth::user()->pricing_id) {
+                return redirect()->route('pricing.page');
+            }
+            
+            if (!session()->has('active_tab_fournisseur_stat')) {
+                session(['active_tab_fournisseur_stat' => 'fournisseur']);
+            }
+
+            $user = Auth::user();
+
+            $businesses = $user->business()->paginate(10);
+
+            $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+
+            $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+
+            $categories = $user->categorieProduits;
+            $fournisseurs = $user->fournisseurs;
+
+            // Get the client by ID (for later use in views)
+            $getClientFromId = function($id) {
+                return Clients::find($id);
+            };
+
+            $countClients = count(Clients::where('user_id' ,$user->id)->get());
+            $countTeams = count(Team::where('user_id' ,$user->id)->get());
+            $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
+            $countBusiness = count(Business::where('user_id' ,$user->id)->get());
+            
+
+           
+            $mouvementDeStocksForCount = DB::table('mouvement_de_stocks')
+            ->where('type_de_mouvement' , 'achat_de_stock_chez_fournisseur')
+            ->where('fournisseur_id' , $fournisseur)
+            ->where('user_id' , auth()->id())
+            ->get();
+
+            //dd($mouvementDeStocksForCount);
+
+            $mouvementDeStocksForPagination = DB::table('mouvement_de_stocks')
+            ->where('type_de_mouvement' , 'achat_de_stock_chez_fournisseur')
+            ->where('fournisseur_id' , $fournisseur)
+            ->where('user_id' , auth()->id())
+            ->paginate(10);
+            $countMouvementDeStocksForCount = count($mouvementDeStocksForCount);
+            $fournisseur = Fournisseur::find($fournisseur);
+
+
+            session(['active_tab_fournisseur_stat' => 'fournisseur']);
+            return view('users.statistiques.fournisseur_detail', compact('businesses' , 'categories' ,   'getClientFromId', 'fournisseurs', 
+        'mouvementDeStocksForPagination' ,'fournisseur' ,  'hasPhysique',  
+              'countBusiness', 'hasPrestation' , 'countTeamMembers' , 
+             'countTeams', 'countClients', 'user'));
+        } else if(auth()->user()->type === 'team_member') {
+            return redirect()->route('dashboard_team_member');
+        }
+
     }
 
 

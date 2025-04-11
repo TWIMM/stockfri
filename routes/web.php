@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-tab-session', [DashboardController::class, 'updateTabSession'])->name('update-tab-session');
     Route::get('/send_invoices/{id}', [ServicesController::class, 'sendInvoiceToRecipient'])->name('services.send_invoices');
     Route::post('/update-tab-stat-session', [DashboardController::class, 'updateTabSessionStat'])->name('update-tab-stat-session');
+    Route::post('/update-tab-stat-fournisseur-session', [DashboardController::class, 'updateTabFournisseurSessionStat'])->name('update-tab-fournisseur-stat-session');
 
     //stock 
 
@@ -198,6 +199,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/statistiques_stock', [StockController::class, 'showStat'])->name('statistiques.stocks.show');
     Route::get('/statistiques_client/{client}', [ClientController::class, 'getStat'])->name('statistiques.clients.stats');
     Route::get('/statistiques_stock/{stock}', [StockController::class, 'getStat'])->name('statistiques.stocks.stats');
+    Route::get('/statistiques_fournisseur/{fournisseur}', [FournisseurController::class, 'getStat'])->name('statistiques.fournisseur.stats');
 
     Route::get('/statistiques_service', [ServicesController::class, 'showStat'])->name('statistiques.services.show');
     Route::get('/statistiques_fournisseur', [FournisseurController::class, 'showStat'])->name('statistiques.fournisseur.show');

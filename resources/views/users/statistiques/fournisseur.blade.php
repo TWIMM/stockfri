@@ -4,9 +4,6 @@
 
 @section('content')
 
-    @include('Modals.add_client')
-    @include('Modals.edit_client')
-    @include('Modals.order_clients')
 
     <div class="row">
         <div class="col-sm-12">
@@ -37,6 +34,8 @@
                                     <th>Nombre de produit achete</th>
                                     <th>Total (F CFA) </th>
                                     <th>Nombre de bonus</th>
+                                    <th>Voir liste</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,7 +47,12 @@
                                         <td>
                                            0 {{-- {{ $commandeTotalPerFournisseur($stock->id , 'bonus') }} --}}
                                         </td>
-                                        
+                                        <td><form action="{{ route('statistiques.fournisseur.stats', $fournisseur->id) }}"
+                                            method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('GET')
+                                            <button type="submit" class="btn btn-secondary"><i class="ti ti-eye"></i></i></button>
+                                        </form></td>
                                     </tr>
                                 @empty
                                     <tr>
