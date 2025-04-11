@@ -52,7 +52,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center">Aucun coéquipier trouvé.</td>
+                                        <td colspan="4" class="text-center">Aucun stock trouvé.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
