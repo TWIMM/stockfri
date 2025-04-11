@@ -38,12 +38,14 @@ class Clients extends Model
 
     public function purchases()
     {
-        return $this->hasMany(Commandes::class , 'client_id');
+        return $this->hasMany(Commandes::class, 'client_id')
+                    ->where('validation_status', 'approved');
     }
+
 
     public function paiements()
     {
-        return $this->hasMany(Paiement::class, 'client_id'); // Use 'client_id' here
+        return $this->hasMany(Pay::class, 'client_id'); // Use 'client_id' here
     }
 
     public function creditHistory()

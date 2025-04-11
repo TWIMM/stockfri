@@ -211,7 +211,7 @@
                                 <h6 class="submenu-hdr">Main Menu</h6>
                                 <ul>
 
-                                    {{-- @if ($isUserAdminQuestionMark) --}}
+                                    @if (isUserAdminQuestionMark())
                                         <li class="submenu">
                                             <a href="javascript:void(0);"
                                                 class="{{ request()->routeIs('owner.business.*') ? 'subdrop active' : '' }}"
@@ -242,7 +242,7 @@
 
                                             </ul>
                                         </li>
-                                    {{-- @endif --}}
+                                    @endif 
 
 
                                     @if ($hasPhysique || $hasPrestation)

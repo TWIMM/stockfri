@@ -35,6 +35,11 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="prix_fournisseur" class="form-label">Prix fournisseur</label>
+                        <input type="number" class="form-control" id="prix_fournisseur" name="prix_fournisseur" required>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="factures_achat" class="form-label">Facture d'achat</label>
                         <input type="file" class="form-control" id="factures_achat" name="factures_achat[]" multiple required>
                     </div>

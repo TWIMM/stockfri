@@ -42,6 +42,8 @@ class PayController extends Controller
 
         $payment = new Pay();
         $payment->user_id = auth()->user()->id;
+        $payment->client_id = $command->client_id;
+
         $payment->amount = $request->amount;
         $payment->payment_method = $request->payment_mode;
         $payment->transaction_id = $this->generateTransactionId(); 
@@ -51,7 +53,7 @@ class PayController extends Controller
         
         $client = Clients::where('id', $command->client_id)->first();
         $client->current_debt  = $client->current_debt - $request->amount;
-        
+        $client->limit_credit_for_this_user	  = $client->limit_credit_for_this_user	 + $request->amount;
 
         if ($request->hasFile('factures_remboursement')) {
             $files = $request->file('factures_remboursement');

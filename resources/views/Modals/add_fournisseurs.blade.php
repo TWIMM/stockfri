@@ -15,19 +15,19 @@
                     </div>
                     <div class="form-group mb-3">
                         <label for="email">IFU</label>
-                        <input type="text" name="ifu" id="ifu" class="form-control" required>
+                        <input type="text" name="ifu" id="ifu" class="form-control" >
                     </div>
                     <div class="form-group mb-3">
                         <label for="email">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" required>
+                        <input type="email" name="email" id="email" class="form-control" >
                     </div>
                     <div class="form-group mb-3">
                         <label for="phone">Téléphone</label>
-                        <input type="text" name="phone" id="phone" class="form-control" required>
+                        <input type="text" name="phone" id="phone" class="form-control" >
                     </div>
                     <div class="form-group mb-3">
                         <label for="address">Adresse</label>
-                        <input type="text" name="address" id="address" class="form-control" required>
+                        <input type="text" name="address" id="address" class="form-control" >
                     </div>
                 </div>
                 <div class="modal-footer">

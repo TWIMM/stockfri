@@ -258,6 +258,24 @@
 
                                             </ul>
                                         </li>
+
+                                        <li class="submenu">
+                                            <a href="javascript:void(0);"
+                                                class="{{ request()->routeIs('statistiques.*') ? 'subdrop active' : '' }}"><i
+                                                    class="ti ti-brand-airtable"></i><span>Rapports et stats</span><span
+                                                    class="menu-arrow"></span></a>
+                                            <ul>
+                                                <li><a href="{{ route('statistiques.client.show') }}"
+                                                        class="{{ request()->routeIs('statistiques.client.show') ||  request()->routeIs('statistiques.clients.stats') ? 'active' : '' }}">Statistiques clients</a></li>
+                                                <li><a href="{{ route('statistiques.stocks.show') }}"
+                                                        class="{{ request()->routeIs('statistiques.stocks.show') ? 'active' : '' }}">Statistiques stocks </a></li>
+                                                <li><a href="{{ route('statistiques.fournisseur.show') }}"
+                                                            class="{{ request()->routeIs('statistiques.fournisseur.show') ? 'active' : '' }}">Statistiques fournisseurs</a></li>
+                                                <li><a href="{{ route('statistiques.services.show') }}"
+                                                                class="{{ request()->routeIs('statistiques.services.show') ? 'active' : '' }}">Statistiques services</a></li>
+                                                        
+                                            </ul>
+                                        </li>
                                     @endif
 
 

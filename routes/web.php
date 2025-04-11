@@ -99,6 +99,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/services_commandes', [ServicesController::class, 'activeCommandes'])->name('commandes_s.services');
     Route::post('/update-tab-session', [DashboardController::class, 'updateTabSession'])->name('update-tab-session');
     Route::get('/send_invoices/{id}', [ServicesController::class, 'sendInvoiceToRecipient'])->name('services.send_invoices');
+    Route::post('/update-tab-stat-session', [DashboardController::class, 'updateTabSessionStat'])->name('update-tab-stat-session');
 
     //stock 
 
@@ -175,7 +176,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices/{id}', [InvoiceController::class, 'retrieveUrl'])->name('invoices.retrieveUrl'); // Show individual supplier
     Route::get('/clients/{client}/debts', [OrderController::class, 'getClientDebts'])->name('clients.debts');
     Route::get('/profile_page', [DashboardController::class, 'profilePage'])->name('profile.page');
-
+    Route::post('/get-cities', [DashboardController::class, 'getCities'])->name('get.cities');
     Route::prefix('pays')->group(function () {
         Route::post('/', [PayController::class, 'pay'])->name('finances.handle_dette');
         Route::get('{commandId}', [PayController::class, 'show']);
@@ -186,6 +187,21 @@ Route::middleware(['auth'])->group(function () {
     
     // Create a new debt from a command
     Route::post('/client-debts/create',  [OrderController::class, 'createDebtFromCommande'])->name('clients.debts.create');
+
+    //Routes statistiques 
+
+    Route::get('/statistiques_client', [ClientController::class, 'showStat'])->name('statistiques.client.show');
+    Route::get('/statistiques_client/{client}', [ClientController::class, 'getStat'])->name('statistiques.clients.stats');
+
+
+
+    Route::get('/statistiques_stock', [StockController::class, 'showStat'])->name('statistiques.stocks.show');
+    Route::get('/statistiques_client/{client}', [ClientController::class, 'getStat'])->name('statistiques.clients.stats');
+    Route::get('/statistiques_stock/{stock}', [StockController::class, 'getStat'])->name('statistiques.stocks.stats');
+
+    Route::get('/statistiques_service', [ServicesController::class, 'showStat'])->name('statistiques.services.show');
+    Route::get('/statistiques_fournisseur', [FournisseurController::class, 'showStat'])->name('statistiques.fournisseur.show');
+
 });
 
 Route::middleware(['auth']) -> group(function(){ 

@@ -10,9 +10,160 @@ use App\Models\Fournisseur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;
+use App\Models\MouvementDeStocks;
 
 class FournisseurController extends Controller
 {
+    public function showStat (Request $request){
+        if(auth()->user()->type === 'team_member'){
+            //return redirect()->route('dashboard_team_member');
+            $teamMember = Auth::user();
+            $realTeamMember = TeamMember::firstWhere('email', $teamMember->email);
+
+            
+            $team = $realTeamMember->team()->first();  // ✅ Correct way to access the relationship
+            /*  if (!$team) {
+                abort(404, "Vous n'etes membre d'aucune equipe");
+            } */
+
+            
+            //$intBus = Business::find(optional($team->pivot)->business_id);
+            
+            $teamBusinessOwner = User::findOrFail($realTeamMember->user_id);  // ✅ Correct way
+
+            
+            $clientOwner = User::findOrFail($realTeamMember->user_id);
+
+            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
+            $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
+            view()->share('realTeamMember', $realTeamMember);
+
+
+            $role = Role::find($realTeamMember->role_id);
+            $formattedRole = $role ? Str::title(str_replace('_', ' ', $role->name)) : 'Unknown';
+
+            $role = Role::find($realTeamMember->role_id);
+            view()->share('role', $formattedRole);
+            view()->share('roleObj', $role);
+            
+            
+            // Start the query to fetch clients
+            $query = Clients::where('user_id', $teamBusinessOwner->id);
+        
+            // Apply the 'search' filter if provided
+            if ($search = request('search')) {
+                $query->where('name', 'like', "%" . $search . "%");
+            }
+        
+            // Apply the 'email' filter if provided
+            if ($email = request('email')) {
+                $query->where('email', 'like', "%" . $email . "%");
+            }
+        
+            // Apply the 'tel' (telephone) filter if provided
+            if ($tel = request('tel')) {
+                $query->where('tel', 'like', "%" . $tel . "%");
+            }
+
+           /*  $approvedSelledProduct = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
+            })
+            ->where('user_id' , auth()->id())
+            ->where('client_id' , $client)
+
+            ->where('validation_status' , 'approved')
+            ->get(); 
+            $countApprovedSelledProduct = count($approvedSelledProduct);
+            $commandeApproved = Commandes::whereHas('commandeItems', function ($query) {
+                $query->whereNull('stock_id'); // Filters CommandItems where service_id is null
+            })
+            ->where('user_id' , auth()->id())
+            ->where('client_id' , $client)
+            ->where('validation_status' , 'approved')
+            ->get();
+            $countApprovedSelledServices = count($commandeApproved);
+
+            $commandCount = $countApprovedSelledProduct + $countApprovedSelledServices; */
+        
+            // Get the filtered clients and paginate the results
+            $clients = $query->paginate(10);
+            $user = User::where('email' , $realTeamMember->email)->first();
+            return view('dashboard_team_member.clients.index', compact('clients' , 'commandCount', 'user', 'hasPhysique', 
+            'hasPrestation', "businesses", 'realTeamMember'));
+        }
+    
+        $user = auth()->user();
+        $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
+        $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
+        $businesses = $user->business; 
+    
+        // Build query to filter suppliers
+        $query = Fournisseur::where('user_id', $user->id);
+
+        // Filter by 'search' if provided
+        if ($search = request('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Filter by 'email' if provided
+        if ($email = request('email')) {
+            $query->where('email', 'like', "%{$email}%");
+        }
+
+        // Filter by 'phone' if provided
+        if ($phone = request('phone')) {
+            $query->where('phone', 'like', "%{$phone}%");
+        }
+
+        // Filter by 'address' if provided
+        if ($address = request('address')) {
+            $query->where('address', 'like', "%{$address}%");
+        }
+
+        // Get the filtered results with pagination
+        $fournisseurs = $query->paginate(10);
+    
+        
+        $commandeTotalPerFournisseur = function($fournisseurId , $what_to_return) 
+        {
+            $countCommandeTotalPerFournisseur = 0;
+            $countCommandeTotalMoneyPerFournisseur = 0;
+            //$countCommandeTotalBuyerBonus = 0;
+
+            $achatChezFournisseur = MouvementDeStocks::whereNotNull('fournisseur_id')
+            ->where('fournisseur_id', $fournisseurId)
+            ->where('user_id', auth()->id())
+            ->where('type_de_mouvement', 'achat_de_stock_chez_fournisseur')
+            ->get();
+
+            //$countCommandeTotalPerFournisseur = count($achatChezFournisseur);
+
+            foreach ($achatChezFournisseur as $value) {
+                $countCommandeTotalMoneyPerFournisseur +=  $value->prix_fournisseur * $value->quantity;
+                $countCommandeTotalPerFournisseur +=  $value->quantity;
+
+            }
+
+
+            if($what_to_return === 'quantity'){
+                return number_format($countCommandeTotalPerFournisseur);
+
+            } else if($what_to_return === 'price'){
+                return number_format($countCommandeTotalMoneyPerFournisseur);
+
+            } else {
+                //return number_format($countCommandeTotalBuyerBonus);
+
+            }
+
+        };
+        
+        return view('users.statistiques.fournisseur', compact('fournisseurs' , 'commandeTotalPerFournisseur' , 'hasPhysique', 
+            'hasPrestation', "businesses", 'user'));
+    }
+
+
     public function index()
     {
         if(auth()->user()->type === 'team_member'){
@@ -153,10 +304,7 @@ class FournisseurController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:fournisseurs,email',
-            'phone' => 'required|string',
-            'address' => 'required|string',
-            'ifu' => 'required|string',
+            
 
         ]);
 
@@ -166,9 +314,9 @@ class FournisseurController extends Controller
         if($isAuthTeamMemberQuestionMark->type === 'client'){
             Fournisseur::create([
                 'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
+                'email' => $request->email ?? '',
+                'phone' => $request->phone ?? '',
+                'address' => $request->address ?? '',
                 'ifu' => $request->ifu ? $request->ifu : null,
                 'user_id' => Auth::id(), 
             ]);
@@ -179,9 +327,9 @@ class FournisseurController extends Controller
             //dd( $test->user_id);
             Fournisseur::create([
                 'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
+                'email' => $request->email ?? '',
+                'phone' => $request->phone ?? '',
+                'address' => $request->address ?? '',
                 'ifu' => $request->ifu ? $request->ifu : null,
                 'user_id' => $test->user_id, 
             ]);
@@ -209,9 +357,7 @@ class FournisseurController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:fournisseurs,email,' . $id,
-            'phone' => 'required|string',
-            'address' => 'required|string',
+           
         ]);
 
         $fournisseur = Fournisseur::find($id);

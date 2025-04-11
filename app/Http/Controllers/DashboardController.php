@@ -17,6 +17,7 @@ use App\Models\Magasins;
 use App\Models\Stock;
 use App\Models\Livraisons;
 use App\Models\Services;
+use Nnjeim\World\World;
 
 class DashboardController extends Controller
 {
@@ -187,7 +188,35 @@ class DashboardController extends Controller
         
     }
 
-
+    public function getCities(Request $request)
+    {
+        $countryId = $request->country_id;
+        
+        if (!$countryId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Country ID is required'
+            ]);
+        }
+        
+        $citiesResponse = World::cities([
+            'filters' => [
+                'country_id' => $countryId
+            ]
+        ]);
+        
+        if ($citiesResponse->success) {
+            return response()->json([
+                'success' => true,
+                'data' => $citiesResponse->data
+            ]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to fetch cities'
+        ]);
+    }
 
     public function dashboard_admin()
     {
@@ -359,6 +388,14 @@ class DashboardController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function updateTabSessionStat(Request $request)
+    {
+        $tab = $request->query('tab', 'service');
+        session(['active_tab_stat' => $tab]);
+        
+        return response()->json(['success' => true]);
+    }
+
 
     public function profilePage(){
         if(Auth::user()->type === 'client'){
@@ -505,7 +542,13 @@ class DashboardController extends Controller
             $countLivraions = count(Livraisons::where('user_id', $user->id)->get());
 
 
-            return view('users.profile_page', compact('businesses' , 'categories' , 'livraisons', 'countLivraions',  'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
+            $countriesResponse = World::countries();
+            if($countriesResponse->success){
+                $countries = $countriesResponse->data;
+            }
+
+
+            return view('users.profile_page', compact('businesses' , 'countries' , 'categories' , 'livraisons', 'countLivraions',  'getClientFromId', 'fournisseurs', 'commandeNotApproved' , 'magasins' , 'stocks', 'clients', 'hasPhysique', 'countApprovedSelledServices',  'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' ,  'countTeams', 'countClients', 'user'));
         
         } else if(Auth::user()->type === 'team_member'){
             

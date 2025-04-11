@@ -22,7 +22,7 @@ class AdminUserSeeder extends Seeder
             'tel' => '+90909090',
             //'sex' => 'male', // Adjust as needed
             'type' => 'admin_sys',
-            'email_verified_at' => 1,
+            //'email_verified_at' => ,
             'address' => 'Admin Address',  
             'country' => 'Country',  
             'city' => 'City',  

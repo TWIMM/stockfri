@@ -39,7 +39,7 @@ class MagasinsController extends Controller
             
             $clientOwner = User::findOrFail($realTeamMember->user_id);
 
-            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $businesses = $teamBusinessOwner->business()->where('type', 'business_physique')->get(); 
             $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
             $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
             view()->share('realTeamMember', $realTeamMember);
@@ -83,7 +83,7 @@ class MagasinsController extends Controller
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
-        $businesses = $user->business; 
+        $businesses = $user->business()->where('type', 'business_physique')->get(); 
         $categories = $user->categorieProduits; 
         $fournisseurs = $user->fournisseurs; 
         $stocks = Stock::where('user_id' ,$user->id)->get();
@@ -270,7 +270,7 @@ class MagasinsController extends Controller
               'description' => 'nullable|max:1000',
               'tel' => 'required|string',
               'address' => 'required|string',
-              'email' => 'required|string|unique:magasins,email',
+              'email' => 'required',
               'business_id' => 'required|exists:business,id',
           ]);
 

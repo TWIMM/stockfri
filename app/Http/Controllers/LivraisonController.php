@@ -52,6 +52,14 @@ class LivraisonController extends Controller
             view()->share('role', $formattedRole);
             view()->share('roleObj', $role);
 
+            $livraisons = DB::table('livraisons')
+            ->join('commandes' , 'livraisons.commande_id' , '=' , 'commandes.id')
+            ->join('users' , 'commandes.user_id' , '=', 'users.id')
+            ->where('users.id' , $teamBusinessOwner->id)
+            ->select('livraisons.*')
+            ->paginate(10);
+            
+
             // Start the query to fetch clients
             $query = Livraisons::where('user_id', $teamBusinessOwner->id);
         
@@ -73,7 +81,7 @@ class LivraisonController extends Controller
             }
         
             // Get the filtered clients and paginate the results
-            $livraisons = $query->paginate(10);
+            //$livraisons = $query->paginate(10);
             $stocks = Stock::where('user_id' ,$teamBusinessOwner->id)->get();
 
             $user = User::where('email' , $realTeamMember->email)->first();
@@ -108,7 +116,14 @@ class LivraisonController extends Controller
         }
     
         // Get the filtered clients and paginate the results
-        $livraisons = $query->paginate(10);
+        //$livraisons = $query->paginate(10);
+
+        $livraisons = DB::table('livraisons')
+            ->join('commandes' , 'livraisons.commande_id' , '=' , 'commandes.id')
+            ->join('users' , 'commandes.user_id' , '=', 'users.id')
+            ->where('users.id' , $user->id)
+            ->select('livraisons.*')
+            ->paginate(10);
         $stocks = Stock::where('user_id' ,$user->id)->get();
 
         return view('users.livraisons.index', compact('livraisons', 'hasPhysique', 
