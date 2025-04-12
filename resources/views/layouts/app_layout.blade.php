@@ -371,6 +371,23 @@
                                         </li>
                                     @endif
 
+                                    <li class="submenu">
+                                        <a href="javascript:void(0);"
+                                            class="{{ request()->routeIs('profile.*') ? 'subdrop active' : '' }}"
+                                            class="subdrop active">
+                                            <i class="ti ti-layout-2"></i><span>Profile et docs</span><span
+                                                class="menu-arrow"></span>
+                                        </a>
+                                        <ul>
+                                            <li><a href="{{ route('profile.page') }}"
+                                                    class="{{ request()->routeIs('profile.page') ? 'active' : '' }}">Gerer parametres</a></li>
+                                        </ul>
+                                         <ul>
+                                            <li><a href="{{ '#'}}"
+                                                    class="{{  '' }}">Documentation</a></li>
+                                        </ul>
+                                    </li>
+
                                     {{-- 
                                     <li class="submenu">
                                         <a href="javascript:void(0);"><i

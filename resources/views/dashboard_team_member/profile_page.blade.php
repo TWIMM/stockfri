@@ -67,6 +67,14 @@
                                     </label>
                                     <p>JPG, GIF ou PNG. Taille maximale de 800K</p>
                                 </div>
+
+                                <div class="profile-upload-content">
+                                    <label class="profile-upload-btn">
+                                        <i class="ti ti-file-broken"></i> Ajouter le logo des factures
+                                        <input type="file" id="imag" name="invoice_logo" class="input-img" />
+                                    </label>
+                                    <p>JPG, GIF ou PNG. Taille maximale de 800K</p>
+                                </div>
                             </div>
                         </div>
 

@@ -22,7 +22,7 @@
         </div>
 
         <div class="card" id="all-content">
-            @include('appbranch_without_layout.stat_commandes_par_client')
+            @include('appbranch_without_layout.stat_commandes_par_client_services')
         </div>
 
        

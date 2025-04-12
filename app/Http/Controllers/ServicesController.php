@@ -160,7 +160,7 @@ class ServicesController extends Controller
             $countCommandeTotalMoneyPerCommande = 0;
             $countCommandeTotalBuyerCommande = 0;
 
-            $stockApprovedCommandes = Commandes::whereHas('commandeItems', function ($query) use ($stockId) {
+            $stockApprovedCommandes = Commandes::whereHas('commandeItems', function ($query) use ($serviceId) {
                 $query->whereNull('stock_id')
                       ->where('service_id', $serviceId); 
             })
@@ -170,7 +170,7 @@ class ServicesController extends Controller
             
             foreach ($stockApprovedCommandes as $commande) {
                 foreach ($commande->commandeItems as $item) {
-                    if ($item->service_id == $stockId && $item->stock_id === null) {
+                    if ($item->service_id == $serviceId && $item->stock_id === null) {
                         $countCommandeTotalPerCommande += $item->quantity; // Assuming price and quantity fields
                         $countCommandeTotalMoneyPerCommande +=  $item->total_price;
                     }
@@ -198,8 +198,7 @@ class ServicesController extends Controller
     }
 
 
-    public function getStat($client){
-
+    public function getStat($service){
 
         if(auth()->user()->type === 'client'){
             if (!Auth::user()->pricing_id) {
@@ -221,173 +220,62 @@ class ServicesController extends Controller
             $categories = $user->categorieProduits;
             $fournisseurs = $user->fournisseurs;
 
-            // Get the client by ID (for later use in views)
-            $getClientFromId = function($id) {
-                return Clients::find($id);
-            };
-
             $countClients = count(Clients::where('user_id' ,$user->id)->get());
             $countTeams = count(Team::where('user_id' ,$user->id)->get());
             $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
             $countBusiness = count(Business::where('user_id' ,$user->id)->get());
-            $approvedSelledProduct = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
+          
 
-            ->where('validation_status' , 'approved')
-            ->get(); 
-            $countApprovedSelledProduct = count($approvedSelledProduct);
-            $commandeApproved = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where service_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
-            ->where('validation_status' , 'approved')
-            ->get(); 
-
-            $serviceApprovedPaginated = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where service_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
-            ->where('validation_status' , 'approved')
-            ->paginate(10);
-
-            $stockApprovedPaginated = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where service_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
-            ->where('validation_status' , 'approved')
-            ->paginate(10);
-
-            $clientIdid =  $client;
-            $countApprovedSelledServices = count($commandeApproved);
-
-            $query  = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
-            })
-            ->where('user_id', $user->id)
-            ->where('validation_status', 'approved');
-    
-            // Apply filters based on form input
-            if ($clientId = request('client')) {
-                $query->where('client_id', $clientId);  // Filter by client ID
-            }
-    
-            if ($status = request('status')) {
-                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
-                    $query->where('delivery_status', $status);  // Filter by delivery status
-                }
-            }
-    
-            if ($minPrice = request('min_price')) {
-                $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
-            }
-    
-            if ($maxPrice = request('max_price')) {
-                $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
-            }
-    
-            if ($dateStart = request('date_start')) {
-                $query->where('created_at', '>=', $dateStart);  // Filter by start date
-            }
-    
-            if ($dateEnd = request('date_end')) {
-                $query->where('created_at', '<=', $dateEnd);  // Filter by end date
-            }
-    
-            // Execute the query and paginate the results //SERVICES
-            $commandeNotApproved = $query->paginate(10);
-
-
-            $querypROD  = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
-            })
-            ->where('user_id', $user->id)
-            ->where('validation_status', 'approved');
-    
-            // Apply filters based on form input
-            if ($clientId = request('client')) {
-                $querypROD->where('client_id', $clientId);  // Filter by client ID
-            }
-    
-            if ($status = request('status')) {
-                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
-                    $querypROD->where('delivery_status', $status);  // Filter by delivery status
-                }
-            }
-    
-            if ($minPrice = request('min_price')) {
-                $querypROD->where('total_price', '>=', $minPrice);  // Filter by minimum price
-            }
-    
-            if ($maxPrice = request('max_price')) {
-                $querypROD->where('total_price', '<=', $maxPrice);  // Filter by maximum price
-            }
-    
-            if ($dateStart = request('date_start')) {
-                $querypROD->where('created_at', '>=', $dateStart);  // Filter by start date
-            }
-    
-            if ($dateEnd = request('date_end')) {
-                $querypROD->where('created_at', '<=', $dateEnd);  // Filter by end date
-            }
-    
-            // Execute the query and paginate the results //SERVICES
-            $approvedSelledProduct = $querypROD->paginate(10);
-           
-
-             // Get additional data
-            $clients = Clients::where('user_id', $user->id)->get();
-            //$stocks = Stock::where('user_id', $user->id)->paginate(10);
-            // Start the query to fetch clients
-            $query = Livraisons::where('user_id', $user->id);
-        
-            // Apply the 'search' filter if provided
-            if ($search = request('search')) {
-                $query->where('name', 'like', "%" . $search . "%");
-            }
-        
-            // Apply the 'email' filter if provided
-            if ($email = request('email')) {
-                $query->where('email', 'like', "%" . $email . "%");
-            }
-            $clients = Clients::where('user_id' ,$user->id)->get();
-
-        
-            // Apply the 'tel' (telephone) filter if provided
-            if ($tel = request('tel')) {
-                $query->where('tel', 'like', "%" . $tel . "%");
-            }
-        
-            // Get the filtered clients and paginate the results
-            $livraisons = $query->paginate(10);
-            $stocks = Stock::where('user_id' ,$user->id)->get();
+            $services = Services::where('user_id' ,$user->id)->get();
             //$countLivraions = count($livraisonsForCount);
-            $livraisonsForCount = DB::table('livraisons')
-            ->join('commandes' , 'livraisons.commande_id' , '=' , 'commandes.id')
-            ->join('clients' , 'commandes.client_id' , '=', 'clients.id')
-            ->where('clients.id' , $client)
-            ->select('livraisons.*')
-            ->get();
-            $countLivraions = count($livraisonsForCount);
+          
+            $clients = Clients::where('user_id' , auth()->id())->paginate(10);
 
 
+            $commandeTotalPerStock = function($clientId , $service , $what_to_return) 
+            {
+                $commandeDatte = null;
+                $countCommandeTotalMoneyPerCommande = 0;
+                $countCommandeTotalBoughtByClient = 0;
 
-            $livraisons = DB::table('livraisons')
-            ->join('commandes' , 'livraisons.commande_id' , '=' , 'commandes.id')
-            ->join('clients' , 'commandes.client_id' , '=', 'clients.id')
-            ->where('clients.id' , $client)
-            ->select('livraisons.*')
-            ->paginate(10);
-            session(['active_tab_stock_stat' => 'commandes']);
-            $client = Clients::find($client);
-            return view('users.statistiques.stock_detail', compact('businesses' , 'stockApprovedPaginated',  'serviceApprovedPaginated' , 'categories' , 'livraisons', 'countLivraions',  'getClientFromId', 'fournisseurs', 
-            'commandeNotApproved' ,  'stocks','client', 'clients' , 'clientIdid', 'hasPhysique', 'countApprovedSelledServices',  
-            'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' , 
+                $stockApprovedCommandes = Commandes::whereHas('commandeItems', function ($query) use ($service) {
+                    $query->whereNull('stock_id')
+                        ->where('service_id', $service); 
+                })
+                ->where('user_id', auth()->id())
+                ->where('validation_status', 'approved')
+                ->get();
+                
+                foreach ($stockApprovedCommandes as $commande) {
+
+                    foreach ($commande->commandeItems as $item) {
+                        if ($commande->client_id == $clientId && $item->stock_id === null) {
+                            $countCommandeTotalBoughtByClient += $item->quantity;
+
+                            $countCommandeTotalMoneyPerCommande += $commande->total_price;
+                        }
+
+                    }
+                    
+                }
+
+
+                if($what_to_return === 'bought'){
+                    return number_format($countCommandeTotalBoughtByClient);
+
+                } else if($what_to_return === 'date'){
+                    return $commandeDatte;
+
+                } else {
+                    return number_format($countCommandeTotalMoneyPerCommande);
+
+                }
+
+            };
+
+            return view('users.statistiques.services_detail', compact('businesses' , 'service' , 'commandeTotalPerStock' , 'clients' ,  'categories', 'fournisseurs', 
+           'services', 'hasPhysique',   
+            'countBusiness', 'hasPrestation' , 'countTeamMembers' , 
              'countTeams', 'countClients', 'user'));
         } else if(auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
@@ -516,7 +404,7 @@ class ServicesController extends Controller
             
             $clientOwner = User::findOrFail($realTeamMember->user_id);
 
-            $businesses = $teamBusinessOwner->business()->paginate(10);
+            $businesses = $teamBusinessOwner->business()->where('type' , 'prestation_de_service')->paginate(10);
             $hasPhysique = $teamBusinessOwner->business()->where('type', 'business_physique')->exists();
             $hasPrestation = $teamBusinessOwner->business()->where('type', 'prestation_de_service')->exists();
             view()->share('realTeamMember', $realTeamMember);
@@ -541,7 +429,7 @@ class ServicesController extends Controller
         $user = Auth::user();
         $hasPhysique = $user->business()->where('type', 'business_physique')->exists();
         $hasPrestation = $user->business()->where('type', 'prestation_de_service')->exists();
-        $businesses = $user->business; 
+        $businesses = $user->business()->where('type' , 'prestation_de_service')->get(); 
         $clients = Clients::where('user_id' ,$user->id)->get();
         // Get all services related to the user's businesses
         $servicesAll = Services::whereIn('business_id', $user->business->pluck('id'))->get();

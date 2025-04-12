@@ -68,12 +68,8 @@ class Clients extends Model
 
         // 1. Calcul de la ponctualité des paiements
         $allPayments = $this->paiements()->where('created_at', '>=', Carbon::now()->subMonths(6))->get();
-        $latePayments = $this->paiements()->where('is_late', true)
-                               ->where('created_at', '>=', Carbon::now()->subMonths(6))->count();
-        
+      
         $totalPayments = $allPayments->count();
-        $punctualityScore = $totalPayments > 0 ? 
-            100 * (($totalPayments - $latePayments) / $totalPayments) : 50;
 
         // 2. Calcul du pourcentage de remboursement
         $totalDebt = $this->purchases()->where('validation_status' , 'approved')->where('rest_to_pay' , '>', 0.00)->sum('total_price');
@@ -90,8 +86,7 @@ class Clients extends Model
         $transactionScore = min(100, $purchaseCount * 10); // 10 points par achat jusqu'à 100
 
         // Calcul du score final
-        $finalScore = ($punctualityScore * $punctualityWeight) +
-                      ($repaymentScore * $repaymentWeight) +
+        $finalScore = ($repaymentScore * $repaymentWeight) +
                       ($historyScore * $historyWeight) +
                       ($transactionScore * $transactionWeight);
 
@@ -101,7 +96,7 @@ class Clients extends Model
         // Sauvegarder l'historique du score
         $this->creditHistory()->create([
             'score' => $finalScore,
-            'punctuality_score' => $punctualityScore,
+            'punctuality_score' => 50,
             'repayment_score' => $repaymentScore,
             'history_score' => $historyScore,
             'transaction_score' => $transactionScore,

@@ -37,6 +37,9 @@
                                     <th>Nombre vendu</th>
                                     <th>Total vendu (F CFA) </th>
                                     <th>Nombre d'acheteur  </th>
+                                    <th>
+                                        Voir plus
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,7 +51,14 @@
                                         <td>
                                             {{ $commandeTotalPerStock($stock->id , 'nombre_acheteur') }}
                                         </td>
-                                        
+                                        <td>
+                                            <form action="{{ route('statistiques.stocks.stats', $stock->id) }}"
+                                                method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('GET')
+                                                <button type="submit" class="btn btn-secondary"><i class="ti ti-eye"></i></i></button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>

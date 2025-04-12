@@ -144,6 +144,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('fournisseurs/{fournisseur}', [FournisseurController::class, 'destroy'])->name('fournisseurs.destroy'); // Delete supplier
     // Route to store a new category
     Route::post('/categories', [CategorieProduitController::class, 'store'])->name('categories.store');
+    Route::post('/bonus_fournisseur', [StockController::class, 'bonus_fournisseur'])->name('stock.bonus_fournisseur');
+    Route::post('/retrait_magasin', [StockController::class, 'retrait_magasin'])->name('stock.retrait_magasin');
+    Route::get('/get-stocks/{magasin}', [StockController::class, 'getStocksOfMagasin']);
 
     // Route to show a single category
     Route::get('/categories/{category}', [CategorieProduitController::class, 'show'])->name('categories.show');
@@ -193,14 +196,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/statistiques_client', [ClientController::class, 'showStat'])->name('statistiques.client.show');
     Route::get('/statistiques_client/{client}', [ClientController::class, 'getStat'])->name('statistiques.clients.stats');
-
-
-
     Route::get('/statistiques_stock', [StockController::class, 'showStat'])->name('statistiques.stocks.show');
     Route::get('/statistiques_client/{client}', [ClientController::class, 'getStat'])->name('statistiques.clients.stats');
     Route::get('/statistiques_stock/{stock}', [StockController::class, 'getStat'])->name('statistiques.stocks.stats');
     Route::get('/statistiques_fournisseur/{fournisseur}', [FournisseurController::class, 'getStat'])->name('statistiques.fournisseur.stats');
-
+    Route::get('/statistiques_service/{service}', [ServicesController::class, 'getStat'])->name('statistiques.services.stats');
     Route::get('/statistiques_service', [ServicesController::class, 'showStat'])->name('statistiques.services.show');
     Route::get('/statistiques_fournisseur', [FournisseurController::class, 'showStat'])->name('statistiques.fournisseur.show');
 

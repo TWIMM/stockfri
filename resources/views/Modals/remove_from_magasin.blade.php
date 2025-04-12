@@ -1,7 +1,7 @@
 <!-- Modal pour ajouter un stock -->
 <div class="modal fade" id="remove_from_magasin" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="addStockForm" method="POST" action="{{ route('stock.store') }}">
+        <form id="addStockForm" method="POST" action="{{ route('stock.retrait_magasin') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
@@ -12,9 +12,11 @@
                     <!-- Sélecteur d'entreprise -->
                     <div class="mb-3">
                         <label for="business_id" class="form-label">Magasin</label>
-                        <select name="business_id" id="business_id" class="form-control" required>
-                            @foreach ($businesses as $business)
-                                <option value="{{ $business->id }}">{{ $business->name }}</option>
+                        <select name="magasin_id" id="magasin_id" class="form-control" required>
+                           
+                           <option value=""></option>
+                            @foreach ($magasins as $magasin)
+                                <option value="{{ $magasin->id }}">{{ $magasin->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -22,10 +24,7 @@
 
                     <div class="mb-3">
                         <label for="business_id" class="form-label">Produit</label>
-                        <select name="business_id" id="business_id" class="form-control" required>
-                            @foreach ($businesses as $business)
-                                <option value="{{ $business->id }}">{{ $business->name }}</option>
-                            @endforeach
+                        <select name="stock_id" id="stockIdiD" class="form-control" required>
                         </select>
                     </div>
 
@@ -48,3 +47,35 @@
         </form>
     </div>
 </div>
+<script>
+    document.getElementById('magasin_id').addEventListener('change', function () {
+        let magasinId = this.value;
+        let stockSelect = document.getElementById('stockIdiD');
+
+        // Vider la liste actuelle
+        stockSelect.innerHTML = '<option value="">Chargement...</option>';
+
+        // Faire appel à la route Laravel
+        fetch(`/get-stocks/${magasinId}`)
+            .then(response => response.json())
+            .then(data => {
+                stockSelect.innerHTML = ''; // Vider les anciennes options
+                console.log(data);
+                if (data.length > 0) {
+                    data.forEach(stock => {
+                        console.log(stock);
+                        let option = document.createElement('option');
+                        option.value = stock.id;
+                        option.text = stock.name;
+                        stockSelect.appendChild(option);
+                    });
+                } else {
+                    stockSelect.innerHTML = '<option value="">Aucun stock trouvé</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des stocks:', error);
+                stockSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            });
+    });
+</script>

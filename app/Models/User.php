@@ -27,6 +27,8 @@ class User extends Authenticatable
         'tel',
         'sex',
         'type',
+        'invoice_logo',
+        'profile_image',
         'otp_hashed',
         'email_verified_at',
         'address',  
@@ -63,6 +65,11 @@ class User extends Authenticatable
     public function business()
     {
         return $this->hasMany(Business::class);
+    }
+
+    public function magasins()
+    {
+        return $this->hasMany(Magasins::class);
     }
 
     public function team()

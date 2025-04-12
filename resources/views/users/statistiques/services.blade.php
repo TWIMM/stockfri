@@ -37,18 +37,28 @@
                                     <th>Nombre vendu</th>
                                     <th>Total vendu (F CFA) </th>
                                     <th>Nombre d'acheteur  </th>
+                                    <th>
+                                        Voir plus
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($services as $service)
                                     <tr>
-                                        <td>{{ $service->name  }}</td>
+                                        <td>{{ $service->title  }}</td>
                                         <td>{{ $commandeTotalPerStock($service->id , 'quantity') }}</td>
                                         <td>{{ $commandeTotalPerStock($service->id , 'price') }}</td>
                                         <td>
                                             {{ $commandeTotalPerStock($service->id , 'nombre_acheteur') }}
                                         </td>
-                                        
+                                        <td>
+                                            <form action="{{ route('statistiques.services.stats', $service->id) }}"
+                                                method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('GET')
+                                                <button type="submit" class="btn btn-secondary"><i class="ti ti-eye"></i></i></button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>

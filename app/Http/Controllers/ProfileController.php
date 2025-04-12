@@ -41,6 +41,20 @@ class ProfileController extends Controller
             $user->save();
         }
 
+        if ($request->hasFile('invoice_logo')) {
+            // Delete old image if exists
+            if ($user->invoice_logo && Storage::exists('public/invoice_logo/' . $user->invoice_logo)) {
+                Storage::delete('public/invoice_logo/' . $user->invoice_logo);
+            }
+
+            // Store the new image
+            $imagePath = $request->file('invoice_logo')->store('invoice_logo', 'public');
+
+            // Update user profile image in database
+            $user->invoice_logo = basename($imagePath); // Save only the file name in the database
+            $user->save();
+        }
+
         return redirect()->route('profile.page')->with('success', 'Profile updated successfully!');
     }
 

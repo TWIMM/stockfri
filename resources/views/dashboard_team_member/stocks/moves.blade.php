@@ -8,8 +8,6 @@
     @include('Modals.addup_quantity')
     @include('Modals.edit_stocks')
     @include('Modals.make_ineventory')
-    @include('Modals.remove_from_magasin')
-    @include('Modals.bonus_from_fournisseur')
 
     <div class="row">
         <div class="col-sm-12">

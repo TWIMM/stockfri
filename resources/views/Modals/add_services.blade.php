@@ -21,7 +21,7 @@
                         <textarea class="form-control" id="description_add" name="description" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="price_add" class="form-label">Prix (€)</label>
+                        <label for="price_add" class="form-label">Prix (F CFA)</label>
                         <input type="number" class="form-control" id="price_add" name="price" required>
                     </div>
 

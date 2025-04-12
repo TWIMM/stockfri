@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Clients;
 use App\Models\Commandes;
 use App\Models\Livraisons;
+use App\Models\Magasins;
 
 class StockController extends Controller
 {
@@ -149,7 +150,7 @@ class StockController extends Controller
                 foreach ($commande->commandeItems as $item) {
                     if ($item->stock_id == $stockId && $item->service_id === null) {
                         $countCommandeTotalPerCommande += $item->quantity; // Assuming price and quantity fields
-                        $countCommandeTotalMoneyPerCommande +=  $item->total_price;
+                        $countCommandeTotalMoneyPerCommande +=  $commande->total_price;
                     }
                 }
                 $countCommandeTotalBuyerCommande += 1;
@@ -175,7 +176,7 @@ class StockController extends Controller
     }
 
 
-    public function getStat($client){
+    public function getStat($stock){
 
 
         if(auth()->user()->type === 'client'){
@@ -198,178 +199,79 @@ class StockController extends Controller
             $categories = $user->categorieProduits;
             $fournisseurs = $user->fournisseurs;
 
-            // Get the client by ID (for later use in views)
-            $getClientFromId = function($id) {
-                return Clients::find($id);
-            };
-
             $countClients = count(Clients::where('user_id' ,$user->id)->get());
             $countTeams = count(Team::where('user_id' ,$user->id)->get());
             $countTeamMembers = count(TeamMember::where('user_id' ,$user->id)->get());
             $countBusiness = count(Business::where('user_id' ,$user->id)->get());
-            $approvedSelledProduct = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
+          
 
-            ->where('validation_status' , 'approved')
-            ->get(); 
-            $countApprovedSelledProduct = count($approvedSelledProduct);
-            $commandeApproved = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where service_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
-            ->where('validation_status' , 'approved')
-            ->get(); 
-
-            $serviceApprovedPaginated = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where service_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
-            ->where('validation_status' , 'approved')
-            ->paginate(10);
-
-            $stockApprovedPaginated = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where service_id is null
-            })
-            ->where('user_id' , auth()->id())
-            ->where('client_id' , $client)
-            ->where('validation_status' , 'approved')
-            ->paginate(10);
-
-            $clientIdid =  $client;
-            $countApprovedSelledServices = count($commandeApproved);
-
-            $query  = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('stock_id'); // Filters CommandItems where stock_id is null
-            })
-            ->where('user_id', $user->id)
-            ->where('validation_status', 'approved');
-    
-            // Apply filters based on form input
-            if ($clientId = request('client')) {
-                $query->where('client_id', $clientId);  // Filter by client ID
-            }
-    
-            if ($status = request('status')) {
-                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
-                    $query->where('delivery_status', $status);  // Filter by delivery status
-                }
-            }
-    
-            if ($minPrice = request('min_price')) {
-                $query->where('total_price', '>=', $minPrice);  // Filter by minimum price
-            }
-    
-            if ($maxPrice = request('max_price')) {
-                $query->where('total_price', '<=', $maxPrice);  // Filter by maximum price
-            }
-    
-            if ($dateStart = request('date_start')) {
-                $query->where('created_at', '>=', $dateStart);  // Filter by start date
-            }
-    
-            if ($dateEnd = request('date_end')) {
-                $query->where('created_at', '<=', $dateEnd);  // Filter by end date
-            }
-    
-            // Execute the query and paginate the results //SERVICES
-            $commandeNotApproved = $query->paginate(10);
-
-
-            $querypROD  = Commandes::whereHas('commandeItems', function ($query) {
-                $query->whereNull('service_id'); // Filters CommandItems where stock_id is null
-            })
-            ->where('user_id', $user->id)
-            ->where('validation_status', 'approved');
-    
-            // Apply filters based on form input
-            if ($clientId = request('client')) {
-                $querypROD->where('client_id', $clientId);  // Filter by client ID
-            }
-    
-            if ($status = request('status')) {
-                if ($status !== 'none') {  // If the status is provided (not 'none'), apply it
-                    $querypROD->where('delivery_status', $status);  // Filter by delivery status
-                }
-            }
-    
-            if ($minPrice = request('min_price')) {
-                $querypROD->where('total_price', '>=', $minPrice);  // Filter by minimum price
-            }
-    
-            if ($maxPrice = request('max_price')) {
-                $querypROD->where('total_price', '<=', $maxPrice);  // Filter by maximum price
-            }
-    
-            if ($dateStart = request('date_start')) {
-                $querypROD->where('created_at', '>=', $dateStart);  // Filter by start date
-            }
-    
-            if ($dateEnd = request('date_end')) {
-                $querypROD->where('created_at', '<=', $dateEnd);  // Filter by end date
-            }
-    
-            // Execute the query and paginate the results //SERVICES
-            $approvedSelledProduct = $querypROD->paginate(10);
-           
-
-             // Get additional data
-            $clients = Clients::where('user_id', $user->id)->get();
-            //$stocks = Stock::where('user_id', $user->id)->paginate(10);
-            // Start the query to fetch clients
-            $query = Livraisons::where('user_id', $user->id);
-        
-            // Apply the 'search' filter if provided
-            if ($search = request('search')) {
-                $query->where('name', 'like', "%" . $search . "%");
-            }
-        
-            // Apply the 'email' filter if provided
-            if ($email = request('email')) {
-                $query->where('email', 'like', "%" . $email . "%");
-            }
-            $clients = Clients::where('user_id' ,$user->id)->get();
-
-        
-            // Apply the 'tel' (telephone) filter if provided
-            if ($tel = request('tel')) {
-                $query->where('tel', 'like', "%" . $tel . "%");
-            }
-        
-            // Get the filtered clients and paginate the results
-            $livraisons = $query->paginate(10);
             $stocks = Stock::where('user_id' ,$user->id)->get();
             //$countLivraions = count($livraisonsForCount);
-            $livraisonsForCount = DB::table('livraisons')
-            ->join('commandes' , 'livraisons.commande_id' , '=' , 'commandes.id')
-            ->join('clients' , 'commandes.client_id' , '=', 'clients.id')
-            ->where('clients.id' , $client)
-            ->select('livraisons.*')
-            ->get();
-            $countLivraions = count($livraisonsForCount);
+          
+            $clients = Clients::where('user_id' , auth()->id())->paginate(10);
 
 
+            $commandeTotalPerStock = function($clientId , $stock , $what_to_return) 
+            {
+                $commandeDatte = null;
+                $countCommandeTotalMoneyPerCommande = 0;
+                $countCommandeTotalBoughtByClient = 0;
 
-            $livraisons = DB::table('livraisons')
-            ->join('commandes' , 'livraisons.commande_id' , '=' , 'commandes.id')
-            ->join('clients' , 'commandes.client_id' , '=', 'clients.id')
-            ->where('clients.id' , $client)
-            ->select('livraisons.*')
-            ->paginate(10);
-            session(['active_tab_stock_stat' => 'commandes']);
-            $client = Clients::find($client);
-            return view('users.statistiques.stock_detail', compact('businesses' , 'stockApprovedPaginated',  'serviceApprovedPaginated' , 'categories' , 'livraisons', 'countLivraions',  'getClientFromId', 'fournisseurs', 
-            'commandeNotApproved' ,  'stocks','client', 'clients' , 'clientIdid', 'hasPhysique', 'countApprovedSelledServices',  
-            'countApprovedSelledProduct' , 'approvedSelledProduct' ,'countBusiness', 'hasPrestation' , 'countTeamMembers' , 
+                $stockApprovedCommandes = Commandes::whereHas('commandeItems', function ($query) use ($stock) {
+                    $query->whereNull('service_id')
+                        ->where('stock_id', $stock); 
+                })
+                ->where('user_id', auth()->id())
+                ->where('validation_status', 'approved')
+                ->get();
+                
+                foreach ($stockApprovedCommandes as $commande) {
+
+                    foreach ($commande->commandeItems as $item) {
+                        if ($commande->client_id == $clientId && $item->service_id === null) {
+                            $countCommandeTotalBoughtByClient += $item->quantity;
+
+                            $countCommandeTotalMoneyPerCommande += $commande->total_price;
+                        }
+
+                    }
+                    
+                }
+
+
+                if($what_to_return === 'bought'){
+                    return number_format($countCommandeTotalBoughtByClient);
+
+                } else if($what_to_return === 'date'){
+                    return $commandeDatte;
+
+                } else {
+                    return number_format($countCommandeTotalMoneyPerCommande);
+
+                }
+
+            };
+
+            return view('users.statistiques.stock_detail', compact('businesses' , 'stock' , 'commandeTotalPerStock' , 'clients' ,  'categories', 'fournisseurs', 
+           'stocks', 'hasPhysique',   
+            'countBusiness', 'hasPrestation' , 'countTeamMembers' , 
              'countTeams', 'countClients', 'user'));
         } else if(auth()->user()->type === 'team_member') {
             return redirect()->route('dashboard_team_member');
         }
 
+    }
+
+
+    public function getStocksOfMagasin($magasin)
+    {
+
+        $magasin = Magasins::find($magasin);
+
+        $pivotData = $magasin->stocks;
+
+
+        return response()->json($pivotData);
     }
 
 
@@ -444,6 +346,7 @@ class StockController extends Controller
         $businesses = $user->business()->where('type', 'business_physique')->get(); 
         $categories = $user->categorieProduits; 
         $fournisseurs = $user->fournisseurs; 
+        $magasins = $user->magasins; 
 
         // Build the query for the stocks, starting with the basic query for the logged-in user
         $stocksQuery = Stock::where('user_id', $user->id);
@@ -468,7 +371,7 @@ class StockController extends Controller
 
         // Return the view with the filtered stocks and other necessary data
         return view('users.stocks.index', compact(
-            'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'user', 'categories', 'fournisseurs'
+            'stocks', 'hasPhysique' , 'magasins', 'hasPrestation', 'businesses', 'user', 'categories', 'fournisseurs'
         ));
     }
 
@@ -586,6 +489,133 @@ class StockController extends Controller
             'stocks', 'hasPhysique', 'hasPrestation', 'businesses', 'user', 
             'categories', 'fournisseurs', 'moves'
         ));
+    }
+
+    public function retrait_magasin(Request $request){
+        $request->validate([
+            'stock_id' => 'required|exists:stocks,id',
+            'quantity' => 'required|integer|min:1',
+            'magasin_id' => 'required|exists:magasins,id',
+        ]);
+    
+        // Find the magasin
+        $magasin = Magasins::find($request->magasin_id);
+        // Find the stock
+        $stock = Stock::find($request->stock_id);
+
+        
+        // Check if the stock is already attached to the magasin
+        $pivotData = $magasin->stocks()->where('stock_id', $stock->id)->first();
+        
+        if ($pivotData) {
+            if($pivotData->pivot->quantity<$request->quantity){
+                return redirect()->back()->with('error', 'Quantité souhaité inférieur a la quantité disponible!');
+            }
+            // If the product already exists, increase the quantity
+            $currentQuantity = $pivotData->pivot->quantity;
+            $newQuantity = $currentQuantity - $request->quantity;
+    
+            // Update the pivot table with the new quantity
+            $magasin->stocks()->updateExistingPivot($stock->id, [
+                'quantity' => $newQuantity
+            ]);
+    
+        } 
+        
+
+        $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+            if($isAuthTeamMemberQuestionMark->type === 'client'){
+                MouvementDeStocks::create([
+                    'stock_id' => $stock->id,
+                    'magasin_id' => $request->magasin_id, //fournisseur id is magasin id in this case
+                    'quantity' => $request->quantity,
+                    'prix_fournisseur' => 0.00,
+                    'user_id' => Auth::id(),
+                    'type_de_mouvement' => env('RETRAIT_MAGASIN'),
+                    'files_paths' => null
+                ]);
+            }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+                
+                $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+                //dd(Auth::id());
+                //dd( $test->user_id);
+                MouvementDeStocks::create([
+                    'stock_id' => $stock->id,
+                    'magasin_id' => $request->magasin_id, //fournisseur id is magasin id in this case
+                    'quantity' => $request->quantity,
+                    'prix_fournisseur' => 0.00,
+                    'user_id' => $test->user_id,
+                    'type_de_mouvement' => env('RETRAIT_MAGASIN'),
+                    'files_paths' => null
+                ]);
+            }
+
+        $stock->quantity += $request->quantity;
+        $stock->save();
+
+        return redirect()->back()->with('success', 'Quantité mise à jour avec succès!');
+
+    }
+
+    public function bonus_fournisseur(Request $request){
+        $request->validate([
+            'fournisseur_id' => 'required|exists:fournisseurs,id',
+            'stock_id' => 'required|exists:stocks,id', 
+            'quantity' => 'required|numeric|min:1',
+            'factures_achat' => 'required|array', 
+            'factures_achat.*' => 'mimes:pdf,jpeg,jpg,png|max:2048',
+        ]);
+    
+        // Retrieve the product/stock by stock_id
+        $stock = Stock::findOrFail($request->stock_id); // Corrected 'business_id' to 'stock_id'
+    
+        // Update the stock quantity
+        $stock->quantity += $request->quantity;
+        $stock->save();
+    
+        // Handle file uploads
+        $filePaths = [];
+        if ($request->hasFile('factures_achat')) {
+            foreach ($request->file('factures_achat') as $file) {
+                // Store each file in the 'factures_add_up_quantity' directory inside 'public' disk
+                $filePath = $file->store('factures_add_up_quantity', 'public');
+                $filePaths[] = $filePath; // Save the file path in the array for later use
+            }
+        }
+    
+       
+
+        $isAuthTeamMemberQuestionMark = User::find(Auth::id());
+
+        if($isAuthTeamMemberQuestionMark->type === 'client'){
+            
+            MouvementDeStocks::create([
+                'stock_id' => $stock->id,
+                'fournisseur_id' => $request->fournisseur_id,
+                'prix_fournisseur' => 0.00,
+                'quantity' => $request->quantity,
+                'user_id' => Auth::id(),
+                'type_de_mouvement' => env('BONUS_FOURNISSEUR'),
+                'files_paths' => json_encode($filePaths)
+            ]);
+        }else if ($isAuthTeamMemberQuestionMark->type === 'team_member') {
+
+            $test = TeamMember::where('email' ,  $isAuthTeamMemberQuestionMark->email)->first();
+            MouvementDeStocks::create([
+                'stock_id' => $stock->id,
+                'fournisseur_id' => $request->fournisseur_id,
+                'quantity' => $request->quantity,
+                'user_id' => $test->user_id, 
+                'type_de_mouvement' => env('BONUS_FOURNISSEUR'),
+                'files_paths' => json_encode($filePaths)
+            ]);
+           
+
+        }
+    
+        return back()->with('success', 'Quantité mise à jour avec succès et factures téléchargées!');
+    
     }
 
 
